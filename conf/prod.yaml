@@ -1,0 +1,10 @@
+database:
+  database: root
+  host: localhost
+  port: 3306
+  user: root
+  pass: root
+
+cache:
+  host: localhost
+  port: 6379
