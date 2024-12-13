@@ -27,5 +27,6 @@ import (
 func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 	r.GET("/announce", handler.Announce)
+	r.GET("/scrape", handler.Scrape)
 	// your code ...
 }

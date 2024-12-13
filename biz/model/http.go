@@ -33,3 +33,17 @@ type ErrorResponse struct {
 	FailureReason string `json:"failureReason" bencode:"failure reason"`
 	Retry         string `json:"retry" bencode:"retry in"`
 }
+
+type ScrapeRequest struct {
+	InfoHashes []string `query:"info_hash"`
+}
+
+type ScrapeResponse struct {
+	Files map[string]*ScrapeFile `json:"files" bencode:"files"`
+}
+
+type ScrapeFile struct {
+	Complete   int `json:"complete" bencode:"complete"`
+	Incomplete int `json:"incomplete" bencode:"incomplete"`
+	Downloaded int `json:"downloaded" bencode:"downloaded"`
+}

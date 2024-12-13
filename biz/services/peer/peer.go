@@ -16,6 +16,7 @@ type Peer struct {
 	IPv6       net.IP
 	ClientIP   net.IP
 	Port       int
+	Left       int
 	Event      PeerEvent
 	Uploaded   int       `json:"uploaded"`
 	Downloaded int       `json:"downloaded"`

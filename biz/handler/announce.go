@@ -45,3 +45,20 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		bencode.ResponseOk(c, resp)
 	}
 }
+
+func Scrape(ctx context.Context, c *app.RequestContext) {
+	req := &model.ScrapeRequest{}
+	if c.BindAndValidate(req) != nil {
+		bencode.ResponseErr(c, errors.New("bad request"))
+		return
+	}
+	if len(req.InfoHashes) == 0 {
+		bencode.ResponseErr(c, errors.New("info hash can't be empty"))
+		return
+	}
+	ret := make(map[string]*model.ScrapeFile)
+	for _, infoHash := range req.InfoHashes {
+		ret[infoHash] = peer.Scrape(infoHash)
+	}
+	bencode.ResponseOk(c, model.ScrapeResponse{Files: ret})
+}
