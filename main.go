@@ -19,9 +19,12 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"github.com/PBH-BTN/trunker/biz/config"
+	"github.com/PBH-BTN/trunker/biz/services/interval"
+	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
@@ -30,10 +33,16 @@ func main() {
 	config.Init()
 	//database.Init()
 	//cache.Init()
+	peer.LoadPeer()
 	h := server.Default()
 	if os.Getenv("RUN_ENV") == "prod" {
 		hlog.SetLevel(hlog.LevelInfo)
 	}
 	register(h)
+	h.Engine.OnShutdown = append(h.Engine.OnShutdown, func(_ context.Context) {
+		// here save current data
+		peer.SavePeer()
+	})
+	interval.StartIntervalTask()
 	h.Spin()
 }

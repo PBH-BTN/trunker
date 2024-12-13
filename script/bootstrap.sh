@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export RUN_ENV="prod"
-RUN_NAME="pbh.btn.server"
+RUN_NAME="pbh.btn.trunker"
 
 #inject some environment variables
 

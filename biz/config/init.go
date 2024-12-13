@@ -24,7 +24,8 @@ type RedisConfig struct {
 }
 
 type TrackerConfig struct {
-	TTL int64 `yaml:"ttl"`
+	TTL          int64 `yaml:"ttl"`
+	IntervalTask int64 `yaml:"intervalTask"`
 }
 
 type Config struct {

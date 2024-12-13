@@ -7,7 +7,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/config"
 )
 
-func CleanUp(root *infoHashRoot) {
+func CleanUp(root *InfoHashRoot) {
 	a := arena.NewArena()
 	toClean := arena.MakeSlice[string](a, 0, root.peerMap.Len()/2)
 	root.peerMap.Range(func(key string, value *Peer) bool {

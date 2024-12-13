@@ -11,3 +11,5 @@ cache:
 
 tracker:
   ttl: 600
+  intervalTask: 600 # 10分钟执行一次定时任务
+  

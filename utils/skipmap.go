@@ -12,9 +12,9 @@ type rangeAble[keyT ordered, valueT any] interface {
 	Len() int
 }
 
-func SkipMapToSlice[keyT ordered, valueT any](m rangeAble[keyT, valueT]) []valueT {
-	res := make([]valueT, 0, m.Len())
-	m.Range(func(_ keyT, value valueT) bool {
+func SkipMapToSlice[K ordered, V any](m rangeAble[K, V]) []V {
+	res := make([]V, 0, m.Len())
+	m.Range(func(_ K, value V) bool {
 		res = append(res, value)
 		return true
 	})

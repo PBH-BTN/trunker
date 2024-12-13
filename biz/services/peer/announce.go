@@ -9,15 +9,19 @@ import (
 	"github.com/zhangyunhao116/skipmap"
 )
 
-type infoHashRoot struct {
+type InfoHashRoot struct {
 	peerMap   *skipmap.OrderedMap[string, *Peer]
 	lastClean time.Time
 }
 
-var infoHashMap *skipmap.OrderedMap[string, *infoHashRoot]
+var infoHashMap *skipmap.OrderedMap[string, *InfoHashRoot]
 
 func init() {
-	infoHashMap = skipmap.New[string, *infoHashRoot]()
+	infoHashMap = skipmap.New[string, *InfoHashRoot]()
+}
+
+func GetAllMap() *skipmap.OrderedMap[string, *InfoHashRoot] {
+	return infoHashMap
 }
 
 func HandleAnnouncePeer(req *model.AnnounceRequest) []*Peer {
@@ -35,7 +39,7 @@ func HandleAnnouncePeer(req *model.AnnounceRequest) []*Peer {
 	}
 	root, ok := infoHashMap.Load(req.InfoHash)
 	if !ok { // first seen torrent
-		root = &infoHashRoot{peerMap: skipmap.New[string, *Peer]()}
+		root = &InfoHashRoot{peerMap: skipmap.New[string, *Peer]()}
 		root.peerMap.Store(peer.GetKey(), peer)
 		infoHashMap.Store(req.InfoHash, root)
 		return nil
@@ -48,7 +52,7 @@ func HandleAnnouncePeer(req *model.AnnounceRequest) []*Peer {
 		knownPeer.Event = peer.Event
 		knownPeer.Left = peer.Left
 		defer func() {
-			logger.Info("do cleaning for info hash: %s", req.InfoHash)
+			logger.Infof("do cleaning for info hash: %s", req.InfoHash)
 			go CleanUp(root)
 		}()
 	} else {
