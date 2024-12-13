@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 
+	"errors"
+
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/utils"
@@ -14,7 +16,7 @@ import (
 func Announce(ctx context.Context, c *app.RequestContext) {
 	req := &model.AnnounceRequest{}
 	if c.BindAndValidate(req) != nil {
-		c.JSON(400, "Bad Request")
+		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
 	req.ClientIP = c.ClientIP()

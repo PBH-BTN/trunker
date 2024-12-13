@@ -16,6 +16,7 @@ type Peer struct {
 	IPv6       net.IP
 	ClientIP   net.IP
 	Port       int
+	Event      PeerEvent
 	Uploaded   int       `json:"uploaded"`
 	Downloaded int       `json:"downloaded"`
 	LastSeen   time.Time `json:"lastSeen"`
@@ -71,4 +72,26 @@ func (p *Peer) GetIP() net.IP {
 
 func (p *Peer) GetKey() string {
 	return p.GetIP().String() + strconv.FormatInt(int64(p.Port), 10)
+}
+
+type PeerEvent int8
+
+const (
+	PeerEvent_Unknown PeerEvent = iota
+	PeerEvent_Started
+	PeerEvent_Stopped
+	PeerEvent_Completed
+)
+
+func ParsePeerEvent(s string) PeerEvent {
+	switch s {
+	case "started":
+		return PeerEvent_Started
+	case "stopped":
+		return PeerEvent_Stopped
+	case "completed":
+		return PeerEvent_Completed
+	default:
+		return PeerEvent_Unknown
+	}
 }

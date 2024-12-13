@@ -8,3 +8,6 @@ database:
 cache:
   host: localhost
   port: 6379
+
+tracker:
+  ttl: 600

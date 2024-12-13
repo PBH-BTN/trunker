@@ -1,12 +1,11 @@
 package peer
 
 import (
+	"github.com/PBH-BTN/trunker/biz/model"
+	"github.com/bytedance/gopkg/util/logger"
+	"github.com/zhangyunhao116/skipmap"
 	"net"
 	"time"
-
-	"github.com/PBH-BTN/trunker/biz/model"
-	"github.com/PBH-BTN/trunker/utils"
-	"github.com/zhangyunhao116/skipmap"
 )
 
 var infoHashMap *skipmap.OrderedMap[string, *skipmap.OrderedMap[string, *Peer]]
@@ -25,6 +24,7 @@ func HandleAnnouncePeer(req *model.AnnounceRequest) []*Peer {
 		Uploaded:   req.Uploaded,
 		Downloaded: req.Downloaded,
 		LastSeen:   time.Now(),
+		Event:      ParsePeerEvent(req.Event),
 	}
 	peerMap, ok := infoHashMap.Load(req.InfoHash)
 	if !ok { // first seen torrent
@@ -38,9 +38,25 @@ func HandleAnnouncePeer(req *model.AnnounceRequest) []*Peer {
 		knownPeer.Uploaded = peer.Uploaded
 		knownPeer.Downloaded = peer.Downloaded
 		knownPeer.LastSeen = peer.LastSeen
+		knownPeer.Event = peer.Event
+		defer func() {
+			logger.Info("do cleaning for info hash: %s", req.InfoHash)
+			go CleanUp(peerMap)
+		}()
 	} else {
 		// new peer!
 		peerMap.Store(peer.GetKey(), peer)
 	}
-	return utils.SkipMapToSlice(peerMap)
+	resp := make([]*Peer, 0, peerMap.Len())
+	peerMap.Range(func(_ string, value *Peer) bool {
+		if value.Port == 0 { // not accept incoming connections
+			return true
+		}
+		if len(resp) >= req.NumWant {
+			return false
+		}
+		resp = append(resp, value)
+		return true
+	})
+	return resp
 }

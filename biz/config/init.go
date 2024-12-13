@@ -23,9 +23,14 @@ type RedisConfig struct {
 	Port int    `yaml:"port"`
 }
 
+type TrackerConfig struct {
+	TTL int64 `yaml:"ttl"`
+}
+
 type Config struct {
-	PersistDatabase MysqlConfig `yaml:"database"`
-	Cache           RedisConfig `yaml:"cache"`
+	PersistDatabase MysqlConfig   `yaml:"database"`
+	Cache           RedisConfig   `yaml:"cache"`
+	Tracker         TrackerConfig `yaml:"tracker"`
 }
 
 func Init() {

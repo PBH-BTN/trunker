@@ -4,10 +4,10 @@ package model
 type AnnounceRequest struct {
 	InfoHash   string `json:"info_hash" query:"info_hash,required" vd:"len($)==20"`
 	PeerID     string `json:"peer_id" query:"peer_id,required"  vd:"len($)==20"`
-	Port       int    `json:"port" query:"port,required" vd:"$>1 && $<65535"`
+	Port       int    `json:"port" query:"port,required" vd:"$>0 && $<65535"`
 	Uploaded   int    `json:"uploaded" query:"uploaded"`
 	Downloaded int    `json:"downloaded" query:"downloaded"`
-	Event      string `json:"event" query:"event"` // not used
+	Event      string `json:"event" query:"event"`
 	Left       int    `json:"left" query:"left"`
 	NumWant    int    `default:"50" json:"numwant" query:"numwant"`
 	Compact    int8   `default:"1" json:"compact" query:"compact"`
@@ -27,4 +27,9 @@ type AnnounceBasicResponse struct {
 	Interval   int     `json:"interval" bencode:"interval"`
 	Peers      []*Peer `json:"peers" bencode:"peers"`
 	ExternalIp string  `json:"externalIp" bencode:"external ip"`
+}
+
+type ErrorResponse struct {
+	FailureReason string `json:"failureReason" bencode:"failure reason"`
+	Retry         string `json:"retry" bencode:"retry in"`
 }
