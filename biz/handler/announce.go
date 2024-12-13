@@ -7,6 +7,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
+	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -17,6 +18,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	req.ClientIP = c.ClientIP()
+	req.UserAgent = conv.UnsafeBytesToString(c.UserAgent())
 	res := peer.HandleAnnouncePeer(req)
 	if req.Compact == 0 {
 		bencode.ResponseOk(c, model.AnnounceBasicResponse{
@@ -24,10 +26,12 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Peers: utils.Map(res, func(p *peer.Peer) *model.Peer {
 				return p.ToModel()
 			}),
+			ExternalIp: req.ClientIP,
 		})
 	} else {
 		resp := map[string]any{
-			"interval": 60,
+			"interval":    60,
+			"external ip": req.ClientIP,
 		}
 		peers, peers6 := peer.PeersToCompact(res)
 		if len(peers) > 0 {

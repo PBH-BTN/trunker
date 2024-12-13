@@ -12,6 +12,7 @@ type AnnounceRequest struct {
 	NumWant    int    `default:"50" json:"numwant" query:"numwant"`
 	Compact    int8   `default:"1" json:"compact" query:"compact"`
 	ClientIP   string
+	UserAgent  string
 	IP         string `query:"ip"`
 	IPv4       string `query:"ipv4"`
 	IPv6       string `query:"ipv6"`
@@ -23,6 +24,7 @@ type Peer struct {
 }
 
 type AnnounceBasicResponse struct {
-	Interval int     `json:"interval" bencode:"interval"`
-	Peers    []*Peer `json:"peers" bencode:"peers"`
+	Interval   int     `json:"interval" bencode:"interval"`
+	Peers      []*Peer `json:"peers" bencode:"peers"`
+	ExternalIp string  `json:"externalIp" bencode:"external ip"`
 }
