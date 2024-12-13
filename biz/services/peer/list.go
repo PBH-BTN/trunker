@@ -1,6 +1,7 @@
 package peer
 
 import (
+	"net"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/model"
@@ -14,13 +15,13 @@ func init() {
 	infoHashMap = skipmap.New[string, *skipmap.OrderedMap[string, *Peer]]()
 }
 
-func HandleAnnouncePeer(req *model.AnnounceRequest) []*model.Peer {
+func HandleAnnouncePeer(req *model.AnnounceRequest) []*Peer {
 	peer := &Peer{
-		Peer: model.Peer{
-			ID:   req.PeerID,
-			Port: req.Port,
-			IP:   req.IP,
-		},
+		ID:         req.PeerID,
+		IP:         net.ParseIP(req.IP),
+		IPv4:       net.ParseIP(req.IPv4),
+		IPv6:       net.ParseIP(req.IPv6),
+		ClientIP:   net.ParseIP(req.ClientIP),
 		Uploaded:   req.Uploaded,
 		Downloaded: req.Downloaded,
 		LastSeen:   time.Now(),
@@ -41,7 +42,5 @@ func HandleAnnouncePeer(req *model.AnnounceRequest) []*model.Peer {
 		// new peer!
 		peerMap.Store(peer.GetKey(), peer)
 	}
-	return utils.Map(utils.SkipMapToSlice(peerMap), func(p *Peer) *model.Peer {
-		return &p.Peer
-	})
+	return utils.SkipMapToSlice(peerMap)
 }

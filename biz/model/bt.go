@@ -10,8 +10,11 @@ type AnnounceRequest struct {
 	Event      string `json:"event" query:"event"` // not used
 	Left       int    `json:"left" query:"left"`
 	NumWant    int    `default:"50" json:"numwant" query:"numwant"`
-	Compact    bool   `json:"compact" query:"compact"`
-	IP         string
+	Compact    int8   `default:"1" json:"compact" query:"compact"`
+	ClientIP   string
+	IP         string `query:"ip"`
+	IPv4       string `query:"ipv4"`
+	IPv6       string `query:"ipv6"`
 }
 type Peer struct {
 	ID   string `json:"id" bencode:"id"`
