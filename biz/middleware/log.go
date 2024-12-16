@@ -12,7 +12,7 @@ func LogSlowQuery(ctx context.Context, c *app.RequestContext) {
 	now := time.Now()
 	c.Next(ctx)
 	cost := time.Since(now)
-	if cost > time.Second*5 {
+	if cost > time.Second*3 {
 		logger.CtxInfof(ctx, "slow query,req: %s ,resp:%s ,cost:%s", c.Request.RequestURI(), c.Response.Body(), cost.String())
 	}
 }
