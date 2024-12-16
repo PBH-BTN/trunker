@@ -24,8 +24,14 @@ type RedisConfig struct {
 }
 
 type TrackerConfig struct {
-	TTL          int64 `yaml:"ttl"`
-	IntervalTask int64 `yaml:"intervalTask"`
+	TTL                int64  `yaml:"ttl"`
+	IntervalTask       int64  `yaml:"intervalTask"`
+	UseDB              bool   `yaml:"useDB"`
+	EnablePersist      bool   `yaml:"enablePersist"`
+	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent"`
+	Shard              int    `yaml:"shard"`
+	UseUnixSocket      bool   `yaml:"useUnixSocket"`
+	HostPorts          string `yaml:"hostPorts"`
 }
 
 type Config struct {

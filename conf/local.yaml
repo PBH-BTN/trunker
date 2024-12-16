@@ -10,6 +10,11 @@ cache:
   port: 6379
 
 tracker:
-  ttl: 600
+  ttl: 3600
   intervalTask: 600 # 10分钟执行一次定时任务
-  
+  useDB: false
+  enablePersist: false
+  maxPeersPerTorrent: 1500
+  shard: 40
+  useUnixSocket: false
+  hostPorts: 127.0.0.1:8888

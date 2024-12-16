@@ -1,14 +1,19 @@
 package interval
 
-import "github.com/PBH-BTN/trunker/biz/services/peer"
+import (
+	"github.com/PBH-BTN/trunker/biz/services/peer"
+	"github.com/bytedance/gopkg/util/logger"
+)
 
 func cleanInactivePeer() {
-	peer.GetAllMap().Range(func(key string, value *peer.InfoHashRoot) bool {
-		peer.CleanUp(value)
-		return true
-	})
+	peer.GetPeerManager().Clean()
 }
 
 func saveDB() {
-	peer.SavePeer()
+	peer.GetPeerManager().StoreToPersist()
+}
+
+func printStatics() {
+	statics := peer.GetPeerManager().GetStatistic()
+	logger.Infof("[Statics] total peer: %d, total seed: %d", statics.TotalPeers, statics.TotalTorrents)
 }

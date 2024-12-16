@@ -1,9 +1,8 @@
-package peer
+package common
 
 import (
 	"encoding/binary"
 	"net"
-	"strconv"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/model"
@@ -17,10 +16,11 @@ type Peer struct {
 	ClientIP   net.IP
 	Port       int
 	Left       int
-	Event      PeerEvent
 	Uploaded   int       `json:"uploaded"`
 	Downloaded int       `json:"downloaded"`
 	LastSeen   time.Time `json:"lastSeen"`
+	UserAgent  string
+	Event      PeerEvent
 }
 
 func (p *Peer) ToModel() *model.Peer {
@@ -72,7 +72,7 @@ func (p *Peer) GetIP() net.IP {
 }
 
 func (p *Peer) GetKey() string {
-	return p.GetIP().String() + strconv.FormatInt(int64(p.Port), 10)
+	return p.ID
 }
 
 type PeerEvent int8

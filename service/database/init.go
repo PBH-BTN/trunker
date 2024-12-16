@@ -18,15 +18,14 @@ package database
 
 import (
 	"fmt"
+
 	"github.com/PBH-BTN/trunker/biz/config"
-	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 var Persist *gorm.DB
-var Clickhouse *gorm.DB
 
 func Init() {
 	var err error
@@ -35,20 +34,6 @@ func Init() {
 
 	Persist, err = gorm.Open(mysql.Open(fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&loc=Local&parseTime=True",
-		endpoint.User, endpoint.Pass, endpoint.Host, endpoint.Port, endpoint.Database,
-	)), &gorm.Config{
-		SkipDefaultTransaction: true,
-		PrepareStmt:            true,
-		Logger:                 logger.Default.LogMode(logger.Info),
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	endpoint = config.AppConfig.PersistDatabase
-
-	Clickhouse, err = gorm.Open(clickhouse.Open(fmt.Sprintf(
-		"clickhouse://%s:%s@tcp(%s:%d)/%s?dial_timeout=10s&read_timeout=20s",
 		endpoint.User, endpoint.Pass, endpoint.Host, endpoint.Port, endpoint.Database,
 	)), &gorm.Config{
 		SkipDefaultTransaction: true,

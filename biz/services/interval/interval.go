@@ -12,16 +12,19 @@ var (
 )
 
 func StartIntervalTask() {
-	logger.Infof("start interval task, interval %d seconds", config.AppConfig.Tracker.IntervalTask)
-	for {
-		<-time.After(time.Duration(config.AppConfig.Tracker.IntervalTask) * time.Second)
-		doIntervalTask()
-	}
+	go func() {
+		logger.Infof("start interval task, interval %d seconds", config.AppConfig.Tracker.IntervalTask)
+		for {
+			<-time.After(time.Duration(config.AppConfig.Tracker.IntervalTask) * time.Second)
+			doIntervalTask()
+		}
+	}()
 }
 
 var taskList = []func(){
 	cleanInactivePeer,
 	saveDB,
+	printStatics,
 }
 
 func doIntervalTask() {

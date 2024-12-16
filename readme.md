@@ -2,45 +2,34 @@
 
 ## Introduce
 
-A demo with `Hertz` and `Gorm`
-
-- Use `thrift` IDL to define `HTTP` interface
-- Use `hz` to generate code
-- Use `Hertz` binding and validate
-- Use `Gorm` and `MySQL`
-
-## IDL
-
-This project use `thrift` IDL to define `HTTP` interface. The specific interface define in [api.thrift](idl/api.thrift)
-
-## Code generation tool
-
-This project use `hz` to generate code. The use of `hz` refers
-to [hz](https://www.cloudwego.io/docs/hertz/tutorials/toolkit/toolkit/)
-
-The `hz` commands used can be found in [Makefile](Makefile)
-
-## Binding and Validate
-
-The use of binding and Validate refers
-to [Binding and Validate](https://www.cloudwego.io/docs/hertz/tutorials/basic-feature/binding-and-validate/)
-
-## Gorm
-
-This project use `Gorm` to operate `MySQL` and refers to [Gorm](https://gorm.io/)
+A BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego.
 
 ## How to run
-
-### Run mysql docker
-
-```bash
-docker-compose up
-```
-
-### Run
 
 ```bash
 ./build.sh
 cd output
 ./bootstrap.sh
 ```
+
+## Features
+- [x] BEP-0003
+- [x] BEP-0007
+- [x] BEP-0023
+- [x] BEP-0024
+- [x] BEP-0031
+- [x] BEP-0048
+- [X] LT-Extension(complete,incomplete)
+- [x] Full-Memory Mode
+- [ ] MySQL Mode
+
+## Benchmark
+CPU: 4 Cores ARM64 Oracle Cloud
+
+Average response time: 600ms when 30K torrents and 27K peers are online. 
+
+QPS: 700~
+
+Memory Cost: 348MB.
+
+![image](https://github.com/user-attachments/assets/00526a7c-1907-4949-a246-0ce6fab6302f)
