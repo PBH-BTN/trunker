@@ -68,13 +68,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		knownPeer.LastSeen = peer.LastSeen
 		knownPeer.Event = peer.Event
 		knownPeer.Left = peer.Left
-		defer func() {
-			// clean up
-			go m.cleanUp(root)
-		}()
 	} else {
 		// new peer!
-		if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback()) { // skip private ip
+		if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0) { // skip private ip
 			root.peerMap.Store(peer.GetKey(), peer)
 			if root.peerMap.Len() > config.AppConfig.Tracker.MaxPeersPerTorrent {
 				shouldEject = true // too much peers, need eject
@@ -86,6 +82,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	var oldestTime *time.Time
 	var oldestPeer *common.Peer
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
+		if len(resp) >= req.NumWant {
+			return false
+		}
 		if shouldEject {
 			if oldestTime == nil {
 				oldestTime = &value.LastSeen
@@ -96,12 +95,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 					oldestPeer = value
 				}
 			}
-		}
-		if value.Port == 0 { // not accept incoming connections
-			return true
-		}
-		if len(resp) >= req.NumWant {
-			return false
 		}
 		resp = append(resp, value)
 		return true
