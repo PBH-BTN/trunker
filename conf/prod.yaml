@@ -19,7 +19,8 @@ tracker:
   useUnixSocket: true
   hostPorts: ingress.sock
   useAnnounceIP: true
+  enableEventProducer: true
 
 rocketmq:
-  Topic: TrunkerEvent
-  Endpoint: localhost:8081
+  topic: TrunkerEvent
+  endpoint: localhost:8081
