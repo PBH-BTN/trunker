@@ -18,27 +18,34 @@ type MysqlConfig struct {
 	User     string `yaml:"user"`
 }
 
+type RocketMqConfig struct {
+	Topic    string `yaml:"topic"`
+	Endpoint string `yaml:"endpoint"`
+}
+
 type RedisConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
 }
 
 type TrackerConfig struct {
-	TTL                int64  `yaml:"ttl"`
-	IntervalTask       int64  `yaml:"intervalTask"`
-	UseDB              bool   `yaml:"useDB"`
-	EnablePersist      bool   `yaml:"enablePersist"`
-	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent"`
-	Shard              int    `yaml:"shard"`
-	UseUnixSocket      bool   `yaml:"useUnixSocket"`
-	HostPorts          string `yaml:"hostPorts"`
-	UseAnnounceIP      bool   `yaml:"useAnnounceIP"` // allow peer to announce it external ip
+	TTL                 int64  `yaml:"ttl"`
+	IntervalTask        int64  `yaml:"intervalTask"`
+	UseDB               bool   `yaml:"useDB"`
+	EnablePersist       bool   `yaml:"enablePersist"`
+	MaxPeersPerTorrent  int    `yaml:"maxPeersPerTorrent"`
+	Shard               int    `yaml:"shard"`
+	UseUnixSocket       bool   `yaml:"useUnixSocket"`
+	HostPorts           string `yaml:"hostPorts"`
+	UseAnnounceIP       bool   `yaml:"useAnnounceIP"` // allow peer to announce it external ip
+	EnableEventProducer bool   `yaml:"enableEventProducer"`
 }
 
 type Config struct {
-	PersistDatabase MysqlConfig   `yaml:"database"`
-	Cache           RedisConfig   `yaml:"cache"`
-	Tracker         TrackerConfig `yaml:"tracker"`
+	PersistDatabase MysqlConfig    `yaml:"database"`
+	Cache           RedisConfig    `yaml:"cache"`
+	Tracker         TrackerConfig  `yaml:"tracker"`
+	RocketMq        RocketMqConfig `yaml:"rocketmq"`
 }
 
 func Init() {

@@ -19,3 +19,7 @@ tracker:
   useUnixSocket: false
   hostPorts: 127.0.0.1:8888
   useAnnounceIP: true
+
+rocketmq:
+  Topic: TrunkerEvent
+  Endpoint: localhost:8081
