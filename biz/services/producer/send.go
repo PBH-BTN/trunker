@@ -50,15 +50,7 @@ func SendPeerEvent(ctx context.Context, infoHash string, peer *common.Peer) {
 		UserAgent:  peer.UserAgent,
 		Event:      peer.Event.String(),
 	})
-	err := producer.Producer.SendAsync(ctx, func(ctx context.Context, result *primitive.SendResult, err error) {
-		if err != nil {
-			hlog.CtxErrorf(ctx, "failed to send to mq:%s", err.Error())
-			return
-		}
-		if result.Status != primitive.SendOK {
-			hlog.CtxErrorf(ctx, "failed to send to mq,code:%d", result.Status)
-		}
-	}, &primitive.Message{
+	err := producer.Producer.SendOneWay(ctx, &primitive.Message{
 		Topic: config.AppConfig.RocketMq.Topic,
 		Body:  body,
 	})
