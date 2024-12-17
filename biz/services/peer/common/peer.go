@@ -5,6 +5,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 )
 
@@ -56,14 +57,16 @@ func PeersToCompact(peerList []*Peer) ([]byte, []byte) {
 }
 
 func (p *Peer) GetIP() net.IP {
-	if p.IP != nil {
-		return p.IP
-	}
-	if p.IPv4 != nil {
-		return p.IPv4
-	}
-	if p.IPv6 != nil {
-		return p.IPv6
+	if config.AppConfig.Tracker.UseAnnounceIP {
+		if p.IP != nil {
+			return p.IP
+		}
+		if p.IPv4 != nil {
+			return p.IPv4
+		}
+		if p.IPv6 != nil {
+			return p.IPv6
+		}
 	}
 	if p.ClientIP != nil {
 		return p.ClientIP

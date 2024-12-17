@@ -18,3 +18,4 @@ tracker:
   shard: 40
   useUnixSocket: false
   hostPorts: 127.0.0.1:8888
+  useAnnounceIP: true

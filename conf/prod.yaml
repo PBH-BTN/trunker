@@ -18,3 +18,4 @@ tracker:
   shard: 40
   useUnixSocket: true
   hostPorts: ingress.sock
+  useAnnounceIP: true

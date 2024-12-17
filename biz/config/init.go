@@ -32,6 +32,7 @@ type TrackerConfig struct {
 	Shard              int    `yaml:"shard"`
 	UseUnixSocket      bool   `yaml:"useUnixSocket"`
 	HostPorts          string `yaml:"hostPorts"`
+	UseAnnounceIP      bool   `yaml:"useAnnounceIP"` // allow peer to announce it external ip
 }
 
 type Config struct {
