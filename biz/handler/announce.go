@@ -13,6 +13,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/thinkeridea/go-extend/exstrings"
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
@@ -26,7 +27,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	req.ClientIP = c.ClientIP()
-	req.UserAgent = string(c.UserAgent())
+	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
 	res := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	scrape := peer.GetPeerManager().Scrape(req.InfoHash)
 	if req.Compact == 0 {
@@ -57,7 +58,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	}
 }
 
-func Scrape(ctx context.Context, c *app.RequestContext) {
+func Scrape(_ context.Context, c *app.RequestContext) {
 	req := &model.ScrapeRequest{}
 	if c.Bind(req) != nil {
 		bencode.ResponseErr(c, errors.New("bad request"))
@@ -75,7 +76,7 @@ func Scrape(ctx context.Context, c *app.RequestContext) {
 	bencode.ResponseOk(c, model.ScrapeResponse{Files: ret})
 }
 
-func Statistic(ctx context.Context, c *app.RequestContext) {
+func Statistic(_ context.Context, c *app.RequestContext) {
 	c.JSON(200, peer.GetPeerManager().GetStatistic())
 }
 
@@ -83,7 +84,7 @@ func validAnnounceReq(req *model.AnnounceRequest) bool {
 	if req == nil {
 		return false
 	}
-	if len(req.PeerID)*len(req.InfoHash) == 0 {
+	if len(req.InfoHash) != 20 || len(req.PeerID) != 20 {
 		return false
 	}
 	return req.Port >= 0 && req.Port < 65535
