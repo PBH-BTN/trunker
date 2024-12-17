@@ -99,3 +99,16 @@ func ParsePeerEvent(s string) PeerEvent {
 		return PeerEvent_Unknown
 	}
 }
+
+func (e PeerEvent) String() string {
+	switch e {
+	case PeerEvent_Started:
+		return "started"
+	case PeerEvent_Stopped:
+		return "stopped"
+	case PeerEvent_Completed:
+		return "completed"
+	default:
+		return "unknown"
+	}
+}

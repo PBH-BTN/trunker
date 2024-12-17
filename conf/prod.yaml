@@ -23,4 +23,4 @@ tracker:
 
 rocketmq:
   topic: TrunkerEvent
-  endpoint: localhost:8081
+  endpoint: 127.0.0.1:8081

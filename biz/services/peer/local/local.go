@@ -10,6 +10,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
+	"github.com/PBH-BTN/trunker/biz/services/producer"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/zhangyunhao116/skipmap"
@@ -58,16 +59,21 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		root.peerMap.Store(peer.GetKey(), peer)
 		m.infoHashMap.Store(req.InfoHash, root)
 		m.peerCount.Add(1)
+		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil
 	}
 	shouldEject := false
 	if knownPeer, ok := root.peerMap.Load(peer.GetKey()); ok {
 		// update current record
+		if (knownPeer.Left != 0 && peer.Left == 0) || knownPeer.Event != peer.Event {
+			go producer.SendPeerEvent(ctx, req.InfoHash, peer)
+		}
 		knownPeer.Uploaded = peer.Uploaded
 		knownPeer.Downloaded = peer.Downloaded
 		knownPeer.LastSeen = peer.LastSeen
 		knownPeer.Event = peer.Event
 		knownPeer.Left = peer.Left
+		knownPeer.Event = peer.Event
 	} else {
 		// new peer!
 		if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0) { // skip private ip
@@ -76,6 +82,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 				shouldEject = true // too much peers, need eject
 			}
 			m.peerCount.Add(1)
+			go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		}
 	}
 	resp := make([]*common.Peer, 0, min(root.peerMap.Len(), req.NumWant))
