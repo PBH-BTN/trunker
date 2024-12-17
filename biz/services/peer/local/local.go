@@ -79,9 +79,15 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		}
 	}
 	resp := make([]*common.Peer, 0, min(root.peerMap.Len(), req.NumWant))
+	timeoutPeer := make([]*common.Peer, 0)
 	var oldestTime *time.Time
 	var oldestPeer *common.Peer
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
+		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
+			// timeout!
+			timeoutPeer = append(timeoutPeer, value)
+			return true
+		}
 		if len(resp) >= req.NumWant {
 			return false
 		}
@@ -99,6 +105,12 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		resp = append(resp, value)
 		return true
 	})
+	if len(timeoutPeer) > 0 {
+		for _, toClean := range timeoutPeer {
+			root.peerMap.Delete(toClean.GetKey())
+		}
+		m.peerCount.Add(int64(-1 * len(timeoutPeer)))
+	}
 	if shouldEject {
 		hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
 		root.peerMap.Delete(oldestPeer.GetKey())
