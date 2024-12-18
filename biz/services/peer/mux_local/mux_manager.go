@@ -3,12 +3,14 @@ package muxlocal
 import (
 	"context"
 	"math/big"
+	"runtime"
 	"strconv"
 
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
 	"github.com/bytedance/gopkg/util/logger"
+	"github.com/xxjwxc/gowp/workpool"
 )
 
 type MuxLocalManager struct {
@@ -43,10 +45,15 @@ func (m *MuxLocalManager) Scrape(infoHash string) *model.ScrapeFile {
 	return worker.Scrape(infoHash)
 }
 func (m *MuxLocalManager) Clean() {
+	wp := workpool.New(max(runtime.NumCPU()-1, 1))
 	for i, manager := range m.localList {
-		logger.Info("clean shard %d", i)
-		go manager.Clean()
+		wp.Do(func() error {
+			logger.Info("clean shard %d", i)
+			manager.Clean()
+			return nil
+		})
 	}
+	_ = wp.Wait()
 }
 
 func (m *MuxLocalManager) LoadFromPersist() {

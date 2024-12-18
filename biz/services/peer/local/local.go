@@ -49,15 +49,13 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		Event:      common.ParsePeerEvent(req.Event),
 		UserAgent:  req.UserAgent,
 	}
-	root, ok := m.infoHashMap.Load(req.InfoHash)
+	root, ok := m.infoHashMap.LoadOrStore(req.InfoHash, &infoHashRoot{
+		peerMap:   skipmap.New[string, *common.Peer](),
+		lastClean: time.Now(),
+		infoHash:  req.InfoHash,
+	})
 	if !ok { // first seen torrent
-		root = &infoHashRoot{
-			peerMap:   skipmap.New[string, *common.Peer](),
-			lastClean: time.Now(),
-			infoHash:  req.InfoHash,
-		}
 		root.peerMap.Store(peer.GetKey(), peer)
-		m.infoHashMap.Store(req.InfoHash, root)
 		m.peerCount.Add(1)
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil
@@ -77,6 +75,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	} else {
 		// new peer!
 		if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0) { // skip private ip
+			// there is a data race, but it's impossible for concurrent access to one peer
 			root.peerMap.Store(peer.GetKey(), peer)
 			if root.peerMap.Len() > config.AppConfig.Tracker.MaxPeersPerTorrent {
 				shouldEject = true // too much peers, need eject
