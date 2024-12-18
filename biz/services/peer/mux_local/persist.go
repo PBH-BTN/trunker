@@ -42,16 +42,29 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			return
 		}
 		data := make([]byte, size)
-		if _, err := reader.Read(data); err != nil {
+		if readCount, err := reader.Read(data); err != nil {
 			logger.Error("Failed to decode data length:", err.Error())
 			return
+		} else if int32(readCount) != size {
+			// read more
+			remain := size - int32(readCount)
+			for remain > 0 {
+				tmp := make([]byte, remain)
+				n, err := reader.Read(tmp)
+				if err != nil {
+					logger.Error("Failed to decode data length:", err.Error())
+					return
+				}
+				remain -= int32(n)
+				data = append(data[0:readCount], tmp...)
+			}
 		}
 
 		// Unmarshal to protobuf SomeStruct
 		pbStruct := &PeerInfo{}
 		if err := proto.Unmarshal(data, pbStruct); err != nil {
 			logger.Error("Failed to decode data length:", err.Error())
-			return
+			break
 		}
 		lastSeen := time.Unix(pbStruct.LastSeen, 0)
 		if lastSeen.Add(time.Duration(config.AppConfig.Tracker.TTL) * time.Second).Before(time.Now()) {
@@ -83,7 +96,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 		logger.Info("persist not enabled, skip...")
 		return
 	}
-	file, err := os.OpenFile(PersistDataName, os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(PersistDataName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Error("open file error")
 		return
