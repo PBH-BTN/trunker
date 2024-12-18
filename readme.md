@@ -21,6 +21,7 @@ cd output
 - [x] BEP-0048
 - [X] LT-Extension(complete,incomplete)
 - [x] Full-Memory Mode
+- [x] Load from Persist
 - [ ] MySQL Mode
 
 ## Benchmark
