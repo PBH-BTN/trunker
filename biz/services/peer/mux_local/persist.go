@@ -77,7 +77,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			IP:         pbStruct.Ip.ReportIp,
 			IPv4:       pbStruct.Ip.ReportV4,
 			IPv6:       pbStruct.Ip.Report_V6,
-			ClientIP:   pbStruct.Ip.Report_V6,
+			ClientIP:   pbStruct.Ip.ClientIp,
 			Port:       int(pbStruct.Port),
 			Left:       pbStruct.Left,
 			Uploaded:   pbStruct.Uploaded,
