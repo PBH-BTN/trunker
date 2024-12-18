@@ -2,7 +2,7 @@ package mux_local
 
 import (
 	"bufio"
-	"encoding/gob"
+	"encoding/binary"
 	"os"
 	"time"
 
@@ -32,9 +32,9 @@ func (m *MuxLocalManager) LoadFromPersist() {
 	count := 0
 	expired := 0
 	for {
-		var size int32
+		var size uint32
 		// Decode data length
-		if err := gob.NewDecoder(reader).Decode(&size); err != nil {
+		if err := binary.Read(reader, binary.LittleEndian, &size); err != nil {
 			if err.Error() == "EOF" { // end of file
 				break
 			}
@@ -45,9 +45,9 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		if readCount, err := reader.Read(data); err != nil {
 			logger.Error("Failed to decode data length:", err.Error())
 			return
-		} else if int32(readCount) != size {
+		} else if uint32(readCount) != size {
 			// read more
-			remain := size - int32(readCount)
+			remain := size - uint32(readCount)
 			for remain > 0 {
 				tmp := make([]byte, remain)
 				n, err := reader.Read(tmp)
@@ -55,7 +55,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 					logger.Error("Failed to decode data length:", err.Error())
 					return
 				}
-				remain -= int32(n)
+				remain -= uint32(n)
 				data = append(data[0:readCount], tmp...)
 			}
 		}
@@ -132,7 +132,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 				}
 
 				// Encode data length
-				if err := gob.NewEncoder(writer).Encode(int32(len(data))); err != nil {
+				if err := binary.Write(writer, binary.LittleEndian, uint32(len(data))); err != nil {
 					logger.Error("Failed to encode data length:", err.Error())
 					return true
 				}
