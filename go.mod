@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/bytedance/gopkg v0.1.1
-	github.com/cloudwego/hertz v0.9.3
+	github.com/cloudwego/hertz v0.9.4
 	github.com/cristalhq/bencode v0.4.0
 	github.com/hertz-contrib/monitor-prometheus v0.1.2
 	github.com/hertz-contrib/pprof v0.1.2
