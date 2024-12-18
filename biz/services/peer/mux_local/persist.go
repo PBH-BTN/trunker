@@ -11,6 +11,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/logger"
+	"golang.org/x/sys/unix"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -102,6 +103,21 @@ func (m *MuxLocalManager) StoreToPersist() {
 		return
 	}
 	defer file.Close()
+	lock := unix.Flock_t{
+		Type:   unix.F_WRLCK,
+		Whence: 0,
+		Start:  0,
+		Len:    0, // 锁定整个文件喵~
+	}
+	if err := unix.FcntlFlock(file.Fd(), unix.F_SETLK, &lock); err != nil {
+		logger.Error("failed to obtain write lock: %s", err.Error())
+		return
+	}
+	defer func() {
+		lock.Type = unix.F_UNLCK
+		unix.FcntlFlock(file.Fd(), unix.F_SETLK, &lock)
+	}()
+
 	writer := bufio.NewWriter(file)
 	logger.Info("start to store peers to persist")
 	count := 0
