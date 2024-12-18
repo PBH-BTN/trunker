@@ -5,7 +5,7 @@ message IPInfo {
   bytes client_ip = 1;
   bytes report_ip = 2;
   bytes report_v4 = 3;
-  bytes report_V6 = 4;
+  bytes report_v6 = 4;
 }
 
 enum PeerEvent {
