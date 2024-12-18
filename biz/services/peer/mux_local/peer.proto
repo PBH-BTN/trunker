@@ -1,0 +1,29 @@
+syntax = "proto3";
+option go_package = "biz/services/peer/mux_local";
+
+message IPInfo {
+  bytes client_ip = 1;
+  bytes report_ip = 2;
+  bytes report_v4 = 3;
+  bytes report_V6 = 4;
+}
+
+enum PeerEvent {
+  Unknown = 0;
+  Started = 1;
+  Stopped = 2;
+  Completed = 3;
+}
+
+message PeerInfo {
+  bytes info_hash = 1;
+  IPInfo ip = 2;
+  int32 port = 3;
+  uint64 left = 4;
+  uint64 downloaded = 5;
+  uint64 uploaded = 6;
+  int64  lastSeen = 7;
+  string user_agent = 8;
+  bytes peer_id = 9;
+  PeerEvent event = 10;
+}

@@ -5,10 +5,10 @@ type AnnounceRequest struct {
 	InfoHash   string `json:"info_hash" query:"info_hash,required"`
 	PeerID     string `json:"peer_id" query:"peer_id,required"`
 	Port       int    `json:"port" query:"port,required"`
-	Uploaded   int    `json:"uploaded" query:"uploaded"`
-	Downloaded int    `json:"downloaded" query:"downloaded"`
+	Uploaded   uint64 `json:"uploaded" query:"uploaded"`
+	Downloaded uint64 `json:"downloaded" query:"downloaded"`
 	Event      string `json:"event" query:"event"`
-	Left       int    `json:"left" query:"left"`
+	Left       uint64 `json:"left" query:"left"`
 	NumWant    int    `default:"50" json:"numwant" query:"numwant"`
 	ClientIP   string
 	UserAgent  string

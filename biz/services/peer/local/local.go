@@ -16,20 +16,28 @@ import (
 	"github.com/zhangyunhao116/skipmap"
 )
 
-type infoHashRoot struct {
+type InfoHashRoot struct {
 	peerMap   *skipmap.OrderedMap[string, *common.Peer]
 	lastClean time.Time
 	infoHash  string
 }
 
+func NewInfoHashRoot(infoHash string) *InfoHashRoot {
+	return &InfoHashRoot{
+		peerMap:   skipmap.New[string, *common.Peer](),
+		lastClean: time.Now(),
+		infoHash:  infoHash,
+	}
+}
+
 type Manager struct {
-	infoHashMap *skipmap.OrderedMap[string, *infoHashRoot]
+	infoHashMap *skipmap.OrderedMap[string, *InfoHashRoot]
 	peerCount   atomic.Int64
 }
 
 func NewLocalManger() *Manager {
 	return &Manager{
-		infoHashMap: skipmap.New[string, *infoHashRoot](),
+		infoHashMap: skipmap.New[string, *InfoHashRoot](),
 		peerCount:   atomic.Int64{},
 	}
 }
@@ -49,10 +57,8 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		Event:      common.ParsePeerEvent(req.Event),
 		UserAgent:  req.UserAgent,
 	}
-	root, ok := m.infoHashMap.LoadOrStore(req.InfoHash, &infoHashRoot{
-		peerMap:   skipmap.New[string, *common.Peer](),
-		lastClean: time.Now(),
-		infoHash:  req.InfoHash,
+	root, ok := m.infoHashMap.LoadOrStoreLazy(req.InfoHash, func() *InfoHashRoot {
+		return NewInfoHashRoot(req.InfoHash)
 	})
 	if !ok { // first seen torrent
 		root.peerMap.Store(peer.GetKey(), peer)
@@ -155,4 +161,28 @@ func (m *Manager) GetStatistic() *common.StatisticInfo {
 		TotalTorrents: uint64(m.infoHashMap.Len()),
 		TotalPeers:    uint64(m.peerCount.Load()),
 	}
+}
+
+func (m *Manager) RangeMap(f func(key string, value *InfoHashRoot) bool) {
+	m.infoHashMap.Range(f)
+}
+
+// DirectStore Store directly, no check, unsafe
+func (m *Manager) DirectStore(infoHash string, peer *common.Peer) {
+	root, _ := m.infoHashMap.LoadOrStoreLazy(infoHash, func() *InfoHashRoot {
+		return NewInfoHashRoot(infoHash)
+	})
+	root.peerMap.Store(peer.GetKey(), peer)
+}
+
+func (i *InfoHashRoot) Range(f func(key string, value *common.Peer) bool) {
+	i.peerMap.Range(f)
+}
+
+func (m *Manager) StoreToPersist() {
+	panic("please use mux to persist")
+}
+
+func (m *Manager) LoadFromPersist() {
+	panic("please use mux to persist")
 }

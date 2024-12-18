@@ -16,9 +16,9 @@ type Peer struct {
 	IPv6       net.IP
 	ClientIP   net.IP
 	Port       int
-	Left       int
-	Uploaded   int       `json:"uploaded"`
-	Downloaded int       `json:"downloaded"`
+	Left       uint64
+	Uploaded   uint64    `json:"uploaded"`
+	Downloaded uint64    `json:"downloaded"`
 	LastSeen   time.Time `json:"lastSeen"`
 	UserAgent  string
 	Event      PeerEvent

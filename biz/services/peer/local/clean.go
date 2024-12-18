@@ -8,12 +8,12 @@ import (
 )
 
 func (m *Manager) Clean() {
-	m.infoHashMap.Range(func(key string, value *infoHashRoot) bool {
+	m.infoHashMap.Range(func(key string, value *InfoHashRoot) bool {
 		m.cleanUp(value)
 		return true
 	})
 }
-func (m *Manager) cleanUp(root *infoHashRoot) {
+func (m *Manager) cleanUp(root *InfoHashRoot) {
 	if root.lastClean.Add(time.Duration(config.AppConfig.Tracker.TTL) * time.Second).After(time.Now()) {
 		return
 	}

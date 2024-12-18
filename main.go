@@ -21,6 +21,7 @@ package main
 import (
 	"context"
 	"os"
+	"time"
 
 	appConfig "github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/middleware"
@@ -39,6 +40,7 @@ func main() {
 	options := []config.Option{
 		server.WithTracer(prometheus.NewServerTracer(":9091", "/metrics")),
 		server.WithHostPorts(appConfig.AppConfig.Tracker.HostPorts),
+		server.WithExitWaitTime(time.Minute),
 	}
 	if appConfig.AppConfig.Tracker.UseUnixSocket {
 		options = append(options, server.WithNetwork("unix"))

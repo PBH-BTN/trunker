@@ -1,4 +1,4 @@
-package muxlocal
+package mux_local
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
+	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/xxjwxc/gowp/workpool"
 )
@@ -36,12 +37,12 @@ func (m *MuxLocalManager) pickWorker(hashBytes []byte) *local.Manager {
 }
 
 func (m *MuxLocalManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) []*common.Peer {
-	worker := m.pickWorker([]byte(req.InfoHash))
+	worker := m.pickWorker(conv.UnsafeStringToBytes(req.InfoHash))
 	return worker.HandleAnnouncePeer(ctx, req)
 }
 
 func (m *MuxLocalManager) Scrape(infoHash string) *model.ScrapeFile {
-	worker := m.pickWorker([]byte(infoHash))
+	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
 	return worker.Scrape(infoHash)
 }
 func (m *MuxLocalManager) Clean() {
@@ -54,14 +55,6 @@ func (m *MuxLocalManager) Clean() {
 		})
 	}
 	_ = wp.Wait()
-}
-
-func (m *MuxLocalManager) LoadFromPersist() {
-	// todo
-}
-
-func (m *MuxLocalManager) StoreToPersist() {
-	// todo
 }
 
 func (m *MuxLocalManager) GetStatistic() *common.StatisticInfo {

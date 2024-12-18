@@ -22,9 +22,9 @@ type eventBody struct {
 	InfoHash   string `msgpack:"info_hash"`
 	IP         ip     `msgpack:"ip"`
 	Port       int    `msgpack:"port"`
-	Left       int    `msgpack:"left"`
-	Uploaded   int    `msgpack:"uploaded"`
-	Downloaded int    `msgpack:"downloaded"`
+	Left       uint64 `msgpack:"left"`
+	Uploaded   uint64 `msgpack:"uploaded"`
+	Downloaded uint64 `msgpack:"downloaded"`
 	LastSeen   int64  `msgpack:"last_seen"`
 	UserAgent  string `msgpack:"user_agent"`
 	Event      string `msgpack:"event"`

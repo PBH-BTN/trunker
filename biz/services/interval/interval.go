@@ -23,8 +23,8 @@ func StartIntervalTask() {
 
 var taskList = []func(){
 	cleanInactivePeer,
-	saveDB,
 	printStatics,
+	saveDB,
 }
 
 func doIntervalTask() {
