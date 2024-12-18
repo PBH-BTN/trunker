@@ -21,6 +21,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		logger.Info("persist not enabled, skip...")
 		return
 	}
+	logger.Info("start to load peers from persist")
 	file, err := os.OpenFile(PersistDataName, os.O_RDONLY, 0644)
 	if err != nil {
 		logger.Error("open file error:", err.Error())
@@ -37,16 +38,19 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			if err.Error() == "EOF" { // end of file
 				break
 			}
+			logger.Error("Failed to decode data length:", err.Error())
 			return
 		}
 		data := make([]byte, size)
 		if _, err := reader.Read(data); err != nil {
+			logger.Error("Failed to decode data length:", err.Error())
 			return
 		}
 
 		// Unmarshal to protobuf SomeStruct
 		pbStruct := &PeerInfo{}
 		if err := proto.Unmarshal(data, pbStruct); err != nil {
+			logger.Error("Failed to decode data length:", err.Error())
 			return
 		}
 		lastSeen := time.Unix(pbStruct.LastSeen, 0)
