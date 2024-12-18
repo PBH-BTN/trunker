@@ -88,7 +88,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		})
 		count++
 	}
-	logger.Infof("load from db done. %d peers loaded,%d peers expired", count, expired)
+	logger.Infof("load from persist done. %d peers loaded,%d peers expired", count, expired)
 }
 
 func (m *MuxLocalManager) StoreToPersist() {
@@ -147,5 +147,5 @@ func (m *MuxLocalManager) StoreToPersist() {
 		})
 	}
 	_ = writer.Flush()
-	logger.Infof("store to db done. %d peers stored", count)
+	logger.Infof("store to persist done. %d peers stored", count)
 }
