@@ -13,10 +13,11 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/thinkeridea/go-extend/exstrings"
 )
 
-func getClientIP(c *app.RequestContext) string {
+func getClientIP(ctx context.Context, c *app.RequestContext) string {
 	// There is a bug in c.ClientIP() while using Unix Domain Socket, unfortunately hertz don't want to fix this.
 	// So we have to use this workaround.
 	ip := c.Request.Header.Get("X-Real-IP")
@@ -27,7 +28,11 @@ func getClientIP(c *app.RequestContext) string {
 	if ip != "" {
 		return ip
 	}
-	return c.RemoteAddr().String()
+	ip = c.RemoteAddr().String()
+	if ip == "" {
+		hlog.CtxWarnf(ctx, "failed to get client ip,header:%s", c.Request.Header.Header())
+	}
+	return ip
 }
 
 func Announce(ctx context.Context, c *app.RequestContext) {
@@ -40,7 +45,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
-	req.ClientIP = getClientIP(c)
+	req.ClientIP = getClientIP(ctx, c)
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
 	res := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	scrape := peer.GetPeerManager().Scrape(req.InfoHash)
