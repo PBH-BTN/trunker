@@ -96,11 +96,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	var oldestPeer *common.Peer
 	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.MaxPeersPerTorrent
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
-		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
-			// timeout!
-			timeoutPeer = append(timeoutPeer, value)
-			return true
-		}
 		if len(resp) >= req.NumWant {
 			return false
 		}
@@ -114,6 +109,11 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 					oldestPeer = value
 				}
 			}
+		}
+		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
+			// timeout!
+			timeoutPeer = append(timeoutPeer, value)
+			return true
 		}
 		resp = append(resp, value)
 		return true
