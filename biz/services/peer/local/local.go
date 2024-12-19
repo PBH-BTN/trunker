@@ -128,7 +128,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			}
 		}()
 	}
-	if shouldEject {
+	if shouldEject && oldestPeer != nil {
 		go func() {
 			hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
 			_, ok := root.peerMap.LoadAndDelete(oldestPeer.GetKey())
