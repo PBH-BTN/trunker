@@ -16,6 +16,20 @@ import (
 	"github.com/thinkeridea/go-extend/exstrings"
 )
 
+func getClientIP(c *app.RequestContext) string {
+	// There is a bug in c.ClientIP() while using Unix Domain Socket, unfortunately hertz don't want to fix this.
+	// So we have to use this workaround.
+	ip := c.Request.Header.Get("X-Real-IP")
+	if ip != "" {
+		return ip
+	}
+	ip = c.Request.Header.Get("X-Forwarded-For")
+	if ip != "" {
+		return ip
+	}
+	return c.RemoteAddr().String()
+}
+
 func Announce(ctx context.Context, c *app.RequestContext) {
 	req := &model.AnnounceRequest{}
 	if c.Bind(req) != nil {
@@ -26,7 +40,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
-	req.ClientIP = c.ClientIP()
+	req.ClientIP = getClientIP(c)
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
 	res := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	scrape := peer.GetPeerManager().Scrape(req.InfoHash)
