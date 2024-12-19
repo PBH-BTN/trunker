@@ -2,6 +2,9 @@
 
 > A Tracker which will "chuang" you
 
+![image](https://github.com/user-attachments/assets/6f3676a8-4b51-4f14-9107-d08a35868238)
+
+
 ## Introduce
 
 A BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego.
