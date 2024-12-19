@@ -119,14 +119,18 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	})
 	if len(timeoutPeer) > 0 {
 		for _, toClean := range timeoutPeer {
-			root.peerMap.Delete(toClean.GetKey())
+			_, ok := root.peerMap.LoadAndDelete(toClean.GetKey())
+			if ok {
+				m.peerCount.Add(-1)
+			}
 		}
-		m.peerCount.Add(int64(-1 * len(timeoutPeer)))
 	}
 	if shouldEject {
 		hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
-		root.peerMap.Delete(oldestPeer.GetKey())
-		m.peerCount.Add(-1)
+		_, ok := root.peerMap.LoadAndDelete(oldestPeer.GetKey())
+		if ok {
+			m.peerCount.Add(-1)
+		}
 	}
 	return resp
 }
