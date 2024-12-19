@@ -1,4 +1,4 @@
-FROM golang:alpine as build
+FROM golang:alpine AS build
 WORKDIR /build
 COPY . .
 RUN sh build.sh

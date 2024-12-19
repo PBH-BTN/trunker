@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 export RUN_ENV="prod"
 RUN_NAME="pbh.btn.trunker"
