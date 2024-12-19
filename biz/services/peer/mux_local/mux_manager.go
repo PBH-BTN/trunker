@@ -49,7 +49,7 @@ func (m *MuxLocalManager) Clean() {
 	wp := workpool.New(max(runtime.NumCPU()-1, 1))
 	for i, manager := range m.localList {
 		wp.Do(func() error {
-			logger.Info("clean shard %d", i)
+			logger.Info("clean shard ", i)
 			manager.Clean()
 			return nil
 		})
