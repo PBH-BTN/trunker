@@ -66,34 +66,35 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil
 	}
-	shouldEject := false
-	if knownPeer, ok := root.peerMap.Load(peer.GetKey()); ok {
-		// update current record
-		if (knownPeer.Left != 0 && peer.Left == 0) || knownPeer.Event != peer.Event {
-			go producer.SendPeerEvent(ctx, req.InfoHash, peer)
-		}
-		knownPeer.Uploaded = peer.Uploaded
-		knownPeer.Downloaded = peer.Downloaded
-		knownPeer.LastSeen = peer.LastSeen
-		knownPeer.Event = peer.Event
-		knownPeer.Left = peer.Left
-		knownPeer.Event = peer.Event
-	} else {
-		// new peer!
-		if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0) { // skip private ip
-			// there is a data race, but it's impossible for concurrent access to one peer
-			root.peerMap.Store(peer.GetKey(), peer)
-			if root.peerMap.Len() > config.AppConfig.Tracker.MaxPeersPerTorrent {
-				shouldEject = true // too much peers, need eject
+	// add to peer list
+	go func() {
+		if knownPeer, ok := root.peerMap.Load(peer.GetKey()); ok {
+			// update current record
+			if (knownPeer.Left != 0 && peer.Left == 0) || knownPeer.Event != peer.Event {
+				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 			}
-			m.peerCount.Add(1)
-			go producer.SendPeerEvent(ctx, req.InfoHash, peer)
+			knownPeer.Uploaded = peer.Uploaded
+			knownPeer.Downloaded = peer.Downloaded
+			knownPeer.LastSeen = peer.LastSeen
+			knownPeer.Event = peer.Event
+			knownPeer.Left = peer.Left
+			knownPeer.Event = peer.Event
+		} else {
+			// new peer!
+			if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0) { // skip private ip
+				// there is a data race, but it's impossible for concurrent access to one peer
+				root.peerMap.Store(peer.GetKey(), peer)
+				m.peerCount.Add(1)
+				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
+			}
 		}
-	}
+	}()
+	// get return
 	resp := make([]*common.Peer, 0, min(root.peerMap.Len(), req.NumWant))
 	timeoutPeer := make([]*common.Peer, 0)
 	var oldestTime *time.Time
 	var oldestPeer *common.Peer
+	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.MaxPeersPerTorrent
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
 		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
 			// timeout!
@@ -118,19 +119,23 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return true
 	})
 	if len(timeoutPeer) > 0 {
-		for _, toClean := range timeoutPeer {
-			_, ok := root.peerMap.LoadAndDelete(toClean.GetKey())
+		go func() {
+			for _, toClean := range timeoutPeer {
+				_, ok := root.peerMap.LoadAndDelete(toClean.GetKey())
+				if ok {
+					m.peerCount.Add(-1)
+				}
+			}
+		}()
+	}
+	if shouldEject {
+		go func() {
+			hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
+			_, ok := root.peerMap.LoadAndDelete(oldestPeer.GetKey())
 			if ok {
 				m.peerCount.Add(-1)
 			}
-		}
-	}
-	if shouldEject {
-		hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
-		_, ok := root.peerMap.LoadAndDelete(oldestPeer.GetKey())
-		if ok {
-			m.peerCount.Add(-1)
-		}
+		}()
 	}
 	return resp
 }

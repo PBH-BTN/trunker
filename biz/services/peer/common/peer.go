@@ -39,14 +39,12 @@ func PeersToCompact(peerList []*Peer) ([]byte, []byte) {
 	var peers []byte
 	var peers6 []byte
 	for _, peer := range peerList {
-		if peer.GetIP().To4() != nil {
-			ip := peer.GetIP().To4() // IPv4 address
+		if ip := peer.GetIP().To4(); ip != nil { // IPv4 address
 			port := make([]byte, 2)
 			binary.BigEndian.PutUint16(port, uint16(peer.Port))
 			peers = append(peers, ip...)
 			peers = append(peers, port...)
-		} else if peer.GetIP().To16() != nil {
-			ip := peer.GetIP().To16() // IPv6 address
+		} else if ip := peer.GetIP().To16(); ip != nil { // IPv6 address
 			port := make([]byte, 2)
 			binary.BigEndian.PutUint16(port, uint16(peer.Port))
 			peers6 = append(peers6, ip...)
