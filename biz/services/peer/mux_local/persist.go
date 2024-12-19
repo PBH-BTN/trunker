@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -138,7 +139,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 					Downloaded: value.Downloaded,
 					Uploaded:   value.Uploaded,
 					LastSeen:   value.LastSeen.Unix(),
-					UserAgent:  value.UserAgent,
+					UserAgent:  strings.ToValidUTF8(value.UserAgent, ""),
 					Event:      PeerEvent(value.Event),
 				}
 				data, err := proto.Marshal(peerPB)
