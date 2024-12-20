@@ -101,9 +101,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			timeoutPeer = append(timeoutPeer, value)
 			return true
 		}
-		if len(resp) >= req.NumWant {
-			return false
-		}
 		if shouldEject {
 			if oldestTime == nil {
 				oldestTime = &value.LastSeen
@@ -114,6 +111,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 					oldestPeer = value
 				}
 			}
+		}
+		if len(resp) >= req.NumWant {
+			return false
 		}
 		resp = append(resp, value)
 		return true

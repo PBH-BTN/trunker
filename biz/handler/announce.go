@@ -47,6 +47,9 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	}
 	req.ClientIP = getClientIP(ctx, c)
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
+	if req.NumWant == 0 {
+		req.NumWant = 50
+	}
 	res := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	scrape := peer.GetPeerManager().Scrape(req.InfoHash)
 	if req.Compact == 0 {
