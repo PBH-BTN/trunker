@@ -1,5 +1,7 @@
 package model
 
+import "net"
+
 // AnnounceRequest Bittorrent Announce Request https://wiki.theory.org/BitTorrent_Tracker_Protocol
 type AnnounceRequest struct {
 	InfoHash   string `json:"info_hash" query:"info_hash,required"`
@@ -10,7 +12,7 @@ type AnnounceRequest struct {
 	Event      string `json:"event" query:"event"`
 	Left       uint64 `json:"left" query:"left"`
 	NumWant    int    `default:"50" json:"numwant" query:"numwant"`
-	ClientIP   string
+	ClientIP   net.IP
 	UserAgent  string
 	IP         string `query:"ip"`
 	IPv4       string `query:"ipv4"`

@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"math/rand"
+	"net"
 
 	"errors"
 
@@ -17,22 +18,30 @@ import (
 	"github.com/thinkeridea/go-extend/exstrings"
 )
 
-func getClientIP(ctx context.Context, c *app.RequestContext) string {
+var ipHeader = []string{
+	"X-Forwarded-For",
+	"X-Real-IP",
+}
+
+func getClientIP(ctx context.Context, c *app.RequestContext) net.IP {
 	// There is a bug in c.ClientIP() while using Unix Domain Socket, unfortunately hertz don't want to fix this.
 	// So we have to use this workaround.
-	ip := c.Request.Header.Get("X-Real-IP")
-	if ip != "" {
-		return ip
+	for _, header := range ipHeader {
+		ip := c.Request.Header.Get(header)
+		if ip != "" {
+			res := net.ParseIP(ip)
+			if res != nil {
+				return res
+			}
+			hlog.CtxWarnf(ctx, "invalid ip from header %s:%s", header, ip)
+		}
 	}
-	ip = c.Request.Header.Get("X-Forwarded-For")
-	if ip != "" {
-		return ip
-	}
-	ip = c.RemoteAddr().String()
+	ip := c.ClientIP()
 	if ip == "" {
 		hlog.CtxWarnf(ctx, "failed to get client ip,header:%s", c.Request.Header.Header())
+		return nil
 	}
-	return ip
+	return net.ParseIP(ip)
 }
 
 func Announce(ctx context.Context, c *app.RequestContext) {
@@ -58,14 +67,14 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Peers: utils.Map(res, func(p *common.Peer) *model.Peer {
 				return p.ToModel()
 			}),
-			ExternalIp: req.ClientIP,
+			ExternalIp: req.ClientIP.String(),
 			Incomplete: scrape.Incomplete,
 			Complete:   scrape.Complete,
 		})
 	} else {
 		resp := map[string]any{
 			"interval":    config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
-			"external ip": req.ClientIP,
+			"external ip": req.ClientIP.String(),
 			"incomplete":  scrape.Incomplete,
 			"complete":    scrape.Complete,
 		}

@@ -48,7 +48,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		IP:         net.ParseIP(req.IP),
 		IPv4:       net.ParseIP(req.IPv4),
 		IPv6:       net.ParseIP(req.IPv6),
-		ClientIP:   net.ParseIP(req.ClientIP),
+		ClientIP:   req.ClientIP,
 		Uploaded:   req.Uploaded,
 		Left:       req.Left,
 		Port:       req.Port,
