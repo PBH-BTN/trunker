@@ -79,9 +79,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			"complete":    scrape.Complete,
 		}
 		peers, peers6 := common.PeersToCompact(res)
-		if len(peers) > 0 {
-			resp["peers"] = peers
-		}
+		resp["peers"] = peers
 		if len(peers6) > 0 {
 			resp["peers6"] = peers6
 		}
