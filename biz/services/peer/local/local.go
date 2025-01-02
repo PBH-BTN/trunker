@@ -61,8 +61,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return NewInfoHashRoot(req.InfoHash)
 	})
 	if !ok { // first seen torrent
-		root.peerMap.Store(peer.GetKey(), peer)
-		m.peerCount.Add(1)
+		if _, exist := root.peerMap.LoadOrStore(peer.GetKey(), peer); !exist {
+			m.peerCount.Add(1)
+		}
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil
 	}
@@ -83,8 +84,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			// new peer!
 			if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0) { // skip private ip
 				// there is a data race, but it's impossible for concurrent access to one peer
-				root.peerMap.Store(peer.GetKey(), peer)
-				m.peerCount.Add(1)
+				if _, exist := root.peerMap.LoadOrStore(peer.GetKey(), peer); !exist {
+					m.peerCount.Add(1)
+				}
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 			}
 		}
