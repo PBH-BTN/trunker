@@ -18,7 +18,10 @@ This tracker is hosted as https://btn-prod.ghostchu-services.top/announce
 cd output
 ./bootstrap.sh
 ```
-
+or
+```
+docker pull gaojianli2333/trunker:latest
+```
 ## Features
 
 - [x] BEP-0003
