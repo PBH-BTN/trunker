@@ -61,8 +61,10 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return NewInfoHashRoot(req.InfoHash)
 	})
 	if !ok { // first seen torrent
-		if _, exist := root.peerMap.LoadOrStore(peer.GetKey(), peer); !exist {
-			m.peerCount.Add(1)
+		if isPeerConnectable(peer) {
+			if _, exist := root.peerMap.LoadOrStore(peer.GetKey(), peer); !exist {
+				m.peerCount.Add(1)
+			}
 		}
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil
@@ -82,7 +84,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			knownPeer.Event = peer.Event
 		} else {
 			// new peer!
-			if !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0) { // skip private ip
+			if isPeerConnectable(peer) { // skip private ip
 				// there is a data race, but it's impossible for concurrent access to one peer
 				if _, exist := root.peerMap.LoadOrStore(peer.GetKey(), peer); !exist {
 					m.peerCount.Add(1)
@@ -196,4 +198,9 @@ func (m *Manager) StoreToPersist() {
 
 func (m *Manager) LoadFromPersist() {
 	panic("please use mux to persist")
+}
+
+// isPeerConnectable Check If Peer is connectable
+func isPeerConnectable(peer *common.Peer) bool {
+	return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0)
 }
