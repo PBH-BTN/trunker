@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
+	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/bytedance/gopkg/util/logger"
 )
 
@@ -12,13 +13,13 @@ var (
 )
 
 func StartIntervalTask() {
-	go func() {
+	gopool.Go(func() {
 		logger.Infof("start interval task, interval %d seconds", config.AppConfig.Tracker.IntervalTask)
 		for {
 			<-time.After(time.Duration(config.AppConfig.Tracker.IntervalTask) * time.Second)
 			doIntervalTask()
 		}
-	}()
+	})
 }
 
 var taskList = []func(){

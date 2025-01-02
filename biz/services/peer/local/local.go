@@ -12,6 +12,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/producer"
 	"github.com/PBH-BTN/trunker/utils/conv"
+	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/zhangyunhao116/skipmap"
 )
@@ -70,7 +71,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return nil
 	}
 	// add to peer list
-	go func() {
+	gopool.CtxGo(ctx, func() {
 		if knownPeer, ok := root.peerMap.Load(peer.GetKey()); ok {
 			// update current record
 			if (knownPeer.Left != 0 && peer.Left == 0) || knownPeer.Event != peer.Event {
@@ -92,7 +93,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 			}
 		}
-	}()
+	})
 	// get return
 	resp := make([]*common.Peer, 0, min(root.peerMap.Len(), req.NumWant))
 	timeoutPeer := make([]*common.Peer, 0)
@@ -123,23 +124,23 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return true
 	})
 	if len(timeoutPeer) > 0 {
-		go func() {
+		gopool.CtxGo(ctx, func() {
 			for _, toClean := range timeoutPeer {
 				_, ok := root.peerMap.LoadAndDelete(toClean.GetKey())
 				if ok {
 					m.peerCount.Add(-1)
 				}
 			}
-		}()
+		})
 	}
 	if shouldEject && oldestPeer != nil {
-		go func() {
+		gopool.CtxGo(ctx, func() {
 			hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
 			_, ok := root.peerMap.LoadAndDelete(oldestPeer.GetKey())
 			if ok {
 				m.peerCount.Add(-1)
 			}
-		}()
+		})
 	}
 	return resp
 }
