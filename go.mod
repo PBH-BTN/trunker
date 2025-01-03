@@ -15,6 +15,7 @@ require (
 	github.com/xxjwxc/gowp v0.0.0-20240929033016-5be68d222389
 	github.com/zhangyunhao116/skipmap v0.10.1
 	golang.org/x/exp v0.0.0-20241210194714-1829a127f884
+	golang.org/x/sys v0.28.0
 	google.golang.org/protobuf v1.35.2
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.7
@@ -68,7 +69,6 @@ require (
 	golang.org/x/arch v0.12.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
 	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
-	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect

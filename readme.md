@@ -50,6 +50,7 @@ docker pull gaojianli2333/trunker:latest
 | useAnnounceIP       | Allow peer to announce its IP in the query string.                                             | true           |
 | enableEventProducer | Send peer event to the mq. Caution: This will produce tons of message.                         | false          |
 
+JSON config is also supported with env `TRUNKER_CONFIG`.
 ## Benchmark
 
 CPU: 4 Cores ARM64 Oracle Cloud
