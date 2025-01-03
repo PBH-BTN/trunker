@@ -14,6 +14,7 @@ tracker:
   intervalTask: 600 # 10分钟执行一次定时任务
   useDB: false
   enablePersist: true
+  persistFile: persist.dat
   maxPeersPerTorrent: 1500
   shard: 40
   useUnixSocket: false

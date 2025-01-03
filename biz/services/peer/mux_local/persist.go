@@ -16,15 +16,13 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const PersistDataName = "persist.dat"
-
 func (m *MuxLocalManager) LoadFromPersist() {
 	if !config.AppConfig.Tracker.EnablePersist {
 		logger.Info("persist not enabled, skip...")
 		return
 	}
 	logger.Info("start to load peers from persist")
-	file, err := os.OpenFile(PersistDataName, os.O_RDONLY, 0644)
+	file, err := os.OpenFile(config.AppConfig.Tracker.PersistFile, os.O_RDONLY, 0644)
 	if err != nil {
 		logger.Error("open file error:", err.Error())
 		return
@@ -98,7 +96,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 		logger.Info("persist not enabled, skip...")
 		return
 	}
-	file, err := os.OpenFile(PersistDataName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(config.AppConfig.Tracker.PersistFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Error("open file error")
 		return

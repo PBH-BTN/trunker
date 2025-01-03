@@ -33,6 +33,7 @@ type TrackerConfig struct {
 	IntervalTask        int64  `yaml:"intervalTask"`
 	UseDB               bool   `yaml:"useDB"`
 	EnablePersist       bool   `yaml:"enablePersist"`
+	PersistFile         string `yaml:"persistFile"`
 	MaxPeersPerTorrent  int    `yaml:"maxPeersPerTorrent"`
 	Shard               int    `yaml:"shard"`
 	UseUnixSocket       bool   `yaml:"useUnixSocket"`
