@@ -55,10 +55,10 @@ JSON config is also supported with env `TRUNKER_CONFIG`.
 
 CPU: 4 Cores ARM64 Oracle Cloud
 
-Average response time: 600ms when 30K torrents and 27K peers are online.
+Average response time: 600μs when 30K torrents and 27K peers are online.
 
-QPS: 700~
+QPS: 700~ (can be higher but we don't have such many peers connect to our tracker)
 
 Memory Cost: 348MB.
 
-![image](https://github.com/user-attachments/assets/00526a7c-1907-4949-a246-0ce6fab6302f)
+![image](https://github.com/user-attachments/assets/746babae-1eb3-4944-afb4-f629f78a007d)
