@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/bytedance/gopkg v0.1.1
+	github.com/bytedance/sonic v1.12.5
 	github.com/cloudwego/hertz v0.9.4
 	github.com/cristalhq/bencode v0.4.0
 	github.com/hertz-contrib/monitor-prometheus v0.1.2
@@ -15,7 +16,7 @@ require (
 	github.com/xxjwxc/gowp v0.0.0-20240929033016-5be68d222389
 	github.com/zhangyunhao116/skipmap v0.10.1
 	golang.org/x/exp v0.0.0-20241210194714-1829a127f884
-	golang.org/x/sys v0.28.0
+	golang.org/x/sys v0.29.0
 	google.golang.org/protobuf v1.35.2
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.7
@@ -24,11 +25,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/andeya/ameda v1.5.3 // indirect
-	github.com/andeya/goutil v1.0.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/go-tagexpr/v2 v2.9.11 // indirect
-	github.com/bytedance/sonic v1.12.5 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -67,8 +64,9 @@ require (
 	github.com/zhangyunhao116/fastrand v0.3.0 // indirect
 	go.uber.org/atomic v1.5.1 // indirect
 	golang.org/x/arch v0.12.0 // indirect
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
+	golang.org/x/term v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
