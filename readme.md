@@ -7,9 +7,11 @@
 
 ## Introduction
 
-A BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego.
+A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego.
 
 This tracker is hosted as https://btn-prod.ghostchu-services.top/announce
+
+For benchmark, please refer to the [Benchmark](#benchmark) section.
 
 ## How to run
 
@@ -51,6 +53,38 @@ docker pull gaojianli2333/trunker:latest
 | enableEventProducer | Send peer event to the mq. Caution: This will produce tons of message.                         | false          |
 
 JSON config is also supported with env `TRUNKER_CONFIG`.
+
+## Admin
+
+Trunker provides a simple admin interface to check the status of the tracker. Before using the admin interface, you need to set the `ADMIN_KEY` env.
+
+### Authorization
+
+Header: `Authorization: Bearer ${ADMIN_KEY}`
+
+### Endpoints
+
+#### Statistic
+| Method | Path                   | Description                       |
+|:-------|:-----------------------|:----------------------------------|
+| GET    | `/admin/statistic`     | Get the statistic of the tracker. |
+
+#### Block list
+You can ban some torrent or peer by using the following endpoints.
+
+| Method | Path                   | Description                       |
+|:-------|:-----------------------|:----------------------------------|
+| PUT    | `/admin/ban/info_hash` | Ban a torrent by info_hash.       |
+| DELETE | `/admin/ban/info_hash` | Clear all info_hash ban list.     |
+| PUT    | `/ban/peer`            | Ban a peer by peer_id.            |
+| DELETE | `/ban/peer`            | Clear all peer ban list.          |
+
+#### InfoHash
+| Method | Path                               | Description                                                      |
+|:-------|:-----------------------------------|:-----------------------------------------------------------------|
+| GET    | `/admin/info_hash/:infoHash/peers` | Get all peers of a info_hash. **The response may be very large** |
+| DELETE | `/admin/info_hash/:infoHash`       | Delete a info_hash                                               |
+
 ## Benchmark
 
 CPU: 4 Cores ARM64 Oracle Cloud
