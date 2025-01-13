@@ -31,7 +31,11 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	if req.NumWant == 0 {
 		req.NumWant = 50
 	}
-	res := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
+	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
+	if err != nil {
+		bencode.ResponseErr(c, err)
+		return
+	}
 	scrape := peer.GetPeerManager().Scrape(req.InfoHash)
 	if req.Compact == 0 {
 		bencode.ResponseOk(c, model.AnnounceBasicResponse{

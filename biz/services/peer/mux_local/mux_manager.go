@@ -2,6 +2,7 @@ package mux_local
 
 import (
 	"context"
+	"errors"
 	"math/big"
 	"runtime"
 	"strconv"
@@ -47,21 +48,21 @@ func (m *MuxLocalManager) pickWorker(hashBytes []byte) *local.Manager {
 
 }
 
-func (m *MuxLocalManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) []*common.Peer {
+func (m *MuxLocalManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) ([]*common.Peer, error) {
 	// process block list
 	m.banInfoHashLock.RLock()
 	banned := m.banInfoHash.Test(conv.UnsafeStringToBytes(req.InfoHash))
 	m.banInfoHashLock.RUnlock()
 	if banned {
 		hlog.CtxInfof(ctx, "info hash %s is banned", req.InfoHash)
-		return nil
+		return nil, errors.New("banned")
 	}
 	m.banPeerLock.RLock()
 	banned = m.banPeerId.Test(conv.UnsafeStringToBytes(req.PeerID))
 	m.banPeerLock.RUnlock()
 	if banned {
 		hlog.CtxInfof(ctx, "peer id %s is banned", req.PeerID)
-		return nil
+		return nil, errors.New("banned")
 	}
 
 	worker := m.pickWorker(conv.UnsafeStringToBytes(req.InfoHash))

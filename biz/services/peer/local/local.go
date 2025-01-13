@@ -44,7 +44,7 @@ func NewLocalManger() *Manager {
 	}
 }
 
-func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) []*common.Peer {
+func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) ([]*common.Peer, error) {
 	peer := &common.Peer{
 		ID:         req.PeerID,
 		IP:         net.ParseIP(req.IP),
@@ -69,7 +69,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			}
 		}
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
-		return nil
+		return nil, nil
 	}
 	// add to peer list
 	gopool.CtxGo(ctx, func() {
@@ -143,7 +143,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			}
 		})
 	}
-	return resp
+	return resp, nil
 }
 
 func (m *Manager) Scrape(infoHash string) *model.ScrapeFile {

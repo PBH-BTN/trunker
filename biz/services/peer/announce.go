@@ -11,7 +11,7 @@ import (
 
 type PeerManager interface {
 	// HandleAnnouncePeer 处理Announce请求
-	HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) []*common.Peer
+	HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) ([]*common.Peer, error)
 	// Scrape 处理Scrape请求
 	Scrape(infoHash string) *model.ScrapeFile
 	// Clean 清理不活跃Peer
