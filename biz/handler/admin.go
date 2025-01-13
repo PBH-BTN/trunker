@@ -66,3 +66,29 @@ func HandleBanPeer(_ context.Context, c *app.RequestContext) {
 	http.ResponseOK(c, fmt.Sprintf("%d peer banned", len(req.PeerId)))
 	return
 }
+
+type getInfoHashPeersReq struct {
+	InfoHash string `path:"infoHash" vd:"len($) >0"`
+}
+
+func GetInfoHashPeers(_ context.Context, c *app.RequestContext) {
+	req := &getInfoHashPeersReq{}
+	if c.BindAndValidate(req) != nil {
+		http.ResponseBadRequest(c)
+		return
+	}
+	manager := peer.GetPeerManager()
+	peers := manager.GetPeers(req.InfoHash)
+	http.ResponseOK(c, peers)
+}
+
+func DeleteInfoHash(_ context.Context, c *app.RequestContext) {
+	req := &getInfoHashPeersReq{}
+	if c.BindAndValidate(req) != nil {
+		http.ResponseBadRequest(c)
+		return
+	}
+	manager := peer.GetPeerManager()
+	manager.DeleteInfoHash(req.InfoHash)
+	http.ResponseOK(c, nil)
+}

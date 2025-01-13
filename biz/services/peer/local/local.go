@@ -11,6 +11,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/producer"
+	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -217,6 +218,18 @@ func (m *Manager) ClearBanInfoHash() {
 
 func (m *Manager) ClearBanPeer() {
 	// do nothing
+}
+
+func (m *Manager) GetPeers(infoHash string) []*common.Peer {
+	peerMap, ok := m.infoHashMap.Load(infoHash)
+	if !ok {
+		return []*common.Peer{}
+	}
+	return utils.SkipMapToSlice(peerMap.peerMap)
+}
+
+func (m *Manager) DeleteInfoHash(infoHash string) {
+	m.infoHashMap.Delete(infoHash)
 }
 
 // isPeerConnectable Check If Peer is connectable

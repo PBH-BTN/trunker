@@ -20,11 +20,15 @@ type PeerManager interface {
 	LoadFromPersist()
 	// StoreToPersist 保存数据到持久化存储
 	StoreToPersist()
+
+	/*	admin interface	*/
 	GetStatistic() *common.StatisticInfo
 	BanInfoHash(infoHash string)
 	BanPeer(peerID string)
 	ClearBanInfoHash()
 	ClearBanPeer()
+	GetPeers(infoHash string) []*common.Peer
+	DeleteInfoHash(infoHash string)
 }
 
 var manager PeerManager

@@ -126,3 +126,13 @@ func (m *MuxLocalManager) GetStatistic() *common.StatisticInfo {
 		Shards:        extra,
 	}
 }
+
+func (m *MuxLocalManager) GetPeers(infoHash string) []*common.Peer {
+	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
+	return worker.GetPeers(infoHash)
+}
+
+func (m *MuxLocalManager) DeleteInfoHash(infoHash string) {
+	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
+	worker.DeleteInfoHash(infoHash)
+}
