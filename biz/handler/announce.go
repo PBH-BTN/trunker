@@ -78,7 +78,7 @@ func Scrape(_ context.Context, c *app.RequestContext) {
 }
 
 func Statistic(_ context.Context, c *app.RequestContext) {
-	c.JSON(200, peer.GetPeerManager().GetStatistic())
+	http.ResponseOK(c, peer.GetPeerManager().GetStatistic())
 }
 
 func validAnnounceReq(req *model.AnnounceRequest) bool {

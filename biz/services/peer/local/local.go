@@ -201,7 +201,25 @@ func (m *Manager) LoadFromPersist() {
 	panic("please use mux to persist")
 }
 
+func (m *Manager) BanInfoHash(infoHash string) {
+	// ban process in the mux, we just delete at here
+	m.infoHashMap.Delete(infoHash)
+}
+
+func (m *Manager) BanPeer(peerID string) {
+	// do nothing, let its ttl end
+	return
+}
+
+func (m *Manager) ClearBanInfoHash() {
+	// do nothing
+}
+
+func (m *Manager) ClearBanPeer() {
+	// do nothing
+}
+
 // isPeerConnectable Check If Peer is connectable
 func isPeerConnectable(peer *common.Peer) bool {
-	return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0)
+	return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
 }

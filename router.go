@@ -19,7 +19,8 @@
 package main
 
 import (
-	handler "github.com/PBH-BTN/trunker/biz/handler"
+	"github.com/PBH-BTN/trunker/biz/handler"
+	"github.com/PBH-BTN/trunker/biz/router"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -28,6 +29,6 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 	r.GET("/announce", handler.Announce)
 	r.GET("/scrape", handler.Scrape)
-	r.GET("/statistic", handler.Statistic)
+	router.RegisterAdminRouter(r)
 	// your code ...
 }
