@@ -22,8 +22,6 @@ import (
 	"github.com/PBH-BTN/trunker/biz/handler"
 	"github.com/PBH-BTN/trunker/biz/router"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/hertz-contrib/pprof/adaptor"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // customizeRegister registers customize routers.
@@ -32,6 +30,5 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/announce", handler.Announce)
 	r.GET("/scrape", handler.Scrape)
 	router.RegisterAdminRouter(r)
-	r.GET("/pprof_metrics", adaptor.NewHertzHTTPHandler(promhttp.Handler()))
 	// your code ...
 }
