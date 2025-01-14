@@ -13,8 +13,8 @@ import (
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/thinkeridea/go-extend/exstrings"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/thinkeridea/go-extend/exstrings"
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
@@ -29,7 +29,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	}
 	req.ClientIP = http.GetClientIP(ctx, c)
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
-	if req.NumWant == 0 {
+	if req.NumWant == 0 || req.NumWant > 500 {
 		req.NumWant = 50
 	}
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
