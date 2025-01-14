@@ -14,6 +14,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/thinkeridea/go-extend/exstrings"
+	hertz "github.com/cloudwego/hertz/pkg/common/utils"
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
@@ -48,7 +49,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Complete:   scrape.Complete,
 		})
 	} else {
-		resp := map[string]any{
+		resp := hertz.H{
 			"interval":    config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
 			"external ip": req.ClientIP.String(),
 			"incomplete":  scrape.Incomplete,

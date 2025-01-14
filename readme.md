@@ -7,7 +7,7 @@
 
 ## Introduction
 
-A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego.
+A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego, with observability.
 
 This tracker is hosted as https://btn-prod.ghostchu-services.top/announce
 
@@ -26,13 +26,13 @@ docker pull gaojianli2333/trunker:latest
 ```
 ## Features
 
-- [x] BEP-0003
-- [x] BEP-0007
-- [x] BEP-0023
-- [x] BEP-0024
-- [x] BEP-0031
-- [x] BEP-0048
-- [X] LT-Extension(complete,incomplete)
+- [x] [BEP-0003](https://www.bittorrent.org/beps/bep_0003.html)
+- [x] [BEP-0007](https://www.bittorrent.org/beps/bep_0007.html) (IPv6 Tracker Extension)
+- [x] [BEP-0023](https://www.bittorrent.org/beps/bep_0023.html) (Compact Peer Lists)
+- [x] [BEP-0024](https://www.bittorrent.org/beps/bep_0024.html) (External IP)
+- [x] [BEP-0031](https://www.bittorrent.org/beps/bep_0031.html) (Failure Retry Extension)
+- [x] [BEP-0048](https://www.bittorrent.org/beps/bep_0048.html) (Scrape)
+- [X] LT-Extension (complete,incomplete)
 - [x] Full-Memory Mode
 - [x] Load from Persist
 - [ ] MySQL Mode
@@ -84,6 +84,11 @@ You can ban some torrent or peer by using the following endpoints.
 |:-------|:-----------------------------------|:-----------------------------------------------------------------|
 | GET    | `/admin/info_hash/:infoHash/peers` | Get all peers of a info_hash. **The response may be very large** |
 | DELETE | `/admin/info_hash/:infoHash`       | Delete a info_hash                                               |
+
+## Metrics
+Currently trunker is serving a prometheus handler at `:9091` by default. With 2 paths:
+- `/metrics` Providing metrics about http request, including latency and QPS.
+- `/pprof` Providing golang runtime pprof info.
 
 ## Benchmark
 
