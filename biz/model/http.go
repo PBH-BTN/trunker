@@ -28,7 +28,7 @@ type Peer struct {
 type AnnounceBasicResponse struct {
 	Interval   int64   `json:"interval" bencode:"interval"`
 	Peers      []*Peer `json:"peers" bencode:"peers"`
-	ExternalIp string  `json:"externalIp" bencode:"external ip"`
+	ExternalIp []byte  `json:"externalIp" bencode:"external ip"`
 	Complete   int     `json:"complete" bencode:"complete"`
 	Incomplete int     `json:"incomplete" bencode:"incomplete"`
 }

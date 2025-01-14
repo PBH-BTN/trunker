@@ -44,14 +44,14 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Peers: utils.Map(res, func(p *common.Peer) *model.Peer {
 				return p.ToModel()
 			}),
-			ExternalIp: req.ClientIP.String(),
+			ExternalIp: req.ClientIP,
 			Incomplete: scrape.Incomplete,
 			Complete:   scrape.Complete,
 		})
 	} else {
 		resp := hertz.H{
 			"interval":    config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
-			"external ip": req.ClientIP.String(),
+			"external ip": req.ClientIP,
 			"incomplete":  scrape.Incomplete,
 			"complete":    scrape.Complete,
 		}
