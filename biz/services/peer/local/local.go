@@ -130,8 +130,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	if len(timeoutPeer) > 0 {
 		gopool.CtxGo(ctx, func() {
 			for _, toClean := range timeoutPeer {
-				_, ok := root.peerMap.LoadAndDelete(toClean.GetKey())
-				if ok {
+				if root.peerMap.Delete(toClean.GetKey()) {
 					m.peerCount.Add(-1)
 				}
 			}
@@ -140,8 +139,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	if shouldEject && oldestPeer != nil {
 		gopool.CtxGo(ctx, func() {
 			hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
-			_, ok := root.peerMap.LoadAndDelete(oldestPeer.GetKey())
-			if ok {
+			if root.peerMap.Delete(oldestPeer.GetKey()) {
 				m.peerCount.Add(-1)
 			}
 		})
