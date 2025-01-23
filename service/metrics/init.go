@@ -3,11 +3,14 @@ package metrics
 import (
 	"sync"
 
+	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 var registry *prometheus.Registry
 var once sync.Once
+var counterHandler map[counterMetrics]*prometheus.CounterVec
+var histogramHandler map[string]*prometheus.HistogramVec
 
 func GetRegistry() *prometheus.Registry {
 	if registry != nil {
@@ -18,4 +21,17 @@ func GetRegistry() *prometheus.Registry {
 
 func Init() {
 	registry = prometheus.NewRegistry()
+	if config.AppConfig.Tracker.EnableMetrics {
+		counterHandler = registerCounter(registry)
+		histogramHandler = registerHistogram(registry)
+	}
+}
+
+func EmitCounter(metrics counterMetrics, value int, labels prometheus.Labels) {
+	if !config.AppConfig.Tracker.EnableMetrics {
+		return
+	}
+	if handler, ok := counterHandler[metrics]; ok {
+		_ = counterAdd(handler, value, labels)
+	}
 }

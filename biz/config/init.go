@@ -42,6 +42,7 @@ type TrackerConfig struct {
 	HostPorts           string `yaml:"hostPorts" json:"hostPorts"`
 	UseAnnounceIP       bool   `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
 	EnableEventProducer bool   `yaml:"enableEventProducer" json:"enableEventProducer"`
+	EnableMetrics       bool   `yaml:"enableMetrics" json:"enableMetrics"`
 }
 
 type Config struct {

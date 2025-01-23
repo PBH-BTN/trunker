@@ -9,6 +9,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/middleware"
 	"github.com/PBH-BTN/trunker/biz/services/interval"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
+	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/config"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -19,7 +20,13 @@ import (
 func main() {
 	Init()
 	options := []config.Option{
-		server.WithTracer(prometheus.NewServerTracer(":9091", "/metrics", prometheus.WithDefaultServerMux(true), prometheus.WithEnableGoCollector(true))),
+		server.WithTracer(
+			prometheus.NewServerTracer(":9091", "/metrics",
+				prometheus.WithDefaultServerMux(true),
+				prometheus.WithEnableGoCollector(true),
+				prometheus.WithRegistry(metrics.GetRegistry()),
+			),
+		),
 		server.WithHostPorts(appConfig.AppConfig.Tracker.HostPorts),
 		server.WithExitWaitTime(time.Minute),
 	}
