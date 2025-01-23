@@ -22,7 +22,7 @@ func main() {
 	Init()
 	http.Handle("/pprof", promhttp.Handler())
 	options := []config.Option{
-		server.WithTracer(prometheus.NewServerTracer(":9091", "/metrics")),
+		server.WithTracer(prometheus.NewServerTracer(":9091", "/metrics", prometheus.WithDefaultServerMux(true))),
 		server.WithHostPorts(appConfig.AppConfig.Tracker.HostPorts),
 		server.WithExitWaitTime(time.Minute),
 	}

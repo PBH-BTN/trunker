@@ -3,6 +3,7 @@ package mux_local
 import (
 	"bufio"
 	"encoding/binary"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -35,7 +36,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		var size uint32
 		// Decode data length
 		if err := binary.Read(reader, binary.LittleEndian, &size); err != nil {
-			if err.Error() == "EOF" { // end of file
+			if err == io.EOF { // end of file
 				break
 			}
 			logger.Error("Failed to decode data length:", err.Error())

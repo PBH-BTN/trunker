@@ -6,9 +6,9 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/sonic v1.12.5
-	github.com/cloudwego/hertz v0.9.4
+	github.com/cloudwego/hertz v0.9.5
 	github.com/cristalhq/bencode v0.4.0
-	github.com/hertz-contrib/monitor-prometheus v0.1.2
+	github.com/hertz-contrib/monitor-prometheus v0.1.3
 	github.com/hertz-contrib/pprof v0.1.2
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/shamaton/msgpack/v2 v2.2.2

@@ -53,6 +53,8 @@ github.com/cloudwego/base64x v0.1.4 h1:jwCgWpFanWmN8xoIUHa2rtzmkd5J2plF/dnLS6Xd/
 github.com/cloudwego/base64x v0.1.4/go.mod h1:0zlkT4Wn5C6NdauXdJRhSKRlJvmclQ1hhJgA0rcu/8w=
 github.com/cloudwego/hertz v0.9.4 h1:iiZDxiN9MxQQfkjZpmT9Fl8diISgrw0QQ8j4TJF243w=
 github.com/cloudwego/hertz v0.9.4/go.mod h1:UUBt8N8hSTStz7NEvLZ5mnALpBSofNL4DoYzIIp8UaY=
+github.com/cloudwego/hertz v0.9.5 h1:FXV2YFLrNHRdpwT+OoIvv0wEHUC0Bo68CDPujr6VnWo=
+github.com/cloudwego/hertz v0.9.5/go.mod h1:UUBt8N8hSTStz7NEvLZ5mnALpBSofNL4DoYzIIp8UaY=
 github.com/cloudwego/iasm v0.2.0 h1:1KNIy1I1H9hNNFEEH3DVnI4UujN+1zjpuk6gwHLTssg=
 github.com/cloudwego/iasm v0.2.0/go.mod h1:8rXZaNYT2n95jn+zTI1sDr+IgcD2GVs0nlbbQPiEFhY=
 github.com/cloudwego/netpoll v0.6.5 h1:6E/BWhSzQoyLg9Kx/4xiMdIIpovzwBtXvuqSqaTUzDQ=
@@ -143,6 +145,8 @@ github.com/grpc-ecosystem/grpc-gateway v1.9.0/go.mod h1:vNeuVxBJEsws4ogUvrchl83t
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
 github.com/hertz-contrib/monitor-prometheus v0.1.2 h1:MYZGi4uStLtHKUm7+kc/ljbxzUTDE9H5FPCTSB/p7ZM=
 github.com/hertz-contrib/monitor-prometheus v0.1.2/go.mod h1:aUP6t5bK8msuf+5dN/k8099IjD0u8s9A6vrYWQ+yzN0=
+github.com/hertz-contrib/monitor-prometheus v0.1.3 h1:gQswZA8AnXHFuULDCRz1A1PDjtKyTh/RatWzCca9b5I=
+github.com/hertz-contrib/monitor-prometheus v0.1.3/go.mod h1:5ZnWsWWdBFJrSRacLfIyudR8+dIvwpBwuYux8ecO3cw=
 github.com/hertz-contrib/pprof v0.1.2 h1:eC4jpg8ToSi+9YEOPIr3jki8e/ix3aFPtphCgJ36T6Q=
 github.com/hertz-contrib/pprof v0.1.2/go.mod h1:OKXw5wCUcy1OVwgQLsoCS9JzfcdjoofP+7Uk4c7P9Po=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
