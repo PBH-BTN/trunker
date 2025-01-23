@@ -107,6 +107,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			timeoutPeer = append(timeoutPeer, value)
 			return true
 		}
+		if value.Event == common.PeerEvent_Stopped { // stopped peer should not return
+			return true
+		}
 		if shouldEject {
 			if oldestTime == nil {
 				oldestTime = &value.LastSeen
