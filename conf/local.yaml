@@ -21,6 +21,7 @@ tracker:
   hostPorts: 127.0.0.1:8888
   useAnnounceIP: true
   enableEventProducer: false
+  enableMetrics: false
 
 rocketmq:
   topic: TrunkerEvent

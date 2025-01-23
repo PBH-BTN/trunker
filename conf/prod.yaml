@@ -21,6 +21,7 @@ tracker:
   hostPorts: ingress.sock
   useAnnounceIP: true
   enableEventProducer: true
+  enableMetrics: true
 
 rocketmq:
   topic: TrunkerEvent
