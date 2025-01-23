@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"time"
 
@@ -15,14 +14,12 @@ import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	prometheus "github.com/hertz-contrib/monitor-prometheus"
 	"github.com/hertz-contrib/pprof"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
 	Init()
-	http.Handle("/pprof", promhttp.Handler())
 	options := []config.Option{
-		server.WithTracer(prometheus.NewServerTracer(":9091", "/metrics", prometheus.WithDefaultServerMux(true))),
+		server.WithTracer(prometheus.NewServerTracer(":9091", "/metrics", prometheus.WithDefaultServerMux(true), prometheus.WithEnableGoCollector(true))),
 		server.WithHostPorts(appConfig.AppConfig.Tracker.HostPorts),
 		server.WithExitWaitTime(time.Minute),
 	}
