@@ -29,9 +29,7 @@ func histogramObserve(histogramVec *prometheus.HistogramVec, value time.Duration
 }
 
 const (
-	LabelPeerId   = "peerId"
-	LabelInfoHash = "infoHash"
-	LabelReason   = "reason"
+	LabelReason = "reason"
 )
 
 func registerCounter(registry *prometheus.Registry) map[counterMetrics]*prometheus.CounterVec {
@@ -41,7 +39,7 @@ func registerCounter(registry *prometheus.Registry) map[counterMetrics]*promethe
 		prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: counterPrefix + string(CounterInvalidRequest),
 			Help: "Total invalid announce counter",
-		}, []string{LabelPeerId, LabelInfoHash, LabelReason})
+		}, []string{LabelReason})
 
 	for _, h := range m {
 		registry.MustRegister(h)

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/hex"
 	"errors"
 	"math/rand"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
-	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
@@ -98,17 +96,13 @@ func validAnnounceReq(req *model.AnnounceRequest) bool {
 	}
 	if len(req.InfoHash) != 20 || len(req.PeerID) != 20 {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
-			metrics.LabelReason:   "info hash or peer id length error",
-			metrics.LabelPeerId:   req.PeerID,
-			metrics.LabelInfoHash: hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)),
+			metrics.LabelReason: "info hash or peer id length error",
 		})
 		return false
 	}
 	if req.Port >= 0 && req.Port < 65535 {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
-			metrics.LabelReason:   "invalid port",
-			metrics.LabelPeerId:   req.PeerID,
-			metrics.LabelInfoHash: hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)),
+			metrics.LabelReason: "invalid port",
 		})
 		return false
 	}
