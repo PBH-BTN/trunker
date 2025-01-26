@@ -18,6 +18,9 @@ import (
 )
 
 func main() {
+	if os.Getenv("RUN_ENV") == "prod" {
+		hlog.SetLevel(hlog.LevelInfo)
+	}
 	Init()
 	options := []config.Option{
 		server.WithTracer(
@@ -35,9 +38,6 @@ func main() {
 	}
 	h := server.Default(options...)
 	pprof.Register(h)
-	if os.Getenv("RUN_ENV") == "prod" {
-		hlog.SetLevel(hlog.LevelInfo)
-	}
 	register(h)
 	h.Use(middleware.LogSlowQuery)
 
