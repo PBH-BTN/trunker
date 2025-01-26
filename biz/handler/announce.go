@@ -100,7 +100,7 @@ func validAnnounceReq(req *model.AnnounceRequest) bool {
 		})
 		return false
 	}
-	if req.Port >= 0 && req.Port < 65535 {
+	if !(req.Port >= 0 && req.Port < 65535) {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
 			metrics.LabelReason: "invalid port",
 		})
