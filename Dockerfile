@@ -1,6 +1,6 @@
 FROM golang:alpine AS build
 WORKDIR /build
-COPY . .
+ADD . .
 RUN apk add --no-cache git
 RUN sh build.sh
 
