@@ -173,6 +173,9 @@ func (m *Manager) Scrape(infoHash string) *model.ScrapeFile {
 }
 
 func (m *Manager) GetStatistic() *common.StatisticInfo {
+	if m.peerCount.Load() < 0 {
+		panic("peer count should not be negative")
+	}
 	return &common.StatisticInfo{
 		TotalTorrents: uint64(m.infoHashMap.Len()),
 		TotalPeers:    uint64(m.peerCount.Load()),
