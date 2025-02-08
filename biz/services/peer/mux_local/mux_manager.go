@@ -114,7 +114,7 @@ func (m *MuxLocalManager) Clean() {
 func (m *MuxLocalManager) GetStatistic() *common.StatisticInfo {
 	peerCount := uint64(0)
 	torrentCount := uint64(0)
-	extra := make(map[string]any)
+	extra := make(map[string]*common.StatisticInfo)
 	mu := sync.Mutex{}
 	wp := workpool.New(max(runtime.NumCPU()-1, 1))
 	for i, manager := range m.localList {

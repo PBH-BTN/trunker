@@ -10,7 +10,8 @@ import (
 var registry *prometheus.Registry
 var once sync.Once
 var counterHandler map[counterMetrics]*prometheus.CounterVec
-var histogramHandler map[string]*prometheus.HistogramVec
+var histogramHandler map[counterMetrics]*prometheus.HistogramVec
+var gaugeHandler map[counterMetrics]prometheus.Collector
 
 func GetRegistry() *prometheus.Registry {
 	if registry != nil {
@@ -24,6 +25,7 @@ func Init() {
 	if config.AppConfig.Tracker.EnableMetrics {
 		counterHandler = registerCounter(registry)
 		histogramHandler = registerHistogram(registry)
+		gaugeHandler = registerGauge(registry)
 	}
 }
 

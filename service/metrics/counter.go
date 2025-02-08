@@ -1,7 +1,8 @@
 package metrics
 
-import "time"
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 type counterMetrics string
 
@@ -19,12 +20,12 @@ func counterAdd(counterVec *prometheus.CounterVec, value int, labels prometheus.
 	return nil
 }
 
-func histogramObserve(histogramVec *prometheus.HistogramVec, value time.Duration, labels prometheus.Labels) error {
+func histogramObserve(histogramVec *prometheus.HistogramVec, value float64, labels prometheus.Labels) error {
 	histogram, err := histogramVec.GetMetricWith(labels)
 	if err != nil {
 		return err
 	}
-	histogram.Observe(float64(value.Microseconds()))
+	histogram.Observe(value)
 	return nil
 }
 
@@ -48,8 +49,8 @@ func registerCounter(registry *prometheus.Registry) map[counterMetrics]*promethe
 	return m
 }
 
-func registerHistogram(registry *prometheus.Registry) map[string]*prometheus.HistogramVec {
-	m := make(map[string]*prometheus.HistogramVec)
+func registerHistogram(registry *prometheus.Registry) map[counterMetrics]*prometheus.HistogramVec {
+	m := make(map[counterMetrics]*prometheus.HistogramVec)
 
 	for _, h := range m {
 		registry.MustRegister(h)
