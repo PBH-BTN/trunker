@@ -19,13 +19,13 @@ import (
 
 func (m *MuxLocalManager) LoadFromPersist() {
 	if !config.AppConfig.Tracker.EnablePersist {
-		logger.Info("persist not enabled, skip...")
+		logger.Infof("persist not enabled, skip...")
 		return
 	}
-	logger.Info("start to load peers from persist")
+	logger.Infof("start to load peers from persist")
 	file, err := os.OpenFile(config.AppConfig.Tracker.PersistFile, os.O_RDONLY, 0644)
 	if err != nil {
-		logger.Error("open file error:", err.Error())
+		logger.Errorf("open file error:%s", err.Error())
 		return
 	}
 	defer file.Close()
@@ -39,12 +39,12 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			if err == io.EOF { // end of file
 				break
 			}
-			logger.Error("Failed to decode data length:", err.Error())
+			logger.Errorf("Failed to decode data length:%s", err.Error())
 			return
 		}
 		data := make([]byte, size)
 		if readCount, err := reader.Read(data); err != nil {
-			logger.Error("Failed to decode data length:", err.Error())
+			logger.Errorf("Failed to decode data length:%s", err.Error())
 			return
 		} else if uint32(readCount) != size {
 			// read more
@@ -53,7 +53,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 				tmp := make([]byte, remain)
 				n, err := reader.Read(tmp)
 				if err != nil {
-					logger.Error("Failed to decode data length:", err.Error())
+					logger.Errorf("Failed to decode data length:%s", err.Error())
 					return
 				}
 				remain -= uint32(n)
@@ -64,7 +64,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		// Unmarshal to protobuf SomeStruct
 		pbStruct := &PeerInfo{}
 		if err := proto.Unmarshal(data, pbStruct); err != nil {
-			logger.Error("Failed to decode data length:", err.Error())
+			logger.Errorf("Failed to decode data length:%s", err.Error())
 			break
 		}
 		lastSeen := time.Unix(pbStruct.LastSeen, 0)
@@ -94,12 +94,12 @@ func (m *MuxLocalManager) LoadFromPersist() {
 
 func (m *MuxLocalManager) StoreToPersist() {
 	if !config.AppConfig.Tracker.EnablePersist {
-		logger.Info("persist not enabled, skip...")
+		logger.Infof("persist not enabled, skip...")
 		return
 	}
 	file, err := os.OpenFile(config.AppConfig.Tracker.PersistFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
-		logger.Error("open file error")
+		logger.Errorf("open file error")
 		return
 	}
 	defer file.Close()
@@ -110,7 +110,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 		Len:    0, // 锁定整个文件喵~
 	}
 	if err := unix.FcntlFlock(file.Fd(), unix.F_SETLK, &lock); err != nil {
-		logger.Error("failed to obtain write lock: %s", err.Error())
+		logger.Errorf("failed to obtain write lock: %s", err.Error())
 		return
 	}
 	defer func() {
@@ -119,7 +119,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 	}()
 
 	writer := bufio.NewWriter(file)
-	logger.Info("start to store peers to persist")
+	logger.Infof("start to store peers to persist")
 	count := 0
 	for _, manager := range m.localList {
 		manager.RangeMap(func(infoHash string, value *local.InfoHashRoot) bool {

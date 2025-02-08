@@ -115,12 +115,20 @@ func (m *MuxLocalManager) GetStatistic() *common.StatisticInfo {
 	peerCount := uint64(0)
 	torrentCount := uint64(0)
 	extra := make(map[string]any)
+	mu := sync.Mutex{}
+	wp := workpool.New(max(runtime.NumCPU()-1, 1))
 	for i, manager := range m.localList {
-		info := manager.GetStatistic()
-		peerCount += info.TotalPeers
-		torrentCount += info.TotalTorrents
-		extra[strconv.Itoa(i)] = info
+		wp.Do(func() error {
+			info := manager.GetStatistic()
+			mu.Lock()
+			peerCount += info.TotalPeers
+			torrentCount += info.TotalTorrents
+			extra[strconv.Itoa(i)] = info
+			mu.Unlock()
+			return nil
+		})
 	}
+	_ = wp.Wait()
 	return &common.StatisticInfo{
 		TotalPeers:    peerCount,
 		TotalTorrents: torrentCount,

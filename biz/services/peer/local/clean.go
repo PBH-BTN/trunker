@@ -25,9 +25,7 @@ func (m *Manager) cleanUp(root *InfoHashRoot) {
 		return true
 	})
 	for _, key := range toClean {
-		if root.peerMap.Delete(key) {
-			m.peerCount.Add(-1)
-		}
+		root.peerMap.Delete(key)
 	}
 	root.lastClean = time.Now()
 	if root.peerMap.Len() == 0 {

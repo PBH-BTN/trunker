@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/hex"
 	"net"
-	"sync/atomic"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -34,13 +33,11 @@ func NewInfoHashRoot(infoHash string) *InfoHashRoot {
 
 type Manager struct {
 	infoHashMap *skipmap.OrderedMap[string, *InfoHashRoot]
-	peerCount   atomic.Int64
 }
 
 func NewLocalManger() *Manager {
 	return &Manager{
 		infoHashMap: skipmap.New[string, *InfoHashRoot](),
-		peerCount:   atomic.Int64{},
 	}
 }
 
@@ -64,9 +61,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	})
 	if !ok { // first seen torrent
 		if isPeerConnectable(peer) {
-			if _, exist := root.peerMap.LoadOrStore(peer.GetKey(), peer); !exist {
-				m.peerCount.Add(1)
-			}
+			root.peerMap.LoadOrStore(peer.GetKey(), peer)
 		}
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil, nil
@@ -88,9 +83,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			// new peer!
 			if isPeerConnectable(peer) { // skip private ip
 				// there is a data race, but it's impossible for concurrent access to one peer
-				if _, exist := root.peerMap.LoadOrStore(peer.GetKey(), peer); !exist {
-					m.peerCount.Add(1)
-				}
+				root.peerMap.LoadOrStore(peer.GetKey(), peer)
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 			}
 		}
@@ -130,18 +123,14 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	if len(timeoutPeer) > 0 {
 		gopool.CtxGo(ctx, func() {
 			for _, toClean := range timeoutPeer {
-				if root.peerMap.Delete(toClean.GetKey()) {
-					m.peerCount.Add(-1)
-				}
+				root.peerMap.Delete(toClean.GetKey())
 			}
 		})
 	}
 	if shouldEject && oldestPeer != nil {
 		gopool.CtxGo(ctx, func() {
 			hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
-			if root.peerMap.Delete(oldestPeer.GetKey()) {
-				m.peerCount.Add(-1)
-			}
+			root.peerMap.Delete(oldestPeer.GetKey())
 		})
 	}
 	return resp, nil
@@ -173,12 +162,14 @@ func (m *Manager) Scrape(infoHash string) *model.ScrapeFile {
 }
 
 func (m *Manager) GetStatistic() *common.StatisticInfo {
-	if m.peerCount.Load() < 0 {
-		panic("peer count should not be negative")
-	}
+	peerCount := 0
+	m.infoHashMap.Range(func(_ string, value *InfoHashRoot) bool {
+		peerCount += value.peerMap.Len()
+		return true
+	})
 	return &common.StatisticInfo{
 		TotalTorrents: uint64(m.infoHashMap.Len()),
-		TotalPeers:    uint64(m.peerCount.Load()),
+		TotalPeers:    uint64(peerCount),
 	}
 }
 
