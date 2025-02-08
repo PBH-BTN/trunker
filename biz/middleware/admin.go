@@ -22,7 +22,7 @@ func GetAdminAuthMiddleware() []app.HandlerFunc {
 			ctx.Next(c)
 		}}
 	} else {
-		logger.Warn("admin key is not set, please set ADMIN_KEY environment variable!")
+		logger.Warnf("admin key is not set, please set ADMIN_KEY environment variable!")
 		return nil
 	}
 }
