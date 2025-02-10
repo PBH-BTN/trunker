@@ -74,8 +74,7 @@ func (m *MuxLocalManager) BanInfoHash(ctx context.Context, infoHash string) erro
 	m.banInfoHash.AddString(infoHash)
 	m.banInfoHashLock.Unlock()
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
-	worker.BanInfoHash(ctx, infoHash)
-	return nil
+	return worker.BanInfoHash(ctx, infoHash)
 }
 
 func (m *MuxLocalManager) BanPeer(_ context.Context, peerID string) error {

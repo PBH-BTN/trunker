@@ -75,23 +75,23 @@ func (m *DBManager) restoreBlockList() {
 	if err != nil {
 		logger.Errorf("failed to get info hash block list from db: %s", err.Error())
 	} else {
-		m.banInfoHashLock.Lock()
 		for _, item := range infoHashList {
 			target, _ := hex.DecodeString(item.Target)
+			m.banInfoHashLock.Lock()
 			m.banInfoHash.Add(target)
+			m.banInfoHashLock.Unlock()
 		}
-		m.banInfoHashLock.Unlock()
 	}
 	peerList, err := m.blockListRepo.GetBlockList(ctx, entity.BlockTypePeerID)
 	if err != nil {
 		logger.Errorf("failed to get peer id block list from db: %s", err.Error())
 	} else {
-		m.banPeerLock.Lock()
 		for _, item := range peerList {
 			target, _ := hex.DecodeString(item.Target)
+			m.banPeerLock.Lock()
 			m.banPeerId.Add(target)
+			m.banPeerLock.Unlock()
 		}
-		m.banPeerLock.Unlock()
 	}
 	logger.Infof("restore block list from db done, %d info_hash(es), %d peer_id(s) restored", len(infoHashList), len(peerList))
 }
