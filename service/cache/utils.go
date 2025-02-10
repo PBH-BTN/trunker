@@ -2,9 +2,10 @@ package cache
 
 import (
 	"context"
-	"github.com/bytedance/gopkg/util/logger"
-	"github.com/shamaton/msgpack/v2"
 	"time"
+
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/shamaton/msgpack/v2"
 )
 
 func Get[T any](ctx context.Context, key string) (*T, bool) {
@@ -15,10 +16,10 @@ func Get[T any](ctx context.Context, key string) (*T, bool) {
 	var value T
 	err := msgpack.Unmarshal([]byte(str), &value)
 	if err != nil {
-		logger.CtxWarnf(ctx, "failed to unmarshal value, key: %s, value: %s , error:%s", key, str, err)
+		hlog.CtxWarnf(ctx, "failed to unmarshal value, key: %s, value: %s , error:%s", key, str, err)
 		return nil, false
 	}
-	logger.CtxInfof(ctx, "get value from redis, key: "+key)
+	hlog.CtxInfof(ctx, "get value from redis, key: "+key)
 	return &value, true
 }
 
@@ -30,15 +31,15 @@ func GetList[T any](ctx context.Context, key string) ([]*T, bool) {
 	var value []*T
 	err := msgpack.Unmarshal([]byte(str), &value)
 	if err != nil {
-		logger.CtxWarnf(ctx, "failed to unmarshal value, key: %s, value: %s , error:%s", key, str, err)
+		hlog.CtxWarnf(ctx, "failed to unmarshal value, key: %s, value: %s , error:%s", key, str, err)
 		return nil, false
 	}
-	logger.CtxInfof(ctx, "get value from redis, key: "+key)
+	hlog.CtxInfof(ctx, "get value from redis, key: "+key)
 	return value, true
 }
 
 func Del(ctx context.Context, key string) error {
-	logger.CtxInfof(ctx, "delete key from redis, key: "+key)
+	hlog.CtxInfof(ctx, "delete key from redis, key: "+key)
 	return Client.Del(ctx, key).Err()
 }
 

@@ -13,7 +13,7 @@ type banInfoHashRequest struct {
 	Hash []string `json:"hash"`
 }
 
-func HandleBanInfoHash(_ context.Context, c *app.RequestContext) {
+func HandleBanInfoHash(ctx context.Context, c *app.RequestContext) {
 	req := &banInfoHashRequest{}
 	if c.Bind(req) != nil {
 		http.ResponseBadRequest(c)
@@ -25,7 +25,7 @@ func HandleBanInfoHash(_ context.Context, c *app.RequestContext) {
 	}
 	manager := peer.GetPeerManager()
 	for _, infoHash := range req.Hash {
-		manager.BanInfoHash(infoHash)
+		manager.BanInfoHash(ctx, infoHash)
 	}
 	http.ResponseOK(c, fmt.Sprintf("%d info hash banned", len(req.Hash)))
 	return
@@ -49,7 +49,7 @@ type banPeerRequest struct {
 	PeerId []string `json:"peer_id"`
 }
 
-func HandleBanPeer(_ context.Context, c *app.RequestContext) {
+func HandleBanPeer(ctx context.Context, c *app.RequestContext) {
 	req := &banPeerRequest{}
 	if c.Bind(req) != nil {
 		http.ResponseBadRequest(c)
@@ -61,7 +61,7 @@ func HandleBanPeer(_ context.Context, c *app.RequestContext) {
 	}
 	manager := peer.GetPeerManager()
 	for _, infoHash := range req.PeerId {
-		manager.BanPeer(infoHash)
+		manager.BanPeer(ctx, infoHash)
 	}
 	http.ResponseOK(c, fmt.Sprintf("%d peer banned", len(req.PeerId)))
 	return
@@ -71,24 +71,28 @@ type getInfoHashPeersReq struct {
 	InfoHash string `path:"infoHash" vd:"len($) >0"`
 }
 
-func GetInfoHashPeers(_ context.Context, c *app.RequestContext) {
+func GetInfoHashPeers(ctx context.Context, c *app.RequestContext) {
 	req := &getInfoHashPeersReq{}
 	if c.BindAndValidate(req) != nil {
 		http.ResponseBadRequest(c)
 		return
 	}
 	manager := peer.GetPeerManager()
-	peers := manager.GetPeers(req.InfoHash)
+	peers, err := manager.GetPeers(ctx, req.InfoHash)
+	if err != nil {
+		http.ResponseErr(c, err)
+		return
+	}
 	http.ResponseOK(c, peers)
 }
 
-func DeleteInfoHash(_ context.Context, c *app.RequestContext) {
+func DeleteInfoHash(ctx context.Context, c *app.RequestContext) {
 	req := &getInfoHashPeersReq{}
 	if c.BindAndValidate(req) != nil {
 		http.ResponseBadRequest(c)
 		return
 	}
 	manager := peer.GetPeerManager()
-	manager.DeleteInfoHash(req.InfoHash)
+	manager.DeleteInfoHash(ctx, req.InfoHash)
 	http.ResponseOK(c, nil)
 }

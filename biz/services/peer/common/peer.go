@@ -110,3 +110,8 @@ func (e PeerEvent) String() string {
 		return "unknown"
 	}
 }
+
+// IsPeerConnectable Check If Peer is connectable
+func IsPeerConnectable(peer *Peer) bool {
+	return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
+}

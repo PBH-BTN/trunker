@@ -18,12 +18,12 @@ import (
 )
 
 func (m *MuxLocalManager) LoadFromPersist() {
-	if !config.AppConfig.Tracker.EnablePersist {
+	if !config.AppConfig.Tracker.Memory.EnablePersist {
 		logger.Infof("persist not enabled, skip...")
 		return
 	}
 	logger.Infof("start to load peers from persist")
-	file, err := os.OpenFile(config.AppConfig.Tracker.PersistFile, os.O_RDONLY, 0644)
+	file, err := os.OpenFile(config.AppConfig.Tracker.Memory.PersistFile, os.O_RDONLY, 0644)
 	if err != nil {
 		logger.Errorf("open file error:%s", err.Error())
 		return
@@ -93,11 +93,11 @@ func (m *MuxLocalManager) LoadFromPersist() {
 }
 
 func (m *MuxLocalManager) StoreToPersist() {
-	if !config.AppConfig.Tracker.EnablePersist {
+	if !config.AppConfig.Tracker.Memory.EnablePersist {
 		logger.Infof("persist not enabled, skip...")
 		return
 	}
-	file, err := os.OpenFile(config.AppConfig.Tracker.PersistFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(config.AppConfig.Tracker.Memory.PersistFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Errorf("open file error")
 		return

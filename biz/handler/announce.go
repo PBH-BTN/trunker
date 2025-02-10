@@ -41,7 +41,11 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		bencode.ResponseErr(c, err)
 		return
 	}
-	scrape := peer.GetPeerManager().Scrape(req.InfoHash)
+	scrape, err := peer.GetPeerManager().Scrape(ctx, req.InfoHash)
+	if err != nil {
+		bencode.ResponseErr(c, err)
+		return
+	}
 	if req.Compact == 0 {
 		bencode.ResponseOk(c, model.AnnounceBasicResponse{
 			Interval: config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
@@ -68,7 +72,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	}
 }
 
-func Scrape(_ context.Context, c *app.RequestContext) {
+func Scrape(ctx context.Context, c *app.RequestContext) {
 	req := &model.ScrapeRequest{}
 	if c.Bind(req) != nil {
 		bencode.ResponseErr(c, errors.New("bad request"))
@@ -81,13 +85,23 @@ func Scrape(_ context.Context, c *app.RequestContext) {
 	ret := make(map[string]*model.ScrapeFile)
 	manager := peer.GetPeerManager()
 	for _, infoHash := range req.InfoHashes {
-		ret[infoHash] = manager.Scrape(infoHash)
+		var err error
+		ret[infoHash], err = manager.Scrape(ctx, infoHash)
+		if err != nil {
+			bencode.ResponseErr(c, err)
+			return
+		}
 	}
 	bencode.ResponseOk(c, model.ScrapeResponse{Files: ret})
 }
 
-func Statistic(_ context.Context, c *app.RequestContext) {
-	http.ResponseOK(c, peer.GetPeerManager().GetStatistic())
+func Statistic(ctx context.Context, c *app.RequestContext) {
+	info, err := peer.GetPeerManager().GetStatistic(ctx)
+	if err != nil {
+		http.ResponseErr(c, err)
+		return
+	}
+	http.ResponseOK(c, info)
 }
 
 func validAnnounceReq(req *model.AnnounceRequest) bool {

@@ -12,7 +12,7 @@ import (
 
 var AppConfig *Config
 
-type MysqlConfig struct {
+type databaseConfig struct {
 	Database string `yaml:"database" json:"database"`
 	Host     string `yaml:"host" json:"host"`
 	Port     int    `yaml:"port" json:"port"`
@@ -30,26 +30,37 @@ type RedisConfig struct {
 	Port int    `yaml:"port" json:"port"`
 }
 
+type runningMode string
+
+const (
+	RunningModeMemory runningMode = "memory"
+	RunningModeDB     runningMode = "db"
+)
+
 type TrackerConfig struct {
-	TTL                 int64  `yaml:"ttl" json:"ttl"`
-	IntervalTask        int64  `yaml:"intervalTask" json:"intervalTask"`
-	UseDB               bool   `yaml:"useDB" json:"useDB"`
-	EnablePersist       bool   `yaml:"enablePersist" json:"enablePersist"`
-	PersistFile         string `yaml:"persistFile" json:"persistFile"`
-	MaxPeersPerTorrent  int    `yaml:"maxPeersPerTorrent" json:"maxPeersPerTorrent"`
-	Shard               int    `yaml:"shard" json:"shard"`
-	UseUnixSocket       bool   `yaml:"useUnixSocket" json:"useUnixSocket"`
-	HostPorts           string `yaml:"hostPorts" json:"hostPorts"`
-	UseAnnounceIP       bool   `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
-	EnableEventProducer bool   `yaml:"enableEventProducer" json:"enableEventProducer"`
-	EnableMetrics       bool   `yaml:"enableMetrics" json:"enableMetrics"`
+	TTL                 int64          `yaml:"ttl" json:"ttl"`
+	IntervalTask        int64          `yaml:"intervalTask" json:"intervalTask"`
+	Mode                runningMode    `yaml:"mode" json:"mode"`
+	Memory              memoryConfig   `yaml:"memory" json:"memory"`
+	Database            databaseConfig `yaml:"database" json:"database"`
+	UseUnixSocket       bool           `yaml:"useUnixSocket" json:"useUnixSocket"`
+	HostPorts           string         `yaml:"hostPorts" json:"hostPorts"`
+	UseAnnounceIP       bool           `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
+	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
+	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
+}
+
+type memoryConfig struct {
+	EnablePersist      bool   `yaml:"enablePersist" json:"enablePersist"`
+	PersistFile        string `yaml:"persistFile" json:"persistFile"`
+	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent" json:"maxPeersPerTorrent"`
+	Shard              int    `yaml:"shard" json:"shard"`
 }
 
 type Config struct {
-	PersistDatabase MysqlConfig    `yaml:"database" json:"database"`
-	Cache           RedisConfig    `yaml:"cache" json:"cache"`
-	Tracker         TrackerConfig  `yaml:"tracker" json:"tracker"`
-	RocketMq        RocketMqConfig `yaml:"rocketmq" json:"rocketmq"`
+	Cache    RedisConfig    `yaml:"cache" json:"cache"`
+	Tracker  TrackerConfig  `yaml:"tracker" json:"tracker"`
+	RocketMq RocketMqConfig `yaml:"rocketmq" json:"rocketmq"`
 }
 
 func Init() {

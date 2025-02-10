@@ -1,10 +1,3 @@
-database:
-  database: test
-  host: localhost
-  port: 3306
-  user: test
-  pass: password123
-
 cache:
   host: localhost
   port: 6379
@@ -12,11 +5,18 @@ cache:
 tracker:
   ttl: 3600
   intervalTask: 600 # 10分钟执行一次定时任务
-  useDB: false
-  enablePersist: true
-  persistFile: persist.dat
-  maxPeersPerTorrent: 1500
-  shard: 40
+  mode: db # memory or db
+  memory:
+    enablePersist: true
+    persistFile: persist.dat
+    maxPeersPerTorrent: 1500
+    shard: 40
+  database:
+    database: test
+    host: localhost
+    port: 3306
+    user: trunker
+    pass: password123
   useUnixSocket: false
   hostPorts: 127.0.0.1:8888
   useAnnounceIP: true

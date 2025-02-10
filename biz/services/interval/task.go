@@ -1,6 +1,8 @@
 package interval
 
 import (
+	"context"
+
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/bytedance/gopkg/util/logger"
 )
@@ -14,6 +16,10 @@ func saveDB() {
 }
 
 func printStatics() {
-	statics := peer.GetPeerManager().GetStatistic()
+	statics, err := peer.GetPeerManager().GetStatistic(context.Background())
+	if err != nil {
+		logger.Errorf("[Statics] get statistic error: %v", err)
+		return
+	}
 	logger.Infof("[Statics] total peer: %d, total seed: %d", statics.TotalPeers, statics.TotalTorrents)
 }

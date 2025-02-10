@@ -1,0 +1,22 @@
+CREATE TABLE `peers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `info_hash` varchar(40) NOT NULL COMMENT 'Info hash',
+  `peer_id` varchar(40) DEFAULT NULL,
+  `ip` varbinary(16) NOT NULL,
+  `ipv4` varbinary(4) DEFAULT NULL,
+  `ipv6` varbinary(16) DEFAULT NULL,
+  `client_ip` varbinary(16) NOT NULL COMMENT 'The ip from the heep client',
+  `port` int(11) NOT NULL,
+  `left` bigint(20) unsigned DEFAULT NULL COMMENT 'Left size of the peer',
+  `uploaded` bigint(20) unsigned DEFAULT NULL COMMENT 'Uploaded size',
+  `downloaded` bigint(20) unsigned DEFAULT NULL COMMENT 'Downloaded size',
+  `last_seen` timestamp NOT NULL COMMENT 'Last seen of this peer',
+  `user_agent` varchar(255) NOT NULL,
+  `event` tinyint NOT NULL COMMENT 'Peer event reported',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_info_hash_peer_id` (`peer_id`,`info_hash`),
+  KEY `idx_event` (`event`),
+  KEY `idx_last_seen` (`last_seen` DESC)
+) ENGINE=rocksdb DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Peers table';

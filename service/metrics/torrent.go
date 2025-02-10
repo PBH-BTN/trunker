@@ -1,6 +1,8 @@
 package metrics
 
 import (
+	"context"
+
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/prometheus/client_golang/prometheus"
@@ -40,7 +42,11 @@ func registerGauge(registry *prometheus.Registry) map[counterMetrics]prometheus.
 		Name: counterPrefix + string(GaugeTorrentTotal),
 		Help: "Total Torrent numbers",
 	}, func() float64 {
-		info = peer.GetPeerManager().GetStatistic()
+		var err error
+		info, err = peer.GetPeerManager().GetStatistic(context.Background())
+		if err != nil {
+			return 0
+		}
 		for s, v := range info.Shards {
 			_ = gaugeSet(m[GaugePeer].(*prometheus.GaugeVec), v.TotalPeers, prometheus.Labels{LabelShards: s})
 			_ = gaugeSet(m[GaugeTorrent].(*prometheus.GaugeVec), v.TotalTorrents, prometheus.Labels{LabelShards: s})

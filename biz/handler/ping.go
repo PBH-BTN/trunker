@@ -26,7 +26,7 @@ import (
 )
 
 // Ping .
-func Ping(ctx context.Context, c *app.RequestContext) {
+func Ping(_ context.Context, c *app.RequestContext) {
 	c.JSON(200, utils.H{
 		"message": "pong",
 	})

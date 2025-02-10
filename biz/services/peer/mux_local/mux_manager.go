@@ -36,7 +36,7 @@ func NewMuxLocalManager(num int) *MuxLocalManager {
 		banPeerLock:     sync.RWMutex{},
 		banInfoHashLock: sync.RWMutex{},
 		banInfoHash:     bloom.NewWithEstimates(uint(10000*num), 0.01),
-		banPeerId:       bloom.NewWithEstimates(uint(10000*num*config.AppConfig.Tracker.MaxPeersPerTorrent), 0.01),
+		banPeerId:       bloom.NewWithEstimates(uint(10000*num*config.AppConfig.Tracker.Memory.MaxPeersPerTorrent), 0.01),
 	}
 }
 
@@ -69,18 +69,20 @@ func (m *MuxLocalManager) HandleAnnouncePeer(ctx context.Context, req *model.Ann
 	return worker.HandleAnnouncePeer(ctx, req)
 }
 
-func (m *MuxLocalManager) BanInfoHash(infoHash string) {
+func (m *MuxLocalManager) BanInfoHash(ctx context.Context, infoHash string) error {
 	m.banInfoHashLock.Lock()
 	m.banInfoHash.AddString(infoHash)
 	m.banInfoHashLock.Unlock()
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
-	worker.BanInfoHash(infoHash)
+	worker.BanInfoHash(ctx, infoHash)
+	return nil
 }
 
-func (m *MuxLocalManager) BanPeer(peerID string) {
+func (m *MuxLocalManager) BanPeer(_ context.Context, peerID string) error {
 	m.banPeerLock.Lock()
 	m.banPeerId.AddString(peerID)
 	m.banPeerLock.Unlock()
+	return nil
 }
 
 func (m *MuxLocalManager) ClearBanInfoHash() {
@@ -95,9 +97,9 @@ func (m *MuxLocalManager) ClearBanPeer() {
 	m.banPeerLock.Unlock()
 }
 
-func (m *MuxLocalManager) Scrape(infoHash string) *model.ScrapeFile {
+func (m *MuxLocalManager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
-	return worker.Scrape(infoHash)
+	return worker.Scrape(ctx, infoHash)
 }
 func (m *MuxLocalManager) Clean() {
 	wp := workpool.New(max(runtime.NumCPU()-1, 1))
@@ -111,7 +113,7 @@ func (m *MuxLocalManager) Clean() {
 	_ = wp.Wait()
 }
 
-func (m *MuxLocalManager) GetStatistic() *common.StatisticInfo {
+func (m *MuxLocalManager) GetStatistic(ctx context.Context) (*common.StatisticInfo, error) {
 	peerCount := uint64(0)
 	torrentCount := uint64(0)
 	extra := make(map[string]*common.StatisticInfo)
@@ -119,7 +121,7 @@ func (m *MuxLocalManager) GetStatistic() *common.StatisticInfo {
 	wp := workpool.New(max(runtime.NumCPU()-1, 1))
 	for i, manager := range m.localList {
 		wp.Do(func() error {
-			info := manager.GetStatistic()
+			info := manager.GetStatistic(ctx)
 			mu.Lock()
 			peerCount += info.TotalPeers
 			torrentCount += info.TotalTorrents
@@ -133,15 +135,15 @@ func (m *MuxLocalManager) GetStatistic() *common.StatisticInfo {
 		TotalPeers:    peerCount,
 		TotalTorrents: torrentCount,
 		Shards:        extra,
-	}
+	}, nil
 }
 
-func (m *MuxLocalManager) GetPeers(infoHash string) []*common.Peer {
+func (m *MuxLocalManager) GetPeers(ctx context.Context, infoHash string) ([]*common.Peer, error) {
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
-	return worker.GetPeers(infoHash)
+	return worker.GetPeers(ctx, infoHash)
 }
 
-func (m *MuxLocalManager) DeleteInfoHash(infoHash string) {
+func (m *MuxLocalManager) DeleteInfoHash(ctx context.Context, infoHash string) error {
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
-	worker.DeleteInfoHash(infoHash)
+	return worker.DeleteInfoHash(ctx, infoHash)
 }

@@ -60,7 +60,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return NewInfoHashRoot(req.InfoHash)
 	})
 	if !ok { // first seen torrent
-		if isPeerConnectable(peer) {
+		if common.IsPeerConnectable(peer) {
 			root.peerMap.LoadOrStore(peer.GetKey(), peer)
 		}
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
@@ -81,7 +81,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			knownPeer.Event = peer.Event
 		} else {
 			// new peer!
-			if isPeerConnectable(peer) { // skip private ip
+			if common.IsPeerConnectable(peer) { // skip private ip
 				// there is a data race, but it's impossible for concurrent access to one peer
 				root.peerMap.LoadOrStore(peer.GetKey(), peer)
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
@@ -93,7 +93,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	timeoutPeer := make([]*common.Peer, 0)
 	var oldestTime *time.Time
 	var oldestPeer *common.Peer
-	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.MaxPeersPerTorrent
+	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
 		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
 			// timeout!
@@ -136,14 +136,14 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	return resp, nil
 }
 
-func (m *Manager) Scrape(infoHash string) *model.ScrapeFile {
+func (m *Manager) Scrape(_ context.Context, infoHash string) (*model.ScrapeFile, error) {
 	root, ok := m.infoHashMap.Load(infoHash)
 	if !ok {
 		return &model.ScrapeFile{
 			Complete:   0,
 			Incomplete: 0,
 			Downloaded: 0,
-		}
+		}, nil
 	}
 	var complete, incomplete, downloaded int
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
@@ -158,10 +158,10 @@ func (m *Manager) Scrape(infoHash string) *model.ScrapeFile {
 		Complete:   complete,
 		Incomplete: incomplete,
 		Downloaded: downloaded, // 这个目前不实现
-	}
+	}, nil
 }
 
-func (m *Manager) GetStatistic() *common.StatisticInfo {
+func (m *Manager) GetStatistic(_ context.Context) *common.StatisticInfo {
 	peerCount := 0
 	m.infoHashMap.Range(func(_ string, value *InfoHashRoot) bool {
 		peerCount += value.peerMap.Len()
@@ -197,14 +197,15 @@ func (m *Manager) LoadFromPersist() {
 	panic("please use mux to persist")
 }
 
-func (m *Manager) BanInfoHash(infoHash string) {
+func (m *Manager) BanInfoHash(_ context.Context, infoHash string) error {
 	// ban process in the mux, we just delete at here
 	m.infoHashMap.Delete(infoHash)
+	return nil
 }
 
-func (m *Manager) BanPeer(peerID string) {
+func (m *Manager) BanPeer(_ context.Context, _ string) error {
 	// do nothing, let its ttl end
-	return
+	return nil
 }
 
 func (m *Manager) ClearBanInfoHash() {
@@ -215,19 +216,15 @@ func (m *Manager) ClearBanPeer() {
 	// do nothing
 }
 
-func (m *Manager) GetPeers(infoHash string) []*common.Peer {
+func (m *Manager) GetPeers(_ context.Context, infoHash string) ([]*common.Peer, error) {
 	peerMap, ok := m.infoHashMap.Load(infoHash)
 	if !ok {
-		return []*common.Peer{}
+		return []*common.Peer{}, nil
 	}
-	return utils.SkipMapToSlice(peerMap.peerMap)
+	return utils.SkipMapToSlice(peerMap.peerMap), nil
 }
 
-func (m *Manager) DeleteInfoHash(infoHash string) {
+func (m *Manager) DeleteInfoHash(_ context.Context, infoHash string) error {
 	m.infoHashMap.Delete(infoHash)
-}
-
-// isPeerConnectable Check If Peer is connectable
-func isPeerConnectable(peer *common.Peer) bool {
-	return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
+	return nil
 }
