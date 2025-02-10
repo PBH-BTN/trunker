@@ -130,8 +130,8 @@ func NewDBManager() *DBManager {
 		blockListRepo:   data.NewBlockListRepository(db),
 		banPeerLock:     sync.RWMutex{},
 		banInfoHashLock: sync.RWMutex{},
-		banInfoHash:     bloom.NewWithEstimates(uint(10000*10000), 0.01),
-		banPeerId:       bloom.NewWithEstimates(uint(10000*10000*1000), 0.01),
+		banInfoHash:     bloom.NewWithEstimates(uint(10000), 0.01),
+		banPeerId:       bloom.NewWithEstimates(uint(10000), 0.01),
 	}
 	m.restoreBlockList()
 	return m

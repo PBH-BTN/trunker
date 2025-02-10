@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
@@ -35,8 +34,8 @@ func NewMuxLocalManager(num int) *MuxLocalManager {
 		localList:       list,
 		banPeerLock:     sync.RWMutex{},
 		banInfoHashLock: sync.RWMutex{},
-		banInfoHash:     bloom.NewWithEstimates(uint(10000*num), 0.01),
-		banPeerId:       bloom.NewWithEstimates(uint(10000*num*config.AppConfig.Tracker.Memory.MaxPeersPerTorrent), 0.01),
+		banInfoHash:     bloom.NewWithEstimates(uint(10000), 0.01),
+		banPeerId:       bloom.NewWithEstimates(uint(10000), 0.01),
 	}
 }
 
