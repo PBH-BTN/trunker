@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"gorm.io/driver/mysql"
@@ -27,5 +28,12 @@ func InitDB() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(150)
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	return db
 }
