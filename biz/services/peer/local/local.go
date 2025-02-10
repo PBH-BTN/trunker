@@ -3,6 +3,7 @@ package local
 import (
 	"context"
 	"encoding/hex"
+	"errors"
 	"net"
 	"time"
 
@@ -56,6 +57,15 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		Event:      common.ParsePeerEvent(req.Event),
 		UserAgent:  req.UserAgent,
 	}
+	if peer.IPv4 != nil && peer.IPv4.To4() == nil {
+		hlog.CtxWarnf(ctx, "invalid ipv4 address,actual: %s", peer.IPv4.String())
+		return nil, errors.New("invalid address")
+	}
+	if peer.IPv6 != nil && peer.IPv6.To4() != nil {
+		hlog.CtxWarnf(ctx, "invalid ipv6 address,actual: %s", peer.IPv4.String())
+		return nil, errors.New("invalid address")
+	}
+
 	root, ok := m.infoHashMap.LoadOrStoreLazy(req.InfoHash, func() *InfoHashRoot {
 		return NewInfoHashRoot(req.InfoHash)
 	})
