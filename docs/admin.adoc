@@ -1,0 +1,42 @@
+== Admin
+
+Trunker provides a simple admin interface to check the status of the tracker. Before using the admin interface, you need to set the `ADMIN_KEY` env.
+
+=== Authorization
+
+Header: `Authorization: Bearer ${ADMIN_KEY}`
+
+=== Endpoints
+
+==== Statistic
+
+[cols="<,<,<"]
+|===
+|Method |Path |Description 
+
+|GET |`/admin/statistic` |Get the statistic of the tracker. 
+|===
+
+==== Block list
+
+You can ban some torrent or peer by using the following endpoints.
+
+[cols="<,<,<"]
+|===
+|Method |Path |Description 
+
+|PUT |`/admin/ban/info_hash` |Ban a torrent by info_hash. 
+|DELETE |`/admin/ban/info_hash` |Clear all info_hash ban list. 
+|PUT |`/ban/peer` |Ban a peer by peer_id. 
+|DELETE |`/ban/peer` |Clear all peer ban list. 
+|===
+
+==== InfoHash
+
+[cols="<,<,<"]
+|===
+|Method |Path |Description 
+
+|GET |`/admin/info_hash/:infoHash/peers` |Get all peers of a info_hash. *The response may be very large* 
+|DELETE |`/admin/info_hash/:infoHash` |Delete a info_hash 
+|===

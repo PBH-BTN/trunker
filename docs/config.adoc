@@ -1,0 +1,62 @@
+= Configuration
+
+The configuration file is in YAML format, you can find the example configuration in the `conf/prod.yaml` file.
+
+[cols="<,<,<"]
+|===
+|Name |Description |Default 
+
+|ttl |The time of a peer announce next time. |3600s 
+|intervalTask |The interval of the task to clean the expired peers. |600s 
+|*mode* |trunker provides 2 running mode: memory and db |*required*,memory 
+|memory/database |Depends on your mode, this can be 2 different struct. | 
+|useUnixSocket |Use Unix Socket instead tcp |false 
+|hostPorts |The host and port of the server, For unix socket mode, this is the file name of the sock file. |127.0.0.1:8888 
+|useAnnounceIP |Allow peer to announce its IP in the query string. |true 
+|enableEventProducer |Send peer event to the mq. Caution: This will produce tons of message. |false 
+|===
+
+== Memory
+
+=== What is memory mode?
+
+Memory mode means that the tracker will store all the data in memory, which will cost more memory but have a better performance. Memory mode only save the data to the disk by interval or when the tracker is shutting down, and load the data from the disk when the tracker is launching (optional).
+
+=== Config
+
+If your mode is `memory`, you can use the following configuration.
+
+[cols="<,<,<"]
+|===
+|Name |Description |Default 
+
+|useDB |Use the database to store the data. (currently no usable) |false 
+|enablePersist |Save the peers to the disk and load them while launching. |true 
+|maxPeersPerTorrent |The max number of peers per torrent. |100 
+|shard |The number of shards. More shards will improve response time, by cost more memory. |16 
+|===
+
+== Database
+
+=== What is database mode?
+
+In database mode, tracker will save all the data in the db, which is convenience for external analysis and backup. The performance is depended on the database, so please confirm your database is powerful enough. Currently only `MySQL` is supported and https://myrocks.io/[rocksdb] is recommended.
+
+=== Config
+
+If your mode is `database`, following configuration are *required*.
+
+[cols="<,<,<"]
+|===
+|Name |Description |Default 
+
+|database |The database name. |*required*, no default 
+|host |The database host. |*required*, no default 
+|port |The database port. |*required*, no default 
+|user |The database user. |*required*, no default 
+|pass |The database password. |*required*, no default 
+|===
+
+== JSON Config
+
+JSON config is also supported with env `TRUNKER_CONFIG`, this will be useful for docker.

@@ -1,0 +1,4 @@
+== Metrics
+Currently trunker is serving a prometheus handler at `:9091` by default. With 2 paths:
+- `/metrics` Providing metrics about http request, including latency and QPS.
+- `/pprof` Providing golang runtime pprof info.
