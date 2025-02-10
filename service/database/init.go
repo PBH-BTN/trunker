@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"gorm.io/driver/mysql"
@@ -10,6 +11,10 @@ import (
 )
 
 func InitDB() *gorm.DB {
+	log := logger.Default.LogMode(logger.Info)
+	if os.Getenv("RUN_ENV") == "prod" {
+		log = logger.Default.LogMode(logger.Silent)
+	}
 	endpoint := config.AppConfig.Tracker.Database
 	db, err := gorm.Open(mysql.Open(fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&loc=Local&parseTime=True",
@@ -17,7 +22,7 @@ func InitDB() *gorm.DB {
 	)), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
-		Logger:                 logger.Default.LogMode(logger.Info),
+		Logger:                 log,
 	})
 	if err != nil {
 		panic(err)
