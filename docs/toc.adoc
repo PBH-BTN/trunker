@@ -1,5 +1,5 @@
 = TOC
 
-. Trunker provides a set of simple admin interface, please refer link:./admin.adoc[Admin]
-. To config the tracker, please refer link:./config.adoc[Configuration]
-. Trunker also provides some metrics, refer link:./metrics.adoc[Metrics]
+. Trunker provides a set of admin interface, please refer link:./admin.adoc[Admin]
+. To configure the tracker, please refer link:./config.adoc[Configuration]
+. Trunker also provides observability capabilities, refer link:./metrics.adoc[Metrics]

@@ -17,10 +17,10 @@ tracker:
     port: 3306
     user: root
     pass: root
-  useUnixSocket: true
-  hostPorts: ingress.sock
+  useUnixSocket: false
+  hostPorts: 0.0.0.0:8888
   useAnnounceIP: true
-  enableEventProducer: true
+  enableEventProducer: false
   enableMetrics: true
 
 rocketmq:
