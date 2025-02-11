@@ -45,9 +45,8 @@ Trunker provides much config and observability capabilities, if you want to run 
 
 Trunker has very strong performance. Here's a record of a real peak.
 
-- CPU: `4 Cores AMD EPYC-Milan`
-- Average response time: `166us` when `905333` torrents and `1577805` peers are online.
-- QPS: `2300` (can be higher, but we don't have such many peers connect to our tracker)
-- Memory Cost: `933MB`.
+![image](https://github.com/user-attachments/assets/920bd461-9389-4aa4-b0bd-1dee26dc9325)
 
-![image](https://github.com/user-attachments/assets/c9c91f00-72b5-444f-8272-1dc986e4788c)
+![image](https://github.com/user-attachments/assets/25bf44e5-8a10-4aec-84cc-02e39b3b9bbc)
+
+
