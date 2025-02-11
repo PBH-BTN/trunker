@@ -42,12 +42,14 @@ If you want to run trunker by yourself, please see the [Wiki](./docs/toc.adoc).
 
 ## Benchmark
 
-CPU: 4 Cores ARM64 Oracle Cloud
+Trunker has very strong performance. Here's a record of a real peak.
 
-Average response time: 600μs when 30K torrents and 27K peers are online.
+CPU: 4 Cores AMD EPYC-Milan
 
-QPS: 700~ (can be higher but we don't have such many peers connect to our tracker)
+Average response time: 166us when 905333 torrents and 1577805 peers are online.
 
-Memory Cost: 348MB.
+QPS: 2300 (can be higher, but we don't have such many peers connect to our tracker)
 
-![image](https://github.com/user-attachments/assets/746babae-1eb3-4944-afb4-f629f78a007d)
+Memory Cost: 933MB.
+
+![image](https://github.com/user-attachments/assets/c9c91f00-72b5-444f-8272-1dc986e4788c)
