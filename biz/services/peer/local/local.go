@@ -62,7 +62,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return nil, errors.New("invalid address")
 	}
 	if peer.IPv6 != nil && peer.IPv6.To4() != nil {
-		hlog.CtxWarnf(ctx, "invalid ipv6 address,actual: %s", peer.IPv4.String())
+		hlog.CtxWarnf(ctx, "invalid ipv6 address,actual: %s", peer.IPv6.String())
 		return nil, errors.New("invalid address")
 	}
 

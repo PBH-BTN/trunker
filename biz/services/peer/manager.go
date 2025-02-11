@@ -16,7 +16,7 @@ type PeerManager interface {
 	// Scrape 处理Scrape请求
 	Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error)
 	// Clean 清理不活跃Peer
-	Clean()
+	Clean() int64
 	// LoadFromPersist 从持久化存储加载数据
 	LoadFromPersist()
 	// StoreToPersist 保存数据到持久化存储

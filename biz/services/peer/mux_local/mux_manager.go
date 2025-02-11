@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
@@ -99,16 +100,17 @@ func (m *MuxLocalManager) Scrape(ctx context.Context, infoHash string) (*model.S
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
 	return worker.Scrape(ctx, infoHash)
 }
-func (m *MuxLocalManager) Clean() {
+func (m *MuxLocalManager) Clean() int64 {
 	wp := workpool.New(max(runtime.NumCPU()-1, 1))
-	for i, manager := range m.localList {
+	total := atomic.Int64{}
+	for _, manager := range m.localList {
 		wp.Do(func() error {
-			hlog.Info("clean shard ", i)
-			manager.Clean()
+			total.Add(manager.Clean())
 			return nil
 		})
 	}
 	_ = wp.Wait()
+	return total.Load()
 }
 
 func (m *MuxLocalManager) GetStatistic(ctx context.Context) (*common.StatisticInfo, error) {

@@ -8,7 +8,8 @@ import (
 )
 
 func cleanInactivePeer() {
-	peer.GetPeerManager().Clean()
+	count := peer.GetPeerManager().Clean()
+	logger.Infof("[Clean] clean inactive peers: %d", count)
 }
 
 func saveDB() {
