@@ -8,6 +8,7 @@ import (
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
+	r.HEAD("/ping", handler.Ping)
 	r.GET("/ping", handler.Ping)
 	r.GET("/announce", handler.Announce)
 	r.GET("/scrape", handler.Scrape)

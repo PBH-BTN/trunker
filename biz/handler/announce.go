@@ -95,6 +95,13 @@ func Scrape(ctx context.Context, c *app.RequestContext) {
 	bencode.ResponseOk(c, model.ScrapeResponse{Files: ret})
 }
 
+func HealthCheck(ctx context.Context, c *app.RequestContext) {
+	resp := hertz.H{
+		"status": "health",
+	}
+	c.JSON(204, resp)
+}
+
 func Statistic(ctx context.Context, c *app.RequestContext) {
 	info, err := peer.GetPeerManager().GetStatistic(ctx)
 	if err != nil {
