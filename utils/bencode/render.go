@@ -3,14 +3,13 @@ package bencode
 import (
 	"github.com/cloudwego/hertz/pkg/app/server/render"
 	"github.com/cloudwego/hertz/pkg/protocol"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cristalhq/bencode"
 )
 
 type BencodeRender struct {
 	Data any
 }
-
-const bencodeContentType = "text/plain; charset=utf-8"
 
 func writeContentType(resp *protocol.Response, value string) {
 	resp.Header.SetContentType(value)
@@ -31,5 +30,5 @@ func (r BencodeRender) Render(resp *protocol.Response) error {
 }
 
 func (r BencodeRender) WriteContentType(resp *protocol.Response) {
-	writeContentType(resp, bencodeContentType)
+	writeContentType(resp, consts.MIMETextPlainUTF8)
 }
