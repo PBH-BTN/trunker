@@ -22,6 +22,13 @@ func ResponseErr(c *app.RequestContext, err error) {
 	})
 }
 
+func ResponseErrCustom(c *app.RequestContext, code int, err error) {
+	c.JSON(code, commonResponse{
+		Code:    code,
+		Message: err.Error(),
+	})
+}
+
 func ResponseUnauthorized(c *app.RequestContext) {
 	c.JSON(401, commonResponse{
 		Code:    401,

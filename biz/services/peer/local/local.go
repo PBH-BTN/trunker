@@ -52,7 +52,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		Uploaded:   req.Uploaded,
 		Left:       req.Left,
 		Port:       req.Port,
+		Type:       req.Type,
 		Downloaded: req.Downloaded,
+		Offers:     req.Offers,
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),
 		UserAgent:  req.UserAgent,
@@ -108,6 +110,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
 			// timeout!
 			timeoutPeer = append(timeoutPeer, value)
+			return true
+		}
+		if value.Type != peer.Type { // same type peer only
 			return true
 		}
 		if value.Event == common.PeerEvent_Stopped { // stopped peer should not return

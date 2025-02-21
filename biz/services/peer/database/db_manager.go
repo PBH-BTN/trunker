@@ -51,11 +51,13 @@ func (m *DBManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceR
 		IPv6:       net.ParseIP(req.IPv6),
 		ClientIP:   req.ClientIP,
 		Uploaded:   req.Uploaded,
+		Type:       req.Type,
 		Left:       req.Left,
 		Port:       req.Port,
 		Downloaded: req.Downloaded,
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),
+		Offers:     req.Offers,
 		UserAgent:  req.UserAgent,
 	}
 	if peer.IPv4 != nil && peer.IPv4.To4() == nil {
@@ -76,7 +78,7 @@ func (m *DBManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceR
 			}
 		}
 	})
-	peers, err := m.peerRepo.PickPeers(ctx, req.InfoHash, req.NumWant)
+	peers, err := m.peerRepo.PickPeers(ctx, req.InfoHash, req.NumWant, req.Type)
 	if err != nil {
 		hlog.CtxErrorf(ctx, "failed to get peers: %s", err.Error())
 		return nil, err

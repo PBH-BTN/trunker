@@ -12,6 +12,7 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 	r.GET("/announce", handler.Announce)
 	r.GET("/scrape", handler.Scrape)
+	r.GET("/ws", handler.HandleWebTorrent)
 	router.RegisterAdminRouter(r)
 	// your code ...
 }

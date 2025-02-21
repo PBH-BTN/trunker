@@ -17,12 +17,16 @@ type Peer struct {
 	ClientIP   net.IP
 	Port       int
 	Left       uint64
+	Type       PeerType
 	Uploaded   uint64    `json:"uploaded"`
 	Downloaded uint64    `json:"downloaded"`
 	LastSeen   time.Time `json:"lastSeen"`
 	UserAgent  string
 	Event      PeerEvent
+	Offers     []*Offer `json:"offers"`
 }
+type PeerType = model.PeerType
+type Offer = model.Offer
 
 func (p *Peer) ToModel() *model.Peer {
 	if p == nil {
@@ -113,5 +117,10 @@ func (e PeerEvent) String() string {
 
 // IsPeerConnectable Check If Peer is connectable
 func IsPeerConnectable(peer *Peer) bool {
-	return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
+	if peer.Type == model.PeerTypeBittorrent {
+		return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
+	} else if peer.Type == model.PeerTypeWebtorrent {
+		return len(peer.Offers) > 0
+	}
+	return false
 }
