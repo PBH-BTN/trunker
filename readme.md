@@ -37,6 +37,7 @@ docker run -d --name trunker -e ADMIN_KEY=aabbcc -p 8888:8888 gaojianli2333/trun
 - [x] Load and store persist from disk
 - [x] Blacklist for info_hash and peer_id
 - [x] Eventbus support
+- [x] Websocket support
 
 ## Wiki
 Trunker provides much config and observability capabilities, if you want to run trunker in production, please see the [Wiki](./docs/toc.adoc).
