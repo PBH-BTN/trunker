@@ -27,6 +27,7 @@ type Peer struct {
 }
 type PeerType = model.PeerType
 type Offer = model.Offer
+type OfferDetail = model.OfferDetail
 
 func (p *Peer) ToModel() *model.Peer {
 	if p == nil {

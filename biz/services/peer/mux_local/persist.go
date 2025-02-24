@@ -11,9 +11,10 @@ import (
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
+	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/logger"
-	"golang.org/x/sys/unix"
+	"github.com/gofrs/flock"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -86,6 +87,16 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			LastSeen:   lastSeen,
 			UserAgent:  pbStruct.UserAgent,
 			Event:      common.PeerEvent(pbStruct.Event),
+			Type:       common.PeerType(pbStruct.Type),
+			Offers: utils.Map(pbStruct.Offers, func(o *Offer) *common.Offer {
+				return &common.Offer{
+					OfferID: o.OfferId,
+					Offer: common.OfferDetail{
+						Type: o.Offer.Type,
+						SDP:  o.Offer.Sdp,
+					},
+				}
+			}),
 		})
 		count++
 	}
@@ -103,19 +114,13 @@ func (m *MuxLocalManager) StoreToPersist() {
 		return
 	}
 	defer file.Close()
-	lock := unix.Flock_t{
-		Type:   unix.F_WRLCK,
-		Whence: 0,
-		Start:  0,
-		Len:    0, // 锁定整个文件喵~
-	}
-	if err := unix.FcntlFlock(file.Fd(), unix.F_SETLK, &lock); err != nil {
+	lock := flock.New(config.AppConfig.Tracker.Memory.PersistFile)
+	if err := lock.Lock(); err != nil {
 		logger.Errorf("failed to obtain write lock: %s", err.Error())
 		return
 	}
 	defer func() {
-		lock.Type = unix.F_UNLCK
-		unix.FcntlFlock(file.Fd(), unix.F_SETLK, &lock)
+		_ = lock.Unlock()
 	}()
 
 	writer := bufio.NewWriter(file)
@@ -140,6 +145,12 @@ func (m *MuxLocalManager) StoreToPersist() {
 					LastSeen:   value.LastSeen.Unix(),
 					UserAgent:  strings.ToValidUTF8(value.UserAgent, ""),
 					Event:      PeerEvent(value.Event),
+					Offers: utils.Map(value.Offers, func(o *common.Offer) *Offer {
+						return &Offer{
+							OfferId: o.OfferID,
+							Offer:   &OfferDetail{Type: o.Offer.Type, Sdp: o.Offer.SDP},
+						}
+					}),
 				}
 				data, err := proto.Marshal(peerPB)
 				if err != nil {

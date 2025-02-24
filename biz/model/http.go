@@ -47,11 +47,12 @@ type AnnounceBasicResponse struct {
 }
 
 type Offer struct {
-	OfferID string `json:"offer_id" query:"offer_id"`
-	Offer   struct {
-		Type string `json:"type" query:"type"`
-		SDP  string `json:"sdp" query:"sdp"`
-	} `json:"offer" query:"offer"`
+	OfferID string      `json:"offer_id" query:"offer_id"`
+	Offer   OfferDetail `json:"offer" query:"offer"`
+}
+type OfferDetail struct {
+	Type string `json:"type" query:"type"`
+	SDP  string `json:"sdp" query:"sdp"`
 }
 type ErrorResponse struct {
 	FailureReason string `json:"failureReason" bencode:"failure reason"`
