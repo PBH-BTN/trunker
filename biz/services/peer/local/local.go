@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -270,5 +271,13 @@ func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID stri
 	_ = json.Unmarshal(answerBody, &resp)
 	delete(resp, "to_peer_id")
 	hlog.CtxDebugf(ctx, "answer to peer %s:%s", peer.ID, utils.ToJSON(resp))
-	return peer.Conn.WriteJSON(resp)
+	err := peer.Conn.WriteJSON(resp)
+	if err != nil {
+		if strings.Contains(err.Error(), "close") {
+			peer.Conn = nil
+			return errors.New("remote peer offline")
+		}
+		return err
+	}
+	return nil
 }

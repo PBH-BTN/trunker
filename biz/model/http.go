@@ -2,8 +2,6 @@ package model
 
 import (
 	"net"
-
-	"github.com/hertz-contrib/websocket"
 )
 
 // AnnounceRequest Bittorrent Announce Request https://wiki.theory.org/BitTorrent_Tracker_Protocol
@@ -24,7 +22,7 @@ type AnnounceRequest struct {
 	IPv6       string   `query:"ipv6"`
 	Compact    int8     `default:"1" json:"compact" query:"compact"`
 	Offers     []*Offer `json:"offers" query:"offers"`
-	Conn       *websocket.Conn
+	Conn       *Conn
 }
 
 type PeerType int8

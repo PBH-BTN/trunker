@@ -24,7 +24,7 @@ func main() {
 	Init()
 	options := []config.Option{
 		server.WithTracer(
-			prometheus.NewServerTracer(":9091", "/metrics",
+			prometheus.NewServerTracer(":9092", "/metrics",
 				prometheus.WithDefaultServerMux(true),
 				prometheus.WithEnableGoCollector(true),
 				prometheus.WithRegistry(metrics.GetRegistry()),

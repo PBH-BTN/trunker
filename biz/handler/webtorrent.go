@@ -34,7 +34,7 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
-				if websocket.IsCloseError(err, websocket.CloseNoStatusReceived) {
+				if websocket.IsCloseError(err, websocket.CloseNoStatusReceived, websocket.CloseNormalClosure) {
 					break
 				}
 				hlog.CtxErrorf(ctx, "failed to read from websocket:%s", err.Error())
@@ -125,7 +125,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	if req.NumWant == 0 || req.NumWant > 500 {
 		req.NumWant = 50
 	}
-	req.Conn = conn
+	req.Conn = model.NewConn(conn)
 	req.Type = model.PeerTypeWebtorrent
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	if err != nil {

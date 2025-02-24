@@ -7,7 +7,6 @@ import (
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
-	"github.com/hertz-contrib/websocket"
 )
 
 type Peer struct {
@@ -24,12 +23,13 @@ type Peer struct {
 	LastSeen   time.Time `json:"lastSeen"`
 	UserAgent  string
 	Event      PeerEvent
-	Offers     []*Offer        `json:"offers"`
-	Conn       *websocket.Conn `json:"-"`
+	Offers     []*Offer `json:"offers"`
+	Conn       *Conn    `json:"-"`
 }
 type PeerType = model.PeerType
 type Offer = model.Offer
 type OfferDetail = model.OfferDetail
+type Conn = model.Conn
 
 func (p *Peer) ToModel() *model.Peer {
 	if p == nil {

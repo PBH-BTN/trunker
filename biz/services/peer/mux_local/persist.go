@@ -154,6 +154,10 @@ func (m *MuxLocalManager) StoreToPersist() {
 							Offer:   &OfferDetail{Type: o.Offer.Type, Sdp: o.Offer.SDP},
 						}
 					}),
+					Type: PeerType(value.Type),
+				}
+				if value.Conn != nil {
+					_ = value.Conn.Close()
 				}
 				data, err := proto.Marshal(peerPB)
 				if err != nil {
