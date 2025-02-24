@@ -107,7 +107,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		"interval":   config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
 		"incomplete": scrape.Incomplete,
 		"complete":   scrape.Complete,
-		"info_hash":  trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash)),
+		"info_hash":  conv.UnsafeBytesToString(trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
 	}
 	hlog.CtxDebugf(ctx, "send msg:%s", utils.ToJSON(resp))
 	if err := conn.WriteJSON(resp); err != nil {
@@ -118,7 +118,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		for _, o := range p.Offers {
 			offer := hertz.H{
 				"action":    "announce",
-				"info_hash": trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash)),
+				"info_hash": conv.UnsafeBytesToString(trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
 				"offer_id":  o.OfferID,
 				"peer_id":   req.PeerID,
 				"offer":     o.Offer,
