@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math/rand"
+	"strings"
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
@@ -14,6 +15,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/thinkeridea/go-extend/exstrings"
 )
@@ -39,6 +41,9 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	req.Type = model.PeerTypeBittorrent
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	if err != nil {
+		if strings.Contains(err.Error(), "invalid address") {
+			hlog.CtxDebugf(ctx, "invalid address, query: %s, ua:%s", c.Request.QueryString(), c.UserAgent())
+		}
 		bencode.ResponseErr(c, err)
 		return
 	}

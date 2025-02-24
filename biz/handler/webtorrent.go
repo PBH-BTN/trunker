@@ -23,7 +23,11 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
-var u = websocket.HertzUpgrader{} // use default options
+var u = websocket.HertzUpgrader{
+	CheckOrigin: func(ctx *app.RequestContext) bool {
+		return true // don't check origin for client
+	},
+} // use default options
 func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 	err := u.Upgrade(c, func(conn *websocket.Conn) {
 		for {
