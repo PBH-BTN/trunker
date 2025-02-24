@@ -107,6 +107,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	var oldestPeer *common.Peer
 	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
+		if value.ID == peer.ID {
+			return true
+		}
 		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
 			// timeout!
 			timeoutPeer = append(timeoutPeer, value)

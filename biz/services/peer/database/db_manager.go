@@ -78,7 +78,7 @@ func (m *DBManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceR
 			}
 		}
 	})
-	peers, err := m.peerRepo.PickPeers(ctx, req.InfoHash, req.NumWant, req.Type)
+	peers, err := m.peerRepo.PickPeers(ctx, req.InfoHash, hex.EncodeToString(conv.UnsafeStringToBytes(peer.ID)), req.NumWant, req.Type)
 	if err != nil {
 		hlog.CtxErrorf(ctx, "failed to get peers: %s", err.Error())
 		return nil, err
