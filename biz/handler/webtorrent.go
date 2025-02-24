@@ -20,8 +20,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/hertz-contrib/websocket"
+	"github.com/lestrrat-go/choose"
 	"github.com/thinkeridea/go-extend/exstrings"
-	"golang.org/x/text/encoding/charmap"
 )
 
 var u = websocket.HertzUpgrader{
@@ -31,10 +31,12 @@ var u = websocket.HertzUpgrader{
 } // use default options
 func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 	err := u.Upgrade(c, func(conn *websocket.Conn) {
+		wrapConn := model.NewConn(conn)
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
-				if websocket.IsCloseError(err, websocket.CloseNoStatusReceived, websocket.CloseNormalClosure) {
+				if websocket.IsCloseError(err, websocket.CloseNoStatusReceived, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+					_ = wrapConn.Close()
 					break
 				}
 				hlog.CtxErrorf(ctx, "failed to read from websocket:%s", err.Error())
@@ -64,9 +66,9 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 						break
 					}
 				}
-				err = handleWSAnnounce(ctx, message, c, conn)
+				err = handleWSAnnounce(ctx, message, c, wrapConn)
 			case "scrape":
-				err = handleWSScrape(ctx, message, conn)
+				err = handleWSScrape(ctx, message, wrapConn)
 			default:
 				_ = webtorrent.ResponseErr(conn, errors.New("invalid action"))
 				_ = conn.Close()
@@ -95,7 +97,7 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 	if err != nil {
 		return err
 	}
-	infoHash = string(transUTF8To9959_1(conv.UnsafeStringToBytes(infoHash)))
+	infoHash = string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(infoHash)))
 	peerIdRaw, err := sonic.Get(msg, "to_peer_id")
 	if err != nil {
 		return err
@@ -107,7 +109,7 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 	return peer.GetPeerManager().AnswerToPeer(ctx, infoHash, peerId, msg)
 }
 
-func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, conn *websocket.Conn) error {
+func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, conn *model.Conn) error {
 	req := &model.AnnounceRequest{}
 	if err := json.Unmarshal(msg, req); err != nil {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
@@ -116,7 +118,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		return err
 	}
 	// The raw info hash is an utf-8 encoded bytes, which should be converted to iso-8859-1
-	req.InfoHash = string(transUTF8To9959_1(conv.UnsafeStringToBytes(req.InfoHash)))
+	req.InfoHash = string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(req.InfoHash)))
 	if !validAnnounceReq(req) {
 		return errors.New("invalid request")
 	}
@@ -125,7 +127,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	if req.NumWant == 0 || req.NumWant > 500 {
 		req.NumWant = 50
 	}
-	req.Conn = model.NewConn(conn)
+	req.Conn = conn
 	req.Type = model.PeerTypeWebtorrent
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	if err != nil {
@@ -140,7 +142,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		"interval":   config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
 		"incomplete": scrape.Incomplete,
 		"complete":   scrape.Complete,
-		"info_hash":  conv.UnsafeBytesToString(trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
+		"info_hash":  conv.UnsafeBytesToString(conv.Trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
 	}
 	hlog.CtxDebugf(ctx, "send msg:%s", utils.ToJSON(resp))
 	if err := conn.WriteJSON(resp); err != nil {
@@ -148,37 +150,25 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		return err
 	}
 	for _, p := range res {
-		for _, o := range p.Offers {
-			offer := hertz.H{
-				"action":    "announce",
-				"info_hash": conv.UnsafeBytesToString(trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
-				"offer_id":  o.OfferID,
-				"peer_id":   p.ID,
-				"offer":     o.Offer,
-			}
-			hlog.CtxDebugf(ctx, "send msg:%s", utils.ToJSON(offer))
-			if err := conn.WriteJSON(offer); err != nil {
-				hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
-				return err
-			}
+		o := choose.Slice(p.Offers).One()
+		offer := hertz.H{
+			"action":    "announce",
+			"info_hash": conv.UnsafeBytesToString(conv.Trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
+			"offer_id":  o.OfferID,
+			"peer_id":   p.ID,
+			"offer":     o.Offer,
 		}
-
+		hlog.CtxDebugf(ctx, "send msg:%s", utils.ToJSON(offer))
+		if err := conn.WriteJSON(offer); err != nil {
+			hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
+			return err
+		}
 	}
 	return nil
 
 }
 
-func transUTF8To9959_1(raw []byte) []byte {
-	encoded, _ := charmap.ISO8859_1.NewEncoder().Bytes(raw)
-	return encoded
-}
-
-func trans9959_1ToUTF8(raw []byte) []byte {
-	encoded, _ := charmap.ISO8859_1.NewDecoder().Bytes(raw)
-	return encoded
-}
-
-func handleWSScrape(ctx context.Context, req []byte, conn *websocket.Conn) error {
+func handleWSScrape(ctx context.Context, req []byte, conn *model.Conn) error {
 	infoHashRaw, err := sonic.Get(req, "info_hash")
 	if err != nil {
 		return err
@@ -187,11 +177,11 @@ func handleWSScrape(ctx context.Context, req []byte, conn *websocket.Conn) error
 	if tryArray, err := infoHashRaw.Array(); err == nil {
 		for _, v := range tryArray {
 			if s, ok := v.(string); ok {
-				infoHashes = append(infoHashes, string(transUTF8To9959_1(conv.UnsafeStringToBytes(s))))
+				infoHashes = append(infoHashes, string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(s))))
 			}
 		}
 	} else if tryString, err := infoHashRaw.String(); err == nil {
-		infoHashes = append(infoHashes, string(transUTF8To9959_1(conv.UnsafeStringToBytes(tryString))))
+		infoHashes = append(infoHashes, string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(tryString))))
 	}
 	if len(infoHashes) == 0 {
 		return errors.New("info_hash can't be empty")
