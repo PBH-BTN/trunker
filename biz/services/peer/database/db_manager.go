@@ -135,6 +135,7 @@ func (m *DBManager) GetStatistic(ctx context.Context) (*common.StatisticInfo, er
 }
 
 func NewDBManager() *DBManager {
+	hlog.Info("running as database mode")
 	db := database.InitDB()
 	m := &DBManager{
 		peerRepo:        data.NewPeerRepository(db),

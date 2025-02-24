@@ -9,6 +9,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
@@ -27,6 +28,10 @@ type MuxLocalManager struct {
 }
 
 func NewMuxLocalManager(num int) *MuxLocalManager {
+	hlog.Info("running as memory mode")
+	if config.AppConfig.Tracker.Memory.EnableWS {
+		hlog.Info("enable websocket support")
+	}
 	list := make([]*local.Manager, 0, num)
 	for i := 0; i < num; i++ {
 		list = append(list, local.NewLocalManger())
