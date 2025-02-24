@@ -53,5 +53,3 @@ Trunker has very strong performance. Here's a record of a real peak.
 ![image](https://github.com/user-attachments/assets/920bd461-9389-4aa4-b0bd-1dee26dc9325)
 
 ![image](https://github.com/user-attachments/assets/25bf44e5-8a10-4aec-84cc-02e39b3b9bbc)
-
-
