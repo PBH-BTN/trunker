@@ -10,6 +10,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/service/metrics"
+	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/PBH-BTN/trunker/utils/webtorrent"
@@ -34,6 +35,7 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 				hlog.CtxErrorf(ctx, "failed to read from websocket:%s", err.Error())
 				break
 			}
+			hlog.CtxDebugf(ctx, "ws received: %s", message)
 			actionRaw, err := sonic.Get(message, "action")
 			if err != nil {
 				hlog.CtxErrorf(ctx, "get action error: %s", err.Error())
@@ -107,6 +109,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		"complete":   scrape.Complete,
 		"info_hash":  trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash)),
 	}
+	hlog.CtxDebugf(ctx, "send msg:%s", utils.ToJSON(resp))
 	if err := conn.WriteJSON(resp); err != nil {
 		hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
 		return err
@@ -120,6 +123,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 				"peer_id":   req.PeerID,
 				"offer":     o.Offer,
 			}
+			hlog.CtxDebugf(ctx, "send msg:%s", utils.ToJSON(offer))
 			if err := conn.WriteJSON(offer); err != nil {
 				hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
 				return err
