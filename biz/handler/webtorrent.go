@@ -32,6 +32,7 @@ var u = websocket.HertzUpgrader{
 func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 	err := u.Upgrade(c, func(conn *websocket.Conn) {
 		wrapConn := model.NewConn(conn)
+		defer wrapConn.Close()
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
