@@ -93,6 +93,7 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 	if err != nil {
 		return err
 	}
+	infoHash = string(transUTF8To9959_1(conv.UnsafeStringToBytes(infoHash)))
 	peerIdRaw, err := sonic.Get(msg, "peer_id")
 	if err != nil {
 		return err
