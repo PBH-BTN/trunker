@@ -24,8 +24,8 @@ type Peer struct {
 	LastSeen   time.Time `json:"lastSeen"`
 	UserAgent  string
 	Event      PeerEvent
-	Offers     []*Offer `json:"offers"`
-	Conn       *websocket.Conn
+	Offers     []*Offer        `json:"offers"`
+	Conn       *websocket.Conn `json:"-"`
 }
 type PeerType = model.PeerType
 type Offer = model.Offer

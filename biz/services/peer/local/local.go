@@ -268,7 +268,7 @@ func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID stri
 	}
 	resp := map[string]any{}
 	_ = json.Unmarshal(answerBody, &resp)
-	delete(resp, "peer_id")
+	delete(resp, "to_peer_id")
 	hlog.CtxDebugf(ctx, "answer to peer %s:%s", peer.ID, utils.ToJSON(resp))
 	return peer.Conn.WriteJSON(resp)
 }
