@@ -74,6 +74,9 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			expired++
 			continue
 		}
+		if pbStruct.Type == PeerType_Webtorrent { // impossible to load webtorrent peer
+			continue
+		}
 		m.pickWorker(pbStruct.InfoHash).DirectStore(string(pbStruct.InfoHash), &common.Peer{
 			ID:         string(pbStruct.PeerId),
 			IP:         pbStruct.Ip.ReportIp,
