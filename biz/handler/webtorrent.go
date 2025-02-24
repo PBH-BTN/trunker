@@ -15,6 +15,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/PBH-BTN/trunker/utils/webtorrent"
 	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
@@ -56,7 +57,8 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 			}
 			switch action {
 			case "announce":
-				if answerRaw, err := sonic.Get(message, "answer"); err == nil {
+				var answerRaw ast.Node
+				if answerRaw, err = sonic.Get(message, "answer"); err == nil {
 					if answerRaw.Valid() {
 						err = handleWSAnswer(ctx, message)
 						break
