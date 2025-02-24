@@ -147,3 +147,8 @@ func (m *MuxLocalManager) DeleteInfoHash(ctx context.Context, infoHash string) e
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
 	return worker.DeleteInfoHash(ctx, infoHash)
 }
+
+func (m *MuxLocalManager) AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error {
+	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
+	return worker.AnswerToPeer(ctx, infoHash, peerID, answerBody)
+}

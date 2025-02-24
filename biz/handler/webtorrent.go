@@ -56,6 +56,12 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 			}
 			switch action {
 			case "announce":
+				if answerRaw, err := sonic.Get(message, "answer"); err == nil {
+					if answerRaw.Valid() {
+						err = handleWSAnswer(ctx, message)
+						break
+					}
+				}
 				err = handleWSAnnounce(ctx, message, c, conn)
 			case "scrape":
 				err = handleWSScrape(ctx, message, conn)
@@ -78,6 +84,25 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 }
+func handleWSAnswer(ctx context.Context, msg []byte) error {
+	infoHashRaw, err := sonic.Get(msg, "info_hash")
+	if err != nil {
+		return err
+	}
+	infoHash, err := infoHashRaw.String()
+	if err != nil {
+		return err
+	}
+	peerIdRaw, err := sonic.Get(msg, "peer_id")
+	if err != nil {
+		return err
+	}
+	peerId, err := peerIdRaw.String()
+	if err != nil {
+		return err
+	}
+	return peer.GetPeerManager().AnswerToPeer(ctx, infoHash, peerId, msg)
+}
 
 func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, conn *websocket.Conn) error {
 	req := &model.AnnounceRequest{}
@@ -97,6 +122,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	if req.NumWant == 0 || req.NumWant > 500 {
 		req.NumWant = 50
 	}
+	req.Conn = conn
 	req.Type = model.PeerTypeWebtorrent
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	if err != nil {

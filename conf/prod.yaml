@@ -11,6 +11,7 @@ tracker:
     persistFile: persist.dat
     maxPeersPerTorrent: 1500
     shard: 40
+    enableWS: true
   database:
     database: root
     host: localhost

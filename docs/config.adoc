@@ -33,7 +33,8 @@ If your mode is `memory`, you can use the following configuration.
 |useDB |Use the database to store the data. (currently no usable) |false 
 |enablePersist |Save the peers to the disk and load them while launching. |true 
 |maxPeersPerTorrent |The max number of peers per torrent. |100 
-|shard |The number of shards. More shards will improve response time, by cost more memory. |16 
+|shard |The number of shards. More shards will improve response time, by cost more memory. |16
+|enableWS|Enable Websocket tracker for WebTorrents|false
 |===
 
 == Database

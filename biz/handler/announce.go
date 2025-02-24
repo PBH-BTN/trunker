@@ -21,6 +21,12 @@ import (
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
+	if config.AppConfig.Tracker.Mode == config.RunningModeMemory && config.AppConfig.Tracker.Memory.EnableWS {
+		if c.Request.Header.Get("connection") == "Upgrade" {
+			HandleWebTorrent(ctx, c)
+			return
+		}
+	}
 	req := &model.AnnounceRequest{}
 	if c.Bind(req) != nil {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{

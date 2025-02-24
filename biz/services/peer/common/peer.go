@@ -7,6 +7,7 @@ import (
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
+	"github.com/hertz-contrib/websocket"
 )
 
 type Peer struct {
@@ -24,6 +25,7 @@ type Peer struct {
 	UserAgent  string
 	Event      PeerEvent
 	Offers     []*Offer `json:"offers"`
+	Conn       *websocket.Conn
 }
 type PeerType = model.PeerType
 type Offer = model.Offer

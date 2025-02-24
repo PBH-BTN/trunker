@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
+	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/bytedance/gopkg/util/gopool"
 )
@@ -33,6 +34,10 @@ func (m *Manager) cleanUp(root *InfoHashRoot) int64 {
 	root.peerMap.Range(func(key string, value *common.Peer) bool {
 		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
 			toClean = append(toClean, key)
+			if value.Type == model.PeerTypeWebtorrent && value.Conn != nil {
+				_ = value.Conn.Close()
+				value.Conn = nil
+			}
 		}
 		return true
 	})

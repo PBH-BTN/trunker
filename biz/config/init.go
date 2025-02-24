@@ -55,6 +55,7 @@ type memoryConfig struct {
 	PersistFile        string `yaml:"persistFile" json:"persistFile"`
 	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent" json:"maxPeersPerTorrent"`
 	Shard              int    `yaml:"shard" json:"shard"`
+	EnableWS           bool   `yaml:"enableWS" json:"enableWS"`
 }
 
 type Config struct {

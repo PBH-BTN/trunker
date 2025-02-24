@@ -14,6 +14,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
+	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/zhangyunhao116/skipmap"
 )
@@ -58,6 +59,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),
 		UserAgent:  req.UserAgent,
+		Conn:       req.Conn,
 	}
 	if peer.IPv4 != nil && peer.IPv4.To4() == nil {
 		hlog.CtxWarnf(ctx, "invalid ipv4 address,actual: %s", peer.IPv4.String())
@@ -117,6 +119,11 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		}
 		if value.Type != peer.Type { // same type peer only
 			return true
+		}
+		if value.Type == model.PeerTypeWebtorrent {
+			if value.Conn == nil {
+				return true
+			}
 		}
 		if value.Event == common.PeerEvent_Stopped { // stopped peer should not return
 			return true
@@ -245,4 +252,23 @@ func (m *Manager) GetPeers(_ context.Context, infoHash string) ([]*common.Peer, 
 func (m *Manager) DeleteInfoHash(_ context.Context, infoHash string) error {
 	m.infoHashMap.Delete(infoHash)
 	return nil
+}
+
+func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error {
+	root, ok := m.infoHashMap.Load(infoHash)
+	if !ok {
+		return errors.New("info hash not found")
+	}
+	peer, ok := root.peerMap.Load(peerID)
+	if !ok {
+		return errors.New("peer not found")
+	}
+	if peer.Conn == nil {
+		return errors.New("peer not connected")
+	}
+	resp := map[string]any{}
+	_ = json.Unmarshal(answerBody, &resp)
+	delete(resp, "peer_id")
+	hlog.CtxDebugf(ctx, "answer to peer %s:%s", peer.ID, utils.ToJSON(resp))
+	return peer.Conn.WriteJSON(resp)
 }

@@ -21,6 +21,8 @@ type PeerManager interface {
 	LoadFromPersist()
 	// StoreToPersist 保存数据到持久化存储
 	StoreToPersist()
+	// AnswerToPeer send message to peer, Only for webtorrent
+	AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error
 
 	/*	admin interface	*/
 	GetStatistic(ctx context.Context) (*common.StatisticInfo, error)
