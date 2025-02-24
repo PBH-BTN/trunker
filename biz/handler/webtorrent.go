@@ -124,7 +124,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 				"action":    "announce",
 				"info_hash": conv.UnsafeBytesToString(trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
 				"offer_id":  o.OfferID,
-				"peer_id":   req.PeerID,
+				"peer_id":   p.ID,
 				"offer":     o.Offer,
 			}
 			hlog.CtxDebugf(ctx, "send msg:%s", utils.ToJSON(offer))
