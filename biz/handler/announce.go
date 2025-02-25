@@ -27,15 +27,15 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			return
 		}
 	}
-	req := &model.AnnounceRequest{}
-	if c.Bind(req) != nil {
+	req := model.HttpAnnounceRequest{}
+	if err := c.Bind(&req); err != nil {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
 			metrics.LabelReason: "bind error",
 		})
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
-	if !validAnnounceReq(req) {
+	if !validAnnounceReq(&req) {
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
@@ -45,7 +45,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		req.NumWant = 50
 	}
 	req.Type = model.PeerTypeBittorrent
-	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
+	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &model.AnnounceRequest{HttpAnnounceRequest: req})
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid address") {
 			hlog.CtxDebugf(ctx, "invalid address, query: %s, ua:%s", c.Request.QueryString(), c.UserAgent())
@@ -116,7 +116,7 @@ func Statistic(ctx context.Context, c *app.RequestContext) {
 	http.ResponseOK(c, info)
 }
 
-func validAnnounceReq(req *model.AnnounceRequest) bool {
+func validAnnounceReq(req *model.HttpAnnounceRequest) bool {
 	if req == nil {
 		return false
 	}

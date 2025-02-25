@@ -4,8 +4,7 @@ import (
 	"net"
 )
 
-// AnnounceRequest Bittorrent Announce Request https://wiki.theory.org/BitTorrent_Tracker_Protocol
-type AnnounceRequest struct {
+type HttpAnnounceRequest struct {
 	InfoHash   string `json:"info_hash" query:"info_hash,required"`
 	PeerID     string `json:"peer_id" query:"peer_id,required"`
 	Port       int    `json:"port" query:"port,required"`
@@ -21,8 +20,13 @@ type AnnounceRequest struct {
 	IPv4       string   `query:"ipv4"`
 	IPv6       string   `query:"ipv6"`
 	Compact    int8     `default:"1" json:"compact" query:"compact"`
-	Offers     []*Offer `json:"offers" query:"offers"`
-	Conn       *Conn
+}
+
+// AnnounceRequest Bittorrent Announce Request https://wiki.theory.org/BitTorrent_Tracker_Protocol
+type AnnounceRequest struct {
+	HttpAnnounceRequest
+	Offers []*Offer `json:"offers" query:"offers"`
+	Conn   *Conn    `form:"-" json:"-" query:"-" header:"-"`
 }
 
 type PeerType int8

@@ -47,15 +47,15 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 			actionRaw, err := sonic.Get(message, "action")
 			if err != nil {
 				hlog.CtxErrorf(ctx, "get action error: %s", err.Error())
-				_ = webtorrent.ResponseErr(conn, errors.New("get action error"))
-				_ = conn.Close()
+				_ = webtorrent.ResponseErr(wrapConn, errors.New("get action error"))
+				_ = wrapConn.Close()
 				return
 			}
 			action, err := actionRaw.String()
 			if err != nil {
 				hlog.CtxErrorf(ctx, "get action error: %s", err.Error())
-				_ = webtorrent.ResponseErr(conn, errors.New("get action error"))
-				_ = conn.Close()
+				_ = webtorrent.ResponseErr(wrapConn, errors.New("get action error"))
+				_ = wrapConn.Close()
 				return
 			}
 			switch action {
@@ -71,14 +71,14 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 			case "scrape":
 				err = handleWSScrape(ctx, message, wrapConn)
 			default:
-				_ = webtorrent.ResponseErr(conn, errors.New("invalid action"))
-				_ = conn.Close()
+				_ = webtorrent.ResponseErr(wrapConn, errors.New("invalid action"))
+				_ = wrapConn.Close()
 				return
 			}
 			if err != nil {
 				hlog.CtxErrorf(ctx, "handle action error: %s", err.Error())
-				_ = webtorrent.ResponseErr(conn, err)
-				_ = conn.Close()
+				_ = webtorrent.ResponseErr(wrapConn, err)
+				_ = wrapConn.Close()
 				return
 			}
 		}
@@ -111,23 +111,24 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 }
 
 func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, conn *model.Conn) error {
-	req := &model.AnnounceRequest{}
-	if err := json.Unmarshal(msg, req); err != nil {
+	baseReq := model.HttpAnnounceRequest{}
+	if err := json.Unmarshal(msg, &baseReq); err != nil {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
 			metrics.LabelReason: "bind error",
 		})
 		return err
 	}
 	// The raw info hash is an utf-8 encoded bytes, which should be converted to iso-8859-1
-	req.InfoHash = string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(req.InfoHash)))
-	if !validAnnounceReq(req) {
+	baseReq.InfoHash = string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(baseReq.InfoHash)))
+	if !validAnnounceReq(&baseReq) {
 		return errors.New("invalid request")
 	}
-	req.ClientIP = http.GetClientIP(ctx, c)
-	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
-	if req.NumWant == 0 || req.NumWant > 500 {
-		req.NumWant = 50
+	baseReq.ClientIP = http.GetClientIP(ctx, c)
+	baseReq.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
+	if baseReq.NumWant == 0 || baseReq.NumWant > 500 {
+		baseReq.NumWant = 50
 	}
+	req := &model.AnnounceRequest{HttpAnnounceRequest: baseReq}
 	req.Conn = conn
 	req.Type = model.PeerTypeWebtorrent
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
