@@ -64,6 +64,16 @@ type Config struct {
 	RocketMq RocketMqConfig `yaml:"rocketmq" json:"rocketmq"`
 }
 
+func injectDefaultValue(conf *Config) {
+	if conf.Tracker.HostPorts == "" {
+		conf.Tracker.HostPorts = "0.0.0.0:8888"
+	}
+	if conf.Tracker.Mode == RunningModeMemory {
+		if conf.Tracker.Memory.PersistFile == "" {
+			conf.Tracker.Memory.PersistFile = "persist.dat"
+		}
+	}
+}
 func Init() {
 	config := &Config{}
 	if jsonConfig := os.Getenv("TRUNKER_CONFIG"); jsonConfig != "" {
@@ -72,6 +82,7 @@ func Init() {
 		if err != nil {
 			panic("invalid json config:" + err.Error())
 		}
+		injectDefaultValue(config)
 		AppConfig = config
 		return
 	}
@@ -91,5 +102,6 @@ func Init() {
 	if err := yaml.Unmarshal(content, config); err != nil {
 		log.Fatalf("parse local config failed: %v", err)
 	}
+	injectDefaultValue(config)
 	AppConfig = config
 }
