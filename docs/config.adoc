@@ -8,12 +8,14 @@ The configuration file is in YAML format, you can find the example configuration
 
 |ttl |The time of a peer announce next time. |3600s 
 |intervalTask |The interval of the task to clean the expired peers. |600s 
-|*mode* |trunker provides 2 running mode: memory and db |*required*,memory 
+|*mode* |trunker provides 2 running mode: memory and db |*required*,`memory`
 |memory/database |Depends on your mode, this can be 2 different struct. | 
 |useUnixSocket |Use Unix Socket instead tcp |false 
-|hostPorts |The host and port of the server, For unix socket mode, this is the file name of the sock file. |127.0.0.1:8888 
+|hostPorts |The host and port of the server, For unix socket mode, this is the file name of the sock file. |`127.0.0.1:8888`
 |useAnnounceIP |Allow peer to announce its IP in the query string. |true 
-|enableEventProducer |Send peer event to the mq. Caution: This will produce tons of message. |false 
+|enableEventProducer |Send peer event to the mq. Caution: This will produce tons of message. |false
+|enableMetrics|Enable prometheus metrics|false
+|metricsHostPorts|The host and port of the metrics server|`127.0.0.1:9091`
 |===
 
 == Memory

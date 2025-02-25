@@ -1,4 +1,16 @@
 == Metrics
 Currently trunker is serving a prometheus handler at `:9091` by default. With 2 paths:
+
 - `/metrics` Providing metrics about http request, including latency and QPS.
 - `/pprof` Providing golang runtime pprof info.
+
+There are also 4 custom metrics provided by trunker:
+
+[cols="3*", options="header"]
+|==========================================================================================
+| Name                              | Type    | Description
+| `trunker_torrents_total`          | gauge   | The total number of torrents.
+| `trunker_shard_peers`             | gauge   | Peer counts per shard
+| `trunker_shard_torrents`          | gauge   | Torrent counts per shard
+| `trunker_invalid_request_counter` | counter | The counter of invalid request, with reason
+|==========================================================================================
