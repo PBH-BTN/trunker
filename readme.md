@@ -7,7 +7,7 @@
 
 ## Introduction
 
-A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego, with observability.
+A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego, with [observability](./docs/metrics.adoc).
 
 This tracker is hosted as https://btn-prod.ghostchu-services.top/announce
 
@@ -38,6 +38,7 @@ docker run -d --name trunker -e ADMIN_KEY=aabbcc -p 8888:8888 gaojianli2333/trun
 - [x] Blacklist for info_hash and peer_id
 - [x] Eventbus support
 - [x] Websocket support
+- [x] Prometheus based [metrics](./docs/metrics.adoc)
 
 ## Wiki
 Trunker provides much config and observability capabilities, if you want to run trunker in production, please see the [Wiki](./docs/toc.adoc).
