@@ -15,12 +15,13 @@ import (
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/thinkeridea/go-extend/exstrings"
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
 	if config.AppConfig.Tracker.Mode == config.RunningModeMemory && config.AppConfig.Tracker.Memory.EnableWS {
-		if c.Request.Header.Get("connection") == "Upgrade" {
+		if c.Request.Header.Get(consts.HeaderConnection) == "Upgrade" {
 			HandleWebTorrent(ctx, c)
 			return
 		}

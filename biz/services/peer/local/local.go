@@ -283,7 +283,6 @@ func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID stri
 	resp := map[string]any{}
 	_ = json.Unmarshal(answerBody, &resp)
 	delete(resp, "to_peer_id")
-	hlog.CtxDebugf(ctx, "answer to peer %s:%s", peer.ID, utils.ToJSON(resp))
 	err := peer.Conn.WriteJSON(resp)
 	if err != nil {
 		if strings.Contains(err.Error(), "close") {
@@ -296,7 +295,6 @@ func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID stri
 }
 
 func (m *Manager) sendOffers(ctx context.Context, infoHash string, peerMap *skipmap.OrderedMap[string, *common.Peer], peer *common.Peer, numWant int) {
-	hlog.CtxDebugf(ctx, "new peer, send offers to %s", infoHash)
 	toClean := make([]string, 0)
 	candidates := make([]*common.Peer, 0)
 	peerMap.Range(func(key string, value *common.Peer) bool {
