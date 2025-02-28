@@ -5,7 +5,7 @@ cache:
 tracker:
   ttl: 3600
   intervalTask: 600 # 10分钟执行一次定时任务
-  mode: memory # memory or db
+  mode: db # memory or db
   memory:
     enablePersist: true
     persistFile: persist.dat
@@ -27,7 +27,6 @@ tracker:
   udpServer:
     enable: true
     hostPorts: :6881
-
 rocketmq:
   topic: TrunkerEvent
   endpoint: localhost:8081
