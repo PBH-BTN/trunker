@@ -93,6 +93,11 @@ func (m *DBManager) Scrape(ctx context.Context, infoHashRaw string) (*model.Scra
 		hlog.CtxErrorf(ctx, "failed to get complete count: %s", err.Error())
 		return nil, err
 	}
+	seeder, err := m.peerRepo.GetSeederCount(ctx, infoHash)
+	if err != nil {
+		hlog.CtxErrorf(ctx, "failed to get seeder count: %s", err.Error())
+		return nil, err
+	}
 	downloaded, err := m.peerRepo.GetDownloadedCount(ctx, infoHash)
 	if err != nil {
 		hlog.CtxErrorf(ctx, "failed to get downloaded count: %s", err.Error())
@@ -104,6 +109,7 @@ func (m *DBManager) Scrape(ctx context.Context, infoHashRaw string) (*model.Scra
 		return nil, err
 	}
 	return &model.ScrapeFile{
+		Seeder:     int(seeder),
 		Complete:   int(complete),
 		Downloaded: int(downloaded),
 		Incomplete: int(incomplete),

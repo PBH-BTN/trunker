@@ -183,18 +183,26 @@ func (m *Manager) Scrape(_ context.Context, infoHash string) (*model.ScrapeFile,
 			Complete:   0,
 			Incomplete: 0,
 			Downloaded: 0,
+			Seeder:     0,
 		}, nil
 	}
-	var complete, incomplete, downloaded int
+	var complete, incomplete, downloaded, seeder int
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
 		if value.Left == 0 {
-			complete++
+			downloaded++
+			if value.Event != common.PeerEvent_Stopped {
+				seeder++
+			}
 		} else {
 			incomplete++
+		}
+		if value.Event == common.PeerEvent_Completed {
+			complete++
 		}
 		return true
 	})
 	return &model.ScrapeFile{
+		Seeder:     seeder,
 		Complete:   complete,
 		Incomplete: incomplete,
 		Downloaded: downloaded, // 这个目前不实现
