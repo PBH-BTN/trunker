@@ -15,8 +15,9 @@ var (
 func StartIntervalTask() {
 	gopool.Go(func() {
 		logger.Infof("start interval task, interval %d seconds", config.AppConfig.Tracker.IntervalTask)
+		tick := time.Tick(time.Duration(config.AppConfig.Tracker.IntervalTask) * time.Second)
 		for {
-			<-time.After(time.Duration(config.AppConfig.Tracker.IntervalTask) * time.Second)
+			<-tick
 			doIntervalTask()
 		}
 	})

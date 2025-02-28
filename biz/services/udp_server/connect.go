@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/binary"
 	"net"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/panjf2000/gnet/v2"
@@ -32,7 +33,7 @@ func (s *UDPServer) handleConnection(ctx context.Context, remote net.Addr, tid u
 		return err
 	}
 	cid := uint64(newId.ToInt())
-	s.connectList.LoadOrStore(cid, &connection{id: cid, remoteAddr: remote})
+	s.connectionList.LoadOrStore(cid, &connection{id: cid, remoteAddr: remote, time: time.Now()})
 	// send response
 	buf := bytes.NewBuffer(make([]byte, 0, 16))
 	writeHeader(buf, ActionConnect, tid)
@@ -42,6 +43,25 @@ func (s *UDPServer) handleConnection(ctx context.Context, remote net.Addr, tid u
 		return err
 	}
 	return nil
+}
+
+const connectionTimeout = 2 * time.Minute
+
+// cleanConnection clean expire connection
+func (s *UDPServer) cleanConnection() {
+	if s.connectionList.Len() == 0 {
+		return
+	}
+	t := time.Now()
+	count := 0
+	s.connectionList.Range(func(id uint64, conn *connection) bool {
+		if conn.time.Add(connectionTimeout).Before(t) {
+			s.connectionList.Delete(id)
+			count++
+		}
+		return true
+	})
+	hlog.Info("cleaned expired connections:", count)
 }
 
 func responseError(c gnet.Conn, tid uint32, err error) {

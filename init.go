@@ -25,7 +25,7 @@ func Init() {
 	//cache.Init()
 	peer.InitPeerManager()
 	if config.AppConfig.Tracker.UDPServer.Enable {
-		initUDPServer()
+		go initUDPServer()
 	}
 }
 
@@ -51,5 +51,5 @@ func getServerOption() []hertzConfig.Option {
 }
 
 func initUDPServer() {
-	log.Fatal(gnet.Run(udp_server.NewUDPServer(), "udp://"+config.AppConfig.Tracker.UDPServer.HostPorts, gnet.WithMulticore(true), gnet.WithLogger(hlog.DefaultLogger())))
+	log.Fatal(gnet.Run(udp_server.NewUDPServer(), "udp://"+config.AppConfig.Tracker.UDPServer.HostPorts, gnet.WithMulticore(true), gnet.WithTicker(true), gnet.WithLogger(hlog.DefaultLogger())))
 }
