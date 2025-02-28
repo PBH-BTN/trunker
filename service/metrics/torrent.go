@@ -30,16 +30,16 @@ func registerGauge(registry *prometheus.Registry) map[counterMetrics]prometheus.
 	m := make(map[counterMetrics]prometheus.Collector)
 	m[GaugePeer] =
 		prometheus.NewGaugeVec(prometheus.GaugeOpts{
-			Name: counterPrefix + string(GaugePeer),
+			Name: metricsPrefix + string(GaugePeer),
 			Help: "Peer counts per shard",
 		}, []string{LabelShards})
 	m[GaugeTorrent] =
 		prometheus.NewGaugeVec(prometheus.GaugeOpts{
-			Name: counterPrefix + string(GaugeTorrent),
+			Name: metricsPrefix + string(GaugeTorrent),
 			Help: "Torrent counts per shard",
 		}, []string{LabelShards})
 	m[GaugeTorrentTotal] = prometheus.NewGaugeFunc(prometheus.GaugeOpts{
-		Name: counterPrefix + string(GaugeTorrentTotal),
+		Name: metricsPrefix + string(GaugeTorrentTotal),
 		Help: "Total Torrent numbers",
 	}, func() float64 {
 		var err error

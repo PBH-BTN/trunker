@@ -7,8 +7,10 @@ import (
 type counterMetrics string
 
 const (
-	counterPrefix                        = "trunker_"
-	CounterInvalidRequest counterMetrics = "invalid_request_counter"
+	metricsPrefix                         = "trunker_"
+	CounterInvalidRequest  counterMetrics = "invalid_request_counter"
+	CounterUDPRequest      counterMetrics = "udp_request_counter"
+	CounterUDPRequestError counterMetrics = "udp_request_error_counter"
 )
 
 func counterAdd(counterVec *prometheus.CounterVec, value int, labels prometheus.Labels) error {
@@ -31,6 +33,7 @@ func histogramObserve(histogramVec *prometheus.HistogramVec, value float64, labe
 
 const (
 	LabelReason = "reason"
+	LabelAction = "action" // type of udp request
 )
 
 func registerCounter(registry *prometheus.Registry) map[counterMetrics]*prometheus.CounterVec {
@@ -38,20 +41,19 @@ func registerCounter(registry *prometheus.Registry) map[counterMetrics]*promethe
 
 	m[CounterInvalidRequest] =
 		prometheus.NewCounterVec(prometheus.CounterOpts{
-			Name: counterPrefix + string(CounterInvalidRequest),
+			Name: metricsPrefix + string(CounterInvalidRequest),
 			Help: "Total invalid announce counter",
 		}, []string{LabelReason})
-
-	for _, h := range m {
-		registry.MustRegister(h)
-	}
-
-	return m
-}
-
-func registerHistogram(registry *prometheus.Registry) map[counterMetrics]*prometheus.HistogramVec {
-	m := make(map[counterMetrics]*prometheus.HistogramVec)
-
+	m[CounterUDPRequest] =
+		prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: metricsPrefix + string(CounterUDPRequest),
+			Help: "Total udp request counter",
+		}, []string{LabelAction})
+	m[CounterUDPRequestError] =
+		prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: metricsPrefix + string(CounterUDPRequestError),
+			Help: "Total udp request error counter",
+		}, []string{LabelReason, LabelAction})
 	for _, h := range m {
 		registry.MustRegister(h)
 	}

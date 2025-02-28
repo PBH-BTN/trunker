@@ -10,7 +10,7 @@ import (
 var registry *prometheus.Registry
 var once sync.Once
 var counterHandler map[counterMetrics]*prometheus.CounterVec
-var histogramHandler map[counterMetrics]*prometheus.HistogramVec
+var histogramHandler map[histogramMetrics]*prometheus.HistogramVec
 var gaugeHandler map[counterMetrics]prometheus.Collector
 
 func GetRegistry() *prometheus.Registry {
@@ -35,5 +35,13 @@ func EmitCounter(metrics counterMetrics, value int, labels prometheus.Labels) {
 	}
 	if handler, ok := counterHandler[metrics]; ok {
 		_ = counterAdd(handler, value, labels)
+	}
+}
+func ObserveHistogram(metrics histogramMetrics, cost float64, labels prometheus.Labels) {
+	if !config.AppConfig.Tracker.EnableMetrics {
+		return
+	}
+	if handler, ok := histogramHandler[metrics]; ok {
+		_ = histogramObserve(handler, cost, labels)
 	}
 }

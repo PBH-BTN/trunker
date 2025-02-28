@@ -8,6 +8,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hitoshi44/go-uid64"
 	"github.com/panjf2000/gnet/v2"
@@ -49,6 +50,7 @@ func NewUDPServer() *UDPServer {
 func (s *UDPServer) OnTraffic(conn gnet.Conn) gnet.Action {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+	start := time.Now()
 	defer func() {
 		if err := recover(); err != nil {
 			hlog.CtxErrorf(ctx, "panic:%s", err)
@@ -56,9 +58,24 @@ func (s *UDPServer) OnTraffic(conn gnet.Conn) gnet.Action {
 		}
 	}()
 	err := s.handleRequest(ctx, conn)
+	cost := time.Now().Sub(start)
 	if err != nil {
 		hlog.CtxErrorf(ctx, "failed to handle request:%s", err.Error())
+		metrics.EmitCounter(metrics.CounterUDPRequestError, 1, map[string]string{
+			metrics.LabelReason: err.Error(),
+			metrics.LabelAction: "unknown",
+		})
+		if conn.Context() == nil {
+			conn.SetContext("unknown")
+		}
 	}
+
+	metrics.EmitCounter(metrics.CounterUDPRequest, 1, map[string]string{
+		metrics.LabelAction: conn.Context().(string),
+	})
+	metrics.ObserveHistogram(metrics.HistogramLatency, float64(cost.Microseconds()), map[string]string{
+		metrics.LabelAction: conn.Context().(string),
+	})
 
 	return gnet.None
 }
@@ -72,6 +89,7 @@ func (s *UDPServer) handleRequest(ctx context.Context, conn gnet.Conn) error {
 	action := binary.BigEndian.Uint32(headerBuf[8:12])
 	transactionID := binary.BigEndian.Uint32(headerBuf[12:16])
 	if connectionID == ProtocolID && action == ActionConnect {
+		conn.SetContext("connection")
 		if err := s.handleConnection(ctx, conn.RemoteAddr(), transactionID, conn); err != nil {
 			hlog.CtxErrorf(ctx, "failed to handle connection:%s", err.Error())
 			return err
@@ -87,10 +105,13 @@ func (s *UDPServer) handleRequest(ctx context.Context, conn gnet.Conn) error {
 		var err error
 		switch action {
 		case ActionAnnounce:
+			conn.SetContext("announce")
 			err = s.handleAnnounce(ctx, conn.RemoteAddr().(*net.UDPAddr), transactionID, conn, headerBuf[16:])
 		case ActionScrape:
+			conn.SetContext("scrape")
 			err = s.handleScrape(ctx, transactionID, conn, headerBuf[16:])
 		default:
+			conn.SetContext("unknown")
 			err = errors.New("invalid action")
 		}
 		if err != nil {
