@@ -108,10 +108,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		} else {
 			// new peer!
 			if common.IsPeerConnectable(peer) { // skip private ip
-				// there is a data race, but it's impossible for concurrent access to one peer
-				if peer.Type == model.PeerTypeWebtorrent && len(peer.Offers) > 0 {
-					go m.sendOffers(ctx, root.infoHash, root.peerMap, peer, req.NumWant)
-				}
 				root.peerMap.LoadOrStore(peer.GetKey(), peer)
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 			}
@@ -303,38 +299,4 @@ func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID stri
 		return err
 	}
 	return nil
-}
-
-func (m *Manager) sendOffers(ctx context.Context, infoHash string, peerMap *skipmap.OrderedMap[string, *common.Peer], peer *common.Peer, numWant int) {
-	toClean := make([]string, 0)
-	candidates := make([]*common.Peer, 0)
-	peerMap.Range(func(key string, value *common.Peer) bool {
-		if value.ID == peer.ID {
-			return true
-		}
-		if value.Type == model.PeerTypeWebtorrent && value.Conn != nil {
-			candidates = append(candidates, value)
-		}
-		return true
-	})
-	picker := choose.Slice(peer.Offers)
-	for _, value := range choose.Slice(candidates).N(numWant) {
-		o := picker.One()
-		offer := hertz.H{
-			"action":    "announce",
-			"info_hash": conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(infoHash))),
-			"offer_id":  o.OfferID,
-			"peer_id":   peer.ID,
-			"offer":     o.Offer,
-		}
-		if err := value.Conn.WriteJSON(offer); err != nil {
-			hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
-			toClean = append(toClean, value.GetKey())
-			break
-		}
-
-	}
-	for _, disconnectedPeer := range toClean {
-		peerMap.Delete(disconnectedPeer)
-	}
 }
