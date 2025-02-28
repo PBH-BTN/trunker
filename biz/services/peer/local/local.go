@@ -311,7 +311,7 @@ func (m *Manager) sendOffers(ctx context.Context, infoHash string, peerMap *skip
 		o := picker.One()
 		offer := hertz.H{
 			"action":    "announce",
-			"info_hash": conv.UnsafeBytesToString(conv.Trans9959_1ToUTF8(conv.UnsafeStringToBytes(infoHash))),
+			"info_hash": conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(infoHash))),
 			"offer_id":  o.OfferID,
 			"peer_id":   peer.ID,
 			"offer":     o.Offer,

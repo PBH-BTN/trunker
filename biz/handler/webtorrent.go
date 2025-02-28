@@ -10,7 +10,6 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/service/metrics"
-	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/PBH-BTN/trunker/utils/webtorrent"
@@ -97,7 +96,7 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 	if err != nil {
 		return err
 	}
-	infoHash = string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(infoHash)))
+	infoHash = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash)))
 	peerIdRaw, err := sonic.Get(msg, "to_peer_id")
 	if err != nil {
 		return err
@@ -118,7 +117,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		return err
 	}
 	// The raw info hash is an utf-8 encoded bytes, which should be converted to iso-8859-1
-	baseReq.InfoHash = string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(baseReq.InfoHash)))
+	baseReq.InfoHash = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(baseReq.InfoHash)))
 	if !validAnnounceReq(&baseReq) {
 		return errors.New("invalid request")
 	}
@@ -143,7 +142,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		"interval":   config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
 		"incomplete": scrape.Incomplete,
 		"complete":   scrape.Complete,
-		"info_hash":  conv.UnsafeBytesToString(conv.Trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
+		"info_hash":  conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
 	}
 	if err := conn.WriteJSON(resp); err != nil {
 		hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
@@ -153,7 +152,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		o := choose.Slice(p.Offers).One()
 		offer := hertz.H{
 			"action":    "announce",
-			"info_hash": conv.UnsafeBytesToString(conv.Trans9959_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
+			"info_hash": conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
 			"offer_id":  o.OfferID,
 			"peer_id":   p.ID,
 			"offer":     o.Offer,
@@ -176,11 +175,11 @@ func handleWSScrape(ctx context.Context, req []byte, conn *model.Conn) error {
 	if tryArray, err := infoHashRaw.Array(); err == nil {
 		for _, v := range tryArray {
 			if s, ok := v.(string); ok {
-				infoHashes = append(infoHashes, string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(s))))
+				infoHashes = append(infoHashes, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(s))))
 			}
 		}
 	} else if tryString, err := infoHashRaw.String(); err == nil {
-		infoHashes = append(infoHashes, string(conv.TransUTF8To9959_1(conv.UnsafeStringToBytes(tryString))))
+		infoHashes = append(infoHashes, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(tryString))))
 	}
 	if len(infoHashes) == 0 {
 		return errors.New("info_hash can't be empty")
