@@ -17,14 +17,16 @@ import (
 type connection struct {
 	id         uint64
 	remoteAddr net.Addr
+	time       time.Time
 }
 
 type UDPServer struct {
 	gnet.BuiltinEventEngine
 
-	eng         gnet.Engine
-	id          *uid64.Generator
-	connectList *skipmap.Uint64Map[*connection]
+	eng            gnet.Engine
+	id             *uid64.Generator
+	stop           chan struct{}
+	connectionList *skipmap.Uint64Map[*connection]
 }
 
 func (s *UDPServer) OnBoot(eng gnet.Engine) (action gnet.Action) {
@@ -32,11 +34,16 @@ func (s *UDPServer) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	return gnet.None
 }
 
+func (s *UDPServer) OnTick() (delay time.Duration, action gnet.Action) {
+	go s.cleanConnection()
+	return time.Minute * 2, gnet.None
+}
+
 func NewUDPServer() *UDPServer {
 	generator, _ := uid64.NewGenerator(0)
 	s := &UDPServer{
-		id:          generator,
-		connectList: skipmap.NewUint64[*connection](),
+		id:             generator,
+		connectionList: skipmap.NewUint64[*connection](),
 	}
 	return s
 }
@@ -73,7 +80,7 @@ func (s *UDPServer) handleRequest(ctx context.Context, conn gnet.Conn) error {
 		return nil
 	}
 
-	if c, ok := s.connectList.Load(connectionID); ok {
+	if c, ok := s.connectionList.Load(connectionID); ok {
 		if c.remoteAddr.String() != conn.RemoteAddr().String() {
 			responseError(conn, transactionID, errors.New("connection mismatch"))
 			return nil
