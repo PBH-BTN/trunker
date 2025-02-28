@@ -9,6 +9,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
+	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
@@ -148,23 +149,25 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
 		return err
 	}
-	for _, p := range res {
-		if len(p.Offers) == 0 {
-			continue
+	if len(req.Offers) == len(res) {
+		for i, to := range res {
+			if to.ID != req.PeerID && i < len(req.Offers) {
+				if err := sendOffer(ctx, to, req.Offers[i], req.InfoHash, req.PeerID); err != nil {
+					hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+				}
+			}
 		}
-		o := choose.Slice(p.Offers).One()
-		offer := hertz.H{
-			"action":    "announce",
-			"info_hash": conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
-			"offer_id":  o.OfferID,
-			"peer_id":   p.ID,
-			"offer":     o.Offer,
-		}
-		if err := conn.WriteJSON(offer); err != nil {
-			hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
-			return err
+	} else {
+		picker := choose.Slice(req.Offers)
+		for _, p := range res {
+			if p.ID != req.PeerID {
+				if err := sendOffer(ctx, p, picker.One(), req.InfoHash, req.PeerID); err != nil {
+					hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+				}
+			}
 		}
 	}
+
 	return nil
 
 }
@@ -202,6 +205,20 @@ func handleWSScrape(ctx context.Context, req []byte, conn *model.Conn) error {
 	}
 	if err := conn.WriteJSON(resp); err != nil {
 		hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+func sendOffer(_ context.Context, target *common.Peer, o *model.Offer, infoHash string, peerId string) error {
+	offer := hertz.H{
+		"action":    "announce",
+		"info_hash": conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(infoHash))),
+		"offer_id":  o.OfferID,
+		"peer_id":   peerId,
+		"offer":     o.Offer,
+	}
+	if err := target.Conn.WriteJSON(offer); err != nil {
 		return err
 	}
 	return nil
