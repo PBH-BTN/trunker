@@ -93,6 +93,10 @@ func DeleteInfoHash(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	manager := peer.GetPeerManager()
-	manager.DeleteInfoHash(ctx, req.InfoHash)
+	err := manager.DeleteInfoHash(ctx, req.InfoHash)
+	if err != nil {
+		http.ResponseErr(c, err)
+		return
+	}
 	http.ResponseOK(c, nil)
 }
