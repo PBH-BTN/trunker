@@ -17,8 +17,6 @@ import (
 	"github.com/bytedance/gopkg/util/gopool"
 	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	hertz "github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/lestrrat-go/choose"
 	"github.com/zhangyunhao116/skipmap"
 )
 
