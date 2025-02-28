@@ -57,13 +57,13 @@ func (s *UDPServer) handleAnnounce(ctx context.Context, remote *net.UDPAddr, tid
 	writeHeader(buf, ActionAnnounce, tid)                                                                   // 8
 	_ = binary.Write(buf, binary.BigEndian, uint32(config.AppConfig.Tracker.TTL+int64(rand.Intn(201)-100))) // interval 4
 	_ = binary.Write(buf, binary.BigEndian, uint32(scrape.Incomplete))                                      // leechers 4
-	_ = binary.Write(buf, binary.BigEndian, uint32(scrape.Complete))                                        // seeders 4
+	_ = binary.Write(buf, binary.BigEndian, uint32(scrape.Seeder))                                          // seeders 4
 	for _, p := range res {
 		var ip net.IP
 		if isIPv6 {
-			ip = p.GetIP().To4()
-		} else {
 			ip = p.GetIP().To16()
+		} else {
+			ip = p.GetIP().To4()
 		}
 		if ip != nil {
 			_ = binary.Write(buf, binary.BigEndian, ip)
@@ -91,7 +91,7 @@ func (s *UDPServer) handleScrape(ctx context.Context, tid uint32, conn gnet.Conn
 		if err != nil {
 			return err
 		}
-		_ = binary.Write(res, binary.BigEndian, uint32(scrape.Complete))   // seeders 4
+		_ = binary.Write(res, binary.BigEndian, uint32(scrape.Seeder))     // seeders 4
 		_ = binary.Write(res, binary.BigEndian, uint32(scrape.Complete))   // completed 4
 		_ = binary.Write(res, binary.BigEndian, uint32(scrape.Incomplete)) // leechers 4
 	}

@@ -27,6 +27,16 @@ func (r *PeerRepository) GetCompleteCount(ctx context.Context, infoHash string) 
 	return count, nil
 }
 
+func (r *PeerRepository) GetSeederCount(ctx context.Context, infoHash string) (int64, error) {
+	var count int64
+	validTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second)
+	err := r.db.WithContext(ctx).Model(&entity.Peers{}).Where("info_hash = ? AND last_seen > ? AND `left` = ? AND event <> ?", infoHash, validTime, 0, 2).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func (r *PeerRepository) GetInCompleteCount(ctx context.Context, infoHash string) (int64, error) {
 	var count int64
 	validTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second)

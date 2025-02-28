@@ -82,6 +82,7 @@ type ScrapeResponse struct {
 }
 
 type ScrapeFile struct {
+	Seeder     int `json:"seeder" bencode:"-"`
 	Complete   int `json:"complete" bencode:"complete"`
 	Incomplete int `json:"incomplete" bencode:"incomplete"`
 	Downloaded int `json:"downloaded" bencode:"downloaded"`
