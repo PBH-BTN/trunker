@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math/rand"
+	"strings"
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
@@ -21,7 +22,7 @@ import (
 
 func Announce(ctx context.Context, c *app.RequestContext) {
 	if config.AppConfig.Tracker.Mode == config.RunningModeMemory && config.AppConfig.Tracker.Memory.EnableWS {
-		if c.Request.Header.Get(consts.HeaderConnection) == "Upgrade" && c.Request.Header.Get("Upgrade") == "websocket" {
+		if strings.EqualFold(c.Request.Header.Get(consts.HeaderConnection), "Upgrade") && strings.EqualFold(c.Request.Header.Get("Upgrade"), "websocket") {
 			HandleWebTorrent(ctx, c)
 			return
 		}

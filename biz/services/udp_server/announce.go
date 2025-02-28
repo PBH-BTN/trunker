@@ -45,6 +45,7 @@ func (s *UDPServer) handleAnnounce(ctx context.Context, remote *net.UDPAddr, tid
 	}
 	req.ClientIP = remote.IP
 	req.Type = model.PeerTypeBittorrent
+	req.Source = model.SourceUDP
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	if err != nil {
 		return err
