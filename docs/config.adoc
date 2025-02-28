@@ -68,7 +68,7 @@ Trunker provide a UDP implement of the Bittorrent tracker server, aka. https://w
 |Name |Description |Default
 
 |enable |Whether enable the UDP server|false
-|hostPorts |The host and port of the UDP server, for listening both IPv4 and IPv6 address, please use `:6881` |`127.0.0.1:6881`
+|hostPorts |The host and port of the UDP server. For listening both IPv4 and IPv6 address, please use `:6881` |`127.0.0.1:6881`
 |===
 
 CAUTION: UDP server can't be protected with CDN, you should protect it by yourself.
