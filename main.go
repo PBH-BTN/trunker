@@ -21,7 +21,6 @@ func main() {
 	pprof.Register(h)
 	register(h)
 	h.Use(middleware.LogSlowQuery)
-
 	h.Engine.OnShutdown = append(h.Engine.OnShutdown, func(_ context.Context) {
 		// here save current data
 		peer.GetPeerManager().StoreToPersist()

@@ -28,6 +28,7 @@ func CommonToDB(infoHash string, peer *common.Peer) *entity.Peers {
 		LastSeen:   peer.LastSeen,
 		UserAgent:  peer.UserAgent,
 		Event:      int8(peer.Event),
+		Source:     peer.Source,
 		Offers:     datatypes.NewJSONSlice(peer.Offers),
 		UpdatedAt:  time.Now(),
 	}
@@ -44,6 +45,7 @@ func DBToCommon(peer *entity.Peers) *common.Peer {
 		Port:       peer.Port,
 		Type:       peer.Type,
 		Left:       peer.Left,
+		Source:     peer.Source,
 		Uploaded:   peer.Uploaded,
 		Downloaded: peer.Downloaded,
 		LastSeen:   peer.LastSeen,

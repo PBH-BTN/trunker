@@ -24,8 +24,10 @@ type Peer struct {
 	UserAgent  string
 	Event      PeerEvent
 	Offers     []*Offer `json:"offers"`
-	Conn       *Conn    `json:"-"`
+	Source     PeerSource
+	Conn       *Conn `json:"-"`
 }
+type PeerSource = model.Source
 type PeerType = model.PeerType
 type Offer = model.Offer
 type OfferDetail = model.OfferDetail
@@ -121,7 +123,7 @@ func (e PeerEvent) String() string {
 // IsPeerConnectable Check If Peer is connectable
 func IsPeerConnectable(peer *Peer) bool {
 	if peer.Type == model.PeerTypeBittorrent {
-		return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
+		return !(peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
 	} else if peer.Type == model.PeerTypeWebtorrent {
 		return len(peer.Offers) > 0
 	}

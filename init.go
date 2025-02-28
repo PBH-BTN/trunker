@@ -1,16 +1,19 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
+	"github.com/PBH-BTN/trunker/biz/services/udp_server"
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/service/mq/producer"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	hertzConfig "github.com/cloudwego/hertz/pkg/common/config"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	prometheus "github.com/hertz-contrib/monitor-prometheus"
+	"github.com/panjf2000/gnet/v2"
 )
 
 func Init() {
@@ -21,6 +24,9 @@ func Init() {
 	metrics.Init()
 	//cache.Init()
 	peer.InitPeerManager()
+	if config.AppConfig.Tracker.UDPServer.Enable {
+		initUDPServer()
+	}
 }
 
 func getServerOption() []hertzConfig.Option {
@@ -42,4 +48,8 @@ func getServerOption() []hertzConfig.Option {
 		options = append(options, server.WithNetwork("unix"))
 	}
 	return options
+}
+
+func initUDPServer() {
+	log.Fatal(gnet.Run(udp_server.NewUDPServer(), "udp://"+config.AppConfig.Tracker.UDPServer.HostPorts, gnet.WithMulticore(true), gnet.WithLogger(hlog.DefaultLogger())))
 }

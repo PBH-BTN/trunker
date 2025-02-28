@@ -100,6 +100,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 					},
 				}
 			}),
+			Source: common.PeerSource(pbStruct.Source),
 		})
 		count++
 	}
@@ -154,7 +155,8 @@ func (m *MuxLocalManager) StoreToPersist() {
 							Offer:   &OfferDetail{Type: o.Offer.Type, Sdp: o.Offer.SDP},
 						}
 					}),
-					Type: PeerType(value.Type),
+					Type:   PeerType(value.Type),
+					Source: PeerSource(value.Source),
 				}
 				if value.Conn != nil {
 					_ = value.Conn.Close()

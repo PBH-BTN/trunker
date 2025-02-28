@@ -25,9 +25,18 @@ type HttpAnnounceRequest struct {
 // AnnounceRequest Bittorrent Announce Request https://wiki.theory.org/BitTorrent_Tracker_Protocol
 type AnnounceRequest struct {
 	HttpAnnounceRequest
+	Source Source   `json:"source" query:"source"`
 	Offers []*Offer `json:"offers" query:"offers"`
 	Conn   *Conn    `form:"-" json:"-" query:"-" header:"-"`
 }
+
+type Source int8
+
+const (
+	SourceHTTP Source = iota
+	SourceUDP
+	SourceWS
+)
 
 type PeerType int8
 

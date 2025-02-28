@@ -3,6 +3,7 @@ CREATE TABLE `peers` (
   `info_hash` varchar(40) NOT NULL COMMENT 'Info hash',
   `peer_id` varchar(40) DEFAULT NULL,
   `type` tinyint(4) DEFAULT 0 COMMENT 'peer type, 0 - bittorrent， 1- webtorrent',
+  `source` tinyint(4) DEFAULT 0 COMMENT 'peer source, 0 - http， 1 - udp, 2 - ws',
   `ip` varbinary(16) DEFAULT NULL,
   `ipv4` varbinary(4) DEFAULT NULL,
   `ipv6` varbinary(16) DEFAULT NULL,

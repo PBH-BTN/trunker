@@ -44,7 +44,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		req.NumWant = 50
 	}
 	req.Type = model.PeerTypeBittorrent
-	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &model.AnnounceRequest{HttpAnnounceRequest: req})
+	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &model.AnnounceRequest{HttpAnnounceRequest: req, Source: model.SourceHTTP})
 	if err != nil {
 		bencode.ResponseErr(c, err)
 		return

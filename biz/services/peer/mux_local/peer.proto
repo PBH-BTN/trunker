@@ -30,6 +30,12 @@ enum PeerType {
   Webtorrent = 1;
 }
 
+enum PeerSource{
+  HTTP = 0;
+  UDP = 1;
+  WS = 2;
+}
+
 message PeerInfo {
   bytes info_hash = 1;
   IPInfo ip = 2;
@@ -43,4 +49,5 @@ message PeerInfo {
   PeerEvent event = 10;
   PeerType type = 11;
   repeated Offer offers = 12;
+  PeerSource source = 13;
 }

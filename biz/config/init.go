@@ -49,6 +49,12 @@ type TrackerConfig struct {
 	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
 	MetricsHostPorts    string         `yaml:"metricsHostPorts" json:"metricsHostPorts"`
+	UDPServer           udpConfig      `yaml:"udpServer" json:"udpServer"`
+}
+
+type udpConfig struct {
+	Enable    bool   `yaml:"enable" json:"enable"`
+	HostPorts string `yaml:"hostPorts" json:"hostPorts"`
 }
 
 type memoryConfig struct {
