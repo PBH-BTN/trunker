@@ -13,4 +13,4 @@ pid=$!
 trap 'kill -SIGINT $pid; wait $pid' SIGTERM
 
 # Wait for the main process to complete
-wait $pidh
+wait $pid

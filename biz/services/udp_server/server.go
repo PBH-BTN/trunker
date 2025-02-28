@@ -25,7 +25,6 @@ type UDPServer struct {
 
 	eng            gnet.Engine
 	id             *uid64.Generator
-	stop           chan struct{}
 	connectionList *skipmap.Uint64Map[*connection]
 }
 

@@ -9,7 +9,6 @@ import (
 
 type Conn struct {
 	conn          *websocket.Conn
-	send          chan []byte
 	m             *sync.Mutex
 	CloseCallback func()
 	closed        *atomic.Bool
@@ -20,7 +19,6 @@ func NewConn(conn *websocket.Conn) *Conn {
 	closed.Store(false)
 	return &Conn{
 		conn,
-		make(chan []byte),
 		&sync.Mutex{},
 		nil,
 		closed,

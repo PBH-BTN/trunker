@@ -20,6 +20,6 @@ func (m *DBManager) StoreToPersist() {
 }
 
 func (m *DBManager) AnswerToPeer(_ context.Context, _ string, _ string, _ []byte) error {
-	hlog.Warn("not supported for database mode")
+	hlog.Warn("AnswerToPeer: peer communication not supported in database mode")
 	return nil
 }

@@ -74,13 +74,6 @@ func parseAnnounceRequestV6(buf []byte) *model.AnnounceRequest {
 	return req
 }
 
-type ExtensionType int8
-type Extension struct {
-	Type   ExtensionType
-	Length uint8
-	Data   []byte
-}
-
 func writeHeader(buf *bytes.Buffer, action uint32, tid uint32) {
 	_ = binary.Write(buf, binary.BigEndian, action)
 	_ = binary.Write(buf, binary.BigEndian, tid)
