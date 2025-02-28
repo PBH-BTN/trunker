@@ -190,14 +190,16 @@ func (m *Manager) Scrape(_ context.Context, infoHash string) (*model.ScrapeFile,
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
 		if value.Left == 0 {
 			downloaded++
+			complete++
 			if value.Event != common.PeerEvent_Stopped {
 				seeder++
 			}
-		} else {
-			incomplete++
+			return true
 		}
 		if value.Event == common.PeerEvent_Completed {
 			complete++
+		} else {
+			incomplete++
 		}
 		return true
 	})
