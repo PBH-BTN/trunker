@@ -63,6 +63,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		Event:      common.ParsePeerEvent(req.Event),
 		UserAgent:  req.UserAgent,
 		Conn:       req.Conn,
+		Source:     req.Source,
 	}
 	if peer.IPv4 != nil && peer.IPv4.To4() == nil {
 		hlog.CtxWarnf(ctx, "invalid ipv4 address,actual: %s", peer.IPv4.String())

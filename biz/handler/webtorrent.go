@@ -128,6 +128,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	}
 	req.Conn = conn
 	req.Type = model.PeerTypeWebtorrent
+	req.Source = model.SourceWS
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &req)
 	if err != nil {
 		return err

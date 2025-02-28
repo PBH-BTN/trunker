@@ -60,6 +60,21 @@ If your mode is `database`, following configuration are *required*.
 |pass |The database password. |*required*, no default 
 |===
 
+== UDP Server
+Trunker provide a UDP implement of the Bittorrent tracker server, aka. https://www.bittorrent.org/beps/bep_0015.html[BEP-0015]
+
+[cols="<,<,<"]
+|===
+|Name |Description |Default
+
+|enable |Whether enable the UDP server|false
+|hostPorts |The host and port of the UDP server |`127.0.0.1:6881`
+|===
+
+CAUTION: UDP server can't be protected with CDN, you should protect it by yourself.
+
+
+
 == JSON Config
 
 JSON config is also supported with env `TRUNKER_CONFIG`, this will be useful for docker.

@@ -24,6 +24,9 @@ tracker:
   enableEventProducer: false
   enableMetrics: true
   metricsHostPorts: 0.0.0.0:9091
+  udpServer:
+    enable: true
+    hostPorts: 127.0.0.1:6881
 
 rocketmq:
   topic: TrunkerEvent

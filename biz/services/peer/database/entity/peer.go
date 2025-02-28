@@ -13,7 +13,8 @@ type Peers struct {
 	PeerID     string                             `json:"peer_id" `
 	Ip         []byte                             `json:"ip" `
 	Ipv4       []byte                             `json:"ipv4" `
-	Type       common.PeerType                    `json:"type"`
+	Type       common.PeerType                    `json:"type"`    // peer type, 0 - bittorrent， 1- webtorrent
+	Source     common.PeerSource                  `json:"source" ` // peer source, 0 - http， 1 - udp, 2 - ws
 	Ipv6       []byte                             `json:"ipv6" `
 	ClientIp   []byte                             `json:"client_ip" ` // The ip from the heep client
 	Port       int                                `json:"port" `
