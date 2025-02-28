@@ -15,19 +15,26 @@ import (
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/thinkeridea/go-extend/exstrings"
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
-	req := &model.AnnounceRequest{}
-	if c.Bind(req) != nil {
+	if config.AppConfig.Tracker.Mode == config.RunningModeMemory && config.AppConfig.Tracker.Memory.EnableWS {
+		if c.Request.Header.Get(consts.HeaderConnection) == "Upgrade" && c.Request.Header.Get("Upgrade") == "websocket" {
+			HandleWebTorrent(ctx, c)
+			return
+		}
+	}
+	req := model.HttpAnnounceRequest{}
+	if err := c.Bind(&req); err != nil {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
 			metrics.LabelReason: "bind error",
 		})
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
-	if !validAnnounceReq(req) {
+	if !validAnnounceReq(&req) {
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
@@ -36,7 +43,8 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	if req.NumWant == 0 || req.NumWant > 500 {
 		req.NumWant = 50
 	}
-	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
+	req.Type = model.PeerTypeBittorrent
+	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &model.AnnounceRequest{HttpAnnounceRequest: req})
 	if err != nil {
 		bencode.ResponseErr(c, err)
 		return
@@ -104,7 +112,7 @@ func Statistic(ctx context.Context, c *app.RequestContext) {
 	http.ResponseOK(c, info)
 }
 
-func validAnnounceReq(req *model.AnnounceRequest) bool {
+func validAnnounceReq(req *model.HttpAnnounceRequest) bool {
 	if req == nil {
 		return false
 	}

@@ -48,6 +48,7 @@ type TrackerConfig struct {
 	UseAnnounceIP       bool           `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
 	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
+	MetricsHostPorts    string         `yaml:"metricsHostPorts" json:"metricsHostPorts"`
 }
 
 type memoryConfig struct {
@@ -55,6 +56,7 @@ type memoryConfig struct {
 	PersistFile        string `yaml:"persistFile" json:"persistFile"`
 	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent" json:"maxPeersPerTorrent"`
 	Shard              int    `yaml:"shard" json:"shard"`
+	EnableWS           bool   `yaml:"enableWS" json:"enableWS"`
 }
 
 type Config struct {
@@ -63,6 +65,19 @@ type Config struct {
 	RocketMq RocketMqConfig `yaml:"rocketmq" json:"rocketmq"`
 }
 
+func injectDefaultValue(conf *Config) {
+	if conf.Tracker.HostPorts == "" {
+		conf.Tracker.HostPorts = "0.0.0.0:8888"
+	}
+	if conf.Tracker.Mode == RunningModeMemory {
+		if conf.Tracker.Memory.PersistFile == "" {
+			conf.Tracker.Memory.PersistFile = "persist.dat"
+		}
+	}
+	if conf.Tracker.MetricsHostPorts == "" {
+		conf.Tracker.MetricsHostPorts = "127.0.0.1:9091"
+	}
+}
 func Init() {
 	config := &Config{}
 	if jsonConfig := os.Getenv("TRUNKER_CONFIG"); jsonConfig != "" {
@@ -71,6 +86,7 @@ func Init() {
 		if err != nil {
 			panic("invalid json config:" + err.Error())
 		}
+		injectDefaultValue(config)
 		AppConfig = config
 		return
 	}
@@ -90,5 +106,6 @@ func Init() {
 	if err := yaml.Unmarshal(content, config); err != nil {
 		log.Fatalf("parse local config failed: %v", err)
 	}
+	injectDefaultValue(config)
 	AppConfig = config
 }

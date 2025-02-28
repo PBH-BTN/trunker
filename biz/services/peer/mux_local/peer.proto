@@ -15,6 +15,21 @@ enum PeerEvent {
   Completed = 3;
 }
 
+message OfferDetail{
+  string type = 1;
+  string sdp = 2;
+}
+
+message Offer{
+  string offer_id = 1;
+  OfferDetail offer = 2;
+}
+
+enum PeerType {
+  Bittorrent = 0;
+  Webtorrent = 1;
+}
+
 message PeerInfo {
   bytes info_hash = 1;
   IPInfo ip = 2;
@@ -26,4 +41,6 @@ message PeerInfo {
   string user_agent = 8;
   bytes peer_id = 9;
   PeerEvent event = 10;
+  PeerType type = 11;
+  repeated Offer offers = 12;
 }

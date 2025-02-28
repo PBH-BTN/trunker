@@ -11,6 +11,7 @@ tracker:
     persistFile: persist.dat
     maxPeersPerTorrent: 1500
     shard: 40
+    enableWS: true
   database:
     database: root
     host: localhost
@@ -22,6 +23,7 @@ tracker:
   useAnnounceIP: true
   enableEventProducer: false
   enableMetrics: true
+  metricsHostPorts: 0.0.0.0:9091
 
 rocketmq:
   topic: TrunkerEvent

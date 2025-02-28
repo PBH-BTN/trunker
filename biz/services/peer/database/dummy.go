@@ -1,6 +1,10 @@
 package database
 
-import "github.com/cloudwego/hertz/pkg/common/hlog"
+import (
+	"context"
+
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+)
 
 func (m *DBManager) Clean() int64 {
 	hlog.Info("no need for database mode, skip")
@@ -13,4 +17,9 @@ func (m *DBManager) LoadFromPersist() {
 
 func (m *DBManager) StoreToPersist() {
 	hlog.Info("no need for database mode, skip")
+}
+
+func (m *DBManager) AnswerToPeer(_ context.Context, _ string, _ string, _ []byte) error {
+	hlog.Warn("not supported for database mode")
+	return nil
 }

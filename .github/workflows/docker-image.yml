@@ -2,11 +2,11 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "miao" ]
+    branches: [ "miao"]
     tags:
       - 'v*'
   pull_request:
-    branches: [ "miao" ]
+    branches: [ "miao"]
 
 jobs:
   build:

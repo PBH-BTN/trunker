@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -14,7 +15,10 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
+	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	hertz "github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/lestrrat-go/choose"
 	"github.com/zhangyunhao116/skipmap"
 )
 
@@ -52,10 +56,13 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		Uploaded:   req.Uploaded,
 		Left:       req.Left,
 		Port:       req.Port,
+		Type:       req.Type,
 		Downloaded: req.Downloaded,
+		Offers:     req.Offers,
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),
 		UserAgent:  req.UserAgent,
+		Conn:       req.Conn,
 	}
 	if peer.IPv4 != nil && peer.IPv4.To4() == nil {
 		hlog.CtxWarnf(ctx, "invalid ipv4 address,actual: %s", peer.IPv4.String())
@@ -69,6 +76,14 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	root, ok := m.infoHashMap.LoadOrStoreLazy(req.InfoHash, func() *InfoHashRoot {
 		return NewInfoHashRoot(req.InfoHash)
 	})
+	if peer.Type == model.PeerTypeWebtorrent && req.Conn != nil {
+		peer.Conn.CloseCallback = func() {
+			hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close", peer.ID, hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)))
+			if v, ok := root.peerMap.LoadAndDelete(req.PeerID); ok {
+				v.Conn = nil
+			}
+		}
+	}
 	if !ok { // first seen torrent
 		if common.IsPeerConnectable(peer) {
 			root.peerMap.LoadOrStore(peer.GetKey(), peer)
@@ -93,6 +108,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			// new peer!
 			if common.IsPeerConnectable(peer) { // skip private ip
 				// there is a data race, but it's impossible for concurrent access to one peer
+				if peer.Type == model.PeerTypeWebtorrent && len(peer.Offers) > 0 {
+					go m.sendOffers(ctx, root.infoHash, root.peerMap, peer, req.NumWant)
+				}
 				root.peerMap.LoadOrStore(peer.GetKey(), peer)
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 			}
@@ -105,10 +123,21 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	var oldestPeer *common.Peer
 	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
+		if value.ID == peer.ID {
+			return true
+		}
 		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
 			// timeout!
 			timeoutPeer = append(timeoutPeer, value)
 			return true
+		}
+		if value.Type != peer.Type { // same type peer only
+			return true
+		}
+		if value.Type == model.PeerTypeWebtorrent {
+			if value.Conn == nil {
+				return true
+			}
 		}
 		if value.Event == common.PeerEvent_Stopped { // stopped peer should not return
 			return true
@@ -237,4 +266,64 @@ func (m *Manager) GetPeers(_ context.Context, infoHash string) ([]*common.Peer, 
 func (m *Manager) DeleteInfoHash(_ context.Context, infoHash string) error {
 	m.infoHashMap.Delete(infoHash)
 	return nil
+}
+
+func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error {
+	root, ok := m.infoHashMap.Load(infoHash)
+	if !ok {
+		return errors.New("info hash not found")
+	}
+	peer, ok := root.peerMap.Load(peerID)
+	if !ok {
+		return errors.New("peer not found")
+	}
+	if peer.Conn == nil {
+		return errors.New("peer not connected")
+	}
+	resp := map[string]any{}
+	_ = json.Unmarshal(answerBody, &resp)
+	delete(resp, "to_peer_id")
+	err := peer.Conn.WriteJSON(resp)
+	if err != nil {
+		if strings.Contains(err.Error(), "close") {
+			peer.Conn = nil
+			return errors.New("remote peer offline")
+		}
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) sendOffers(ctx context.Context, infoHash string, peerMap *skipmap.OrderedMap[string, *common.Peer], peer *common.Peer, numWant int) {
+	toClean := make([]string, 0)
+	candidates := make([]*common.Peer, 0)
+	peerMap.Range(func(key string, value *common.Peer) bool {
+		if value.ID == peer.ID {
+			return true
+		}
+		if value.Type == model.PeerTypeWebtorrent && value.Conn != nil {
+			candidates = append(candidates, value)
+		}
+		return true
+	})
+	picker := choose.Slice(peer.Offers)
+	for _, value := range choose.Slice(candidates).N(numWant) {
+		o := picker.One()
+		offer := hertz.H{
+			"action":    "announce",
+			"info_hash": conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(infoHash))),
+			"offer_id":  o.OfferID,
+			"peer_id":   peer.ID,
+			"offer":     o.Offer,
+		}
+		if err := value.Conn.WriteJSON(offer); err != nil {
+			hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
+			toClean = append(toClean, value.GetKey())
+			break
+		}
+
+	}
+	for _, disconnectedPeer := range toClean {
+		peerMap.Delete(disconnectedPeer)
+	}
 }
