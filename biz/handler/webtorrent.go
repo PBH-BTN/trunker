@@ -149,6 +149,9 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		return err
 	}
 	for _, p := range res {
+		if len(p.Offers) == 0 {
+			continue
+		}
 		o := choose.Slice(p.Offers).One()
 		offer := hertz.H{
 			"action":    "announce",
