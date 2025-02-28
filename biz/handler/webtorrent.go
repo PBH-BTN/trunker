@@ -109,27 +109,26 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 }
 
 func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, conn *model.Conn) error {
-	baseReq := model.HttpAnnounceRequest{}
-	if err := json.Unmarshal(msg, &baseReq); err != nil {
+	req := model.AnnounceRequest{}
+	if err := json.Unmarshal(msg, &req); err != nil {
 		metrics.EmitCounter(metrics.CounterInvalidRequest, 1, map[string]string{
 			metrics.LabelReason: "bind error",
 		})
 		return err
 	}
 	// The raw info hash is an utf-8 encoded bytes, which should be converted to iso-8859-1
-	baseReq.InfoHash = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(baseReq.InfoHash)))
-	if !validAnnounceReq(&baseReq) {
+	req.InfoHash = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(req.InfoHash)))
+	if !validAnnounceReq(&req.HttpAnnounceRequest) {
 		return errors.New("invalid request")
 	}
-	baseReq.ClientIP = http.GetClientIP(ctx, c)
-	baseReq.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
-	if baseReq.NumWant == 0 || baseReq.NumWant > 500 {
-		baseReq.NumWant = 50
+	req.ClientIP = http.GetClientIP(ctx, c)
+	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
+	if req.NumWant == 0 || req.NumWant > 500 {
+		req.NumWant = 50
 	}
-	req := &model.AnnounceRequest{HttpAnnounceRequest: baseReq}
 	req.Conn = conn
 	req.Type = model.PeerTypeWebtorrent
-	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
+	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &req)
 	if err != nil {
 		return err
 	}

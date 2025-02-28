@@ -78,7 +78,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	})
 	if peer.Type == model.PeerTypeWebtorrent && req.Conn != nil {
 		peer.Conn.CloseCallback = func() {
-			hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close", peer.ID, req.InfoHash)
+			hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close", peer.ID, hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)))
 			if v, ok := root.peerMap.LoadAndDelete(req.PeerID); ok {
 				v.Conn = nil
 			}
