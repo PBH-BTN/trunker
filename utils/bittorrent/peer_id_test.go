@@ -24,6 +24,11 @@ func TestParsePeerID(t *testing.T) {
 			expected: "-BC0211-",
 		},
 		{
+			name:     "validPeerIDWithSlashPrefix",
+			peerID:   "-SP3604ndasgasgwegaeg",
+			expected: "-SP3604",
+		},
+		{
 			name:     "Random PeerId",
 			peerID:   "qB452B-w(33PK*XDMdD",
 			expected: "unknown",
