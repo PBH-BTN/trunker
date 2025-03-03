@@ -36,7 +36,7 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
-				if websocket.IsCloseError(err, websocket.CloseNoStatusReceived, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+				if websocket.IsCloseError(err, websocket.CloseNoStatusReceived, websocket.CloseNormalClosure, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 					_ = wrapConn.Close()
 					break
 				}
@@ -120,6 +120,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	// The raw info hash is an utf-8 encoded bytes, which should be converted to iso-8859-1
 	req.InfoHash = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(req.InfoHash)))
 	if !validAnnounceReq(&req.HttpAnnounceRequest) {
+		hlog.CtxDebugf(ctx, "invalid request:%s", msg)
 		return errors.New("invalid request")
 	}
 	req.ClientIP = http.GetClientIP(ctx, c)
