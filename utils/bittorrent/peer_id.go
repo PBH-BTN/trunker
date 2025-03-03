@@ -2,6 +2,7 @@ package bittorrent
 
 import (
 	"strings"
+	"unicode"
 
 	regexp "github.com/wasilibs/go-re2"
 )
@@ -19,7 +20,9 @@ func ParsePeerID(peerIdRaw string) string {
 	if len(peerIdRaw) < 8 { // peer_id must have 20 bytes, this will never happen
 		return ""
 	}
-	peerId := peerIdRaw
+	peerId := strings.TrimFunc(peerIdRaw, func(r rune) bool {
+		return !unicode.IsGraphic(r)
+	})
 	if strings.HasPrefix(peerId, "-FD51") { //-FD51]�-FdrWCsIvJAk4
 		return "-FD51"
 	}
