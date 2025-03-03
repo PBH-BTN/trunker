@@ -68,6 +68,21 @@ func TestParsePeerID(t *testing.T) {
 			peerID:   "FD68Ki0o~Jd0mWb(GCY5",
 			expected: "FD6",
 		},
+		{
+			name:     "FD5",
+			peerID:   "-FD51]�-FdrWCsIvJAk4",
+			expected: "-FD51",
+		},
+		{
+			name:     "BS",
+			peerID:   "12BS�\u007F]���A%��o\u001F�U\u0006�",
+			expected: "12BS",
+		},
+		{
+			name:     "MG",
+			peerID:   "MG-3.01.43194l*c0n8.",
+			expected: "MG-3.01.4319",
+		},
 	}
 
 	for _, tt := range tests {
