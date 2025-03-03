@@ -10,23 +10,24 @@ import (
 )
 
 type Peer struct {
-	ID         string
 	IP         net.IP
 	IPv4       net.IP
 	IPv6       net.IP
 	ClientIP   net.IP
+	LastSeen   time.Time      `json:"lastSeen"`
+	Offers     []*model.Offer `json:"offers"`
+	ID         string
+	UserAgent  string
 	Port       int
 	Left       uint64
-	Type       PeerType
-	Uploaded   uint64    `json:"uploaded"`
-	Downloaded uint64    `json:"downloaded"`
-	LastSeen   time.Time `json:"lastSeen"`
-	UserAgent  string
+	Uploaded   uint64      `json:"uploaded"`
+	Downloaded uint64      `json:"downloaded"`
+	Conn       *model.Conn `json:"-"`
+	Type       model.PeerType
 	Event      PeerEvent
-	Offers     []*Offer `json:"offers"`
-	Source     PeerSource
-	Conn       *Conn `json:"-"`
+	Source     model.Source
 }
+
 type PeerSource = model.Source
 type PeerType = model.PeerType
 type Offer = model.Offer

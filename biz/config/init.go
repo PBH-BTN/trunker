@@ -38,18 +38,18 @@ const (
 )
 
 type TrackerConfig struct {
+	Database            databaseConfig `yaml:"database" json:"database"`
+	Memory              memoryConfig   `yaml:"memory" json:"memory"`
+	UDPServer           udpConfig      `yaml:"udpServer" json:"udpServer"`
+	Mode                runningMode    `yaml:"mode" json:"mode"`
+	HostPorts           string         `yaml:"hostPorts" json:"hostPorts"`
+	MetricsHostPorts    string         `yaml:"metricsHostPorts" json:"metricsHostPorts"`
 	TTL                 int64          `yaml:"ttl" json:"ttl"`
 	IntervalTask        int64          `yaml:"intervalTask" json:"intervalTask"`
-	Mode                runningMode    `yaml:"mode" json:"mode"`
-	Memory              memoryConfig   `yaml:"memory" json:"memory"`
-	Database            databaseConfig `yaml:"database" json:"database"`
 	UseUnixSocket       bool           `yaml:"useUnixSocket" json:"useUnixSocket"`
-	HostPorts           string         `yaml:"hostPorts" json:"hostPorts"`
 	UseAnnounceIP       bool           `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
 	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
-	MetricsHostPorts    string         `yaml:"metricsHostPorts" json:"metricsHostPorts"`
-	UDPServer           udpConfig      `yaml:"udpServer" json:"udpServer"`
 }
 
 type udpConfig struct {
@@ -58,10 +58,10 @@ type udpConfig struct {
 }
 
 type memoryConfig struct {
-	EnablePersist      bool   `yaml:"enablePersist" json:"enablePersist"`
 	PersistFile        string `yaml:"persistFile" json:"persistFile"`
 	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent" json:"maxPeersPerTorrent"`
 	Shard              int    `yaml:"shard" json:"shard"`
+	EnablePersist      bool   `yaml:"enablePersist" json:"enablePersist"`
 	EnableWS           bool   `yaml:"enableWS" json:"enableWS"`
 }
 

@@ -343,7 +343,6 @@ type PeerInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	InfoHash      []byte                 `protobuf:"bytes,1,opt,name=info_hash,json=infoHash,proto3" json:"info_hash,omitempty"`
 	Ip            *IPInfo                `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`
-	Port          int32                  `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
 	Left          uint64                 `protobuf:"varint,4,opt,name=left,proto3" json:"left,omitempty"`
 	Downloaded    uint64                 `protobuf:"varint,5,opt,name=downloaded,proto3" json:"downloaded,omitempty"`
 	Uploaded      uint64                 `protobuf:"varint,6,opt,name=uploaded,proto3" json:"uploaded,omitempty"`
@@ -354,6 +353,7 @@ type PeerInfo struct {
 	Type          PeerType               `protobuf:"varint,11,opt,name=type,proto3,enum=PeerType" json:"type,omitempty"`
 	Offers        []*Offer               `protobuf:"bytes,12,rep,name=offers,proto3" json:"offers,omitempty"`
 	Source        PeerSource             `protobuf:"varint,13,opt,name=source,proto3,enum=PeerSource" json:"source,omitempty"`
+	Port          int32                  `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

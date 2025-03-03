@@ -5,20 +5,20 @@ import (
 )
 
 type HttpAnnounceRequest struct {
+	ClientIP   net.IP
 	InfoHash   string `json:"info_hash" query:"info_hash,required"`
 	PeerID     string `json:"peer_id" query:"peer_id,required"`
-	Port       int    `json:"port" query:"port,required"`
-	Uploaded   uint64 `json:"uploaded" query:"uploaded"`
-	Downloaded uint64 `json:"downloaded" query:"downloaded"`
 	Event      string `json:"event" query:"event"`
-	Left       uint64 `json:"left" query:"left"`
-	NumWant    int    `default:"50" json:"numwant" query:"numwant"`
-	ClientIP   net.IP
 	UserAgent  string
-	Type       PeerType `json:"type" query:"type"`
 	IP         string   `query:"ip"`
 	IPv4       string   `query:"ipv4"`
 	IPv6       string   `query:"ipv6"`
+	Port       int      `json:"port" query:"port,required"`
+	Uploaded   uint64   `json:"uploaded" query:"uploaded"`
+	Downloaded uint64   `json:"downloaded" query:"downloaded"`
+	Left       uint64   `json:"left" query:"left"`
+	NumWant    int      `default:"50" json:"numwant" query:"numwant"`
+	Type       PeerType `json:"type" query:"type"`
 	Compact    int8     `default:"1" json:"compact" query:"compact"`
 }
 
