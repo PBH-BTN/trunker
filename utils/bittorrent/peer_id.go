@@ -3,7 +3,6 @@ package bittorrent
 import (
 	"strings"
 
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	regexp "github.com/wasilibs/go-re2"
 )
 
@@ -50,6 +49,5 @@ func ParsePeerID(peerIdRaw string) string {
 	if strings.HasPrefix(peerId, "12BS") { //12BS�\u007F]���A%��o\u001F�U\u0006�
 		return "12BS"
 	}
-	hlog.Info("unknown peer id: ", peerId)
 	return "unknown"
 }
