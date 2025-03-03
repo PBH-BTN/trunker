@@ -340,21 +340,21 @@ func (x *Offer) GetOffer() *OfferDetail {
 }
 
 type PeerInfo struct {
-	InfoHash      []byte   `protobuf:"bytes,1,opt,name=info_hash,json=infoHash,proto3" json:"info_hash,omitempty"`
-	PeerId        []byte   `protobuf:"bytes,9,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
-	Offers        []*Offer `protobuf:"bytes,12,rep,name=offers,proto3" json:"offers,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	UserAgent     string                 `protobuf:"bytes,8,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	InfoHash      []byte                 `protobuf:"bytes,1,opt,name=info_hash,json=infoHash,proto3" json:"info_hash,omitempty"`
 	Ip            *IPInfo                `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`
+	Port          int32                  `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
 	Left          uint64                 `protobuf:"varint,4,opt,name=left,proto3" json:"left,omitempty"`
 	Downloaded    uint64                 `protobuf:"varint,5,opt,name=downloaded,proto3" json:"downloaded,omitempty"`
 	Uploaded      uint64                 `protobuf:"varint,6,opt,name=uploaded,proto3" json:"uploaded,omitempty"`
 	LastSeen      int64                  `protobuf:"varint,7,opt,name=lastSeen,proto3" json:"lastSeen,omitempty"`
-	Port          int32                  `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
+	UserAgent     string                 `protobuf:"bytes,8,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	PeerId        []byte                 `protobuf:"bytes,9,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
 	Event         PeerEvent              `protobuf:"varint,10,opt,name=event,proto3,enum=PeerEvent" json:"event,omitempty"`
 	Type          PeerType               `protobuf:"varint,11,opt,name=type,proto3,enum=PeerType" json:"type,omitempty"`
+	Offers        []*Offer               `protobuf:"bytes,12,rep,name=offers,proto3" json:"offers,omitempty"`
 	Source        PeerSource             `protobuf:"varint,13,opt,name=source,proto3,enum=PeerSource" json:"source,omitempty"`
+	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
