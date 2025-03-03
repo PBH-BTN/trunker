@@ -1,10 +1,9 @@
-FROM golang:alpine AS build
+FROM --platform=$BUILDPLATFORM golang:alpine AS build
 ARG COMMIT_SHA
-ARG TARGETOS
+ARG TARGETPLATFORM
 WORKDIR /build
 COPY . .
-RUN echo $TARGETOS
-RUN sh build.sh $COMMIT_SHA
+RUN export GOARCH=${TARGETPLATFORM#*/}  && sh build.sh $COMMIT_SHA
 
 FROM alpine
 WORKDIR /app
