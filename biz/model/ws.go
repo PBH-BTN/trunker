@@ -1,6 +1,7 @@
 package model
 
 import (
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -31,7 +32,14 @@ func (c *Conn) WriteJSON(v any) error {
 	}
 	c.m.Lock()
 	defer c.m.Unlock()
-	return c.conn.WriteJSON(v)
+	err := c.conn.WriteJSON(v)
+	if err != nil {
+		if strings.Contains(err.Error(), "connection has been closed") || strings.Contains(err.Error(), "broken pipe") { // closed is not considered as an error
+			return nil
+		}
+		return err
+	}
+	return nil
 }
 
 func (c *Conn) WriteString(s []byte) error {
