@@ -1,9 +1,12 @@
 package bittorrent
 
-import regexp "github.com/wasilibs/go-re2"
+import (
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	regexp "github.com/wasilibs/go-re2"
+)
 
-var commonClients = regexp.MustCompile(`^-.+-`)           // common clients, use for qbitorrent, utorrent, vuze, bittorrent, etc
-var btspritClients = regexp.MustCompile(`^-[A-Z]+[0-9]+`) // btsprit-like clients, no second -
+var commonClients = regexp.MustCompile(`^-.+-`)                // common clients, use for qbitorrent, utorrent, vuze, bittorrent, etc
+var btspritClients = regexp.MustCompile(`^-[a-zA-Z]+[0-9]{4}`) // btsprit-like clients, no second -
 
 // ParsePeerID Parse the client name from the peer_id
 func ParsePeerID(peerIdRaw string) string {
@@ -18,5 +21,6 @@ func ParsePeerID(peerIdRaw string) string {
 	if len(slash) > 0 {
 		return slash[0]
 	}
+	hlog.Info("unknown peer id: ", peerIdRaw)
 	return "unknown"
 }
