@@ -106,6 +106,7 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 	if err != nil {
 		return err
 	}
+	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash)))
 	return peer.GetPeerManager().AnswerToPeer(ctx, infoHash, peerId, msg)
 }
 
@@ -118,7 +119,8 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		return err
 	}
 	// The raw info hash is an utf-8 encoded bytes, which should be converted to iso-8859-1
-	req.InfoHash = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(req.InfoHash)))
+	req.InfoHash = conv.UnsafeBytesToString(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(req.InfoHash)))
+	req.PeerID = conv.UnsafeBytesToString(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(req.PeerID)))
 	if !validAnnounceReq(&req.HttpAnnounceRequest) {
 		hlog.CtxDebugf(ctx, "invalid request:%s", msg)
 		return errors.New("invalid request")
