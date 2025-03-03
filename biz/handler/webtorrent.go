@@ -11,6 +11,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/service/metrics"
+	"github.com/PBH-BTN/trunker/utils/bittorrent"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/PBH-BTN/trunker/utils/webtorrent"
@@ -125,6 +126,10 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		hlog.CtxDebugf(ctx, "invalid request:%s", msg)
 		return errors.New("invalid request")
 	}
+	go metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
+		metrics.LabelSource: "websocket",
+		metrics.LabelClient: bittorrent.ParsePeerID(req.PeerID),
+	})
 	req.ClientIP = http.GetClientIP(ctx, c)
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
 	if req.NumWant == 0 || req.NumWant > 500 {

@@ -13,6 +13,7 @@ import (
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
+	"github.com/PBH-BTN/trunker/utils/bittorrent"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
@@ -39,6 +40,10 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
+	go metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
+		metrics.LabelSource: "http",
+		metrics.LabelClient: bittorrent.ParsePeerID(req.PeerID),
+	})
 	req.ClientIP = http.GetClientIP(ctx, c)
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
 	if req.NumWant == 0 || req.NumWant > 500 {

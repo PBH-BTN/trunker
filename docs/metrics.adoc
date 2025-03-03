@@ -1,5 +1,5 @@
 == Metrics
-Currently trunker is serving a prometheus handler at `:9091` by default. With 2 paths:
+Currently, trunker is serving a prometheus handler at `:9091` by default. With 2 paths:
 
 - `/metrics` Providing metrics about http request, including latency and QPS.
 - `/pprof` Providing golang runtime pprof info.
@@ -15,4 +15,5 @@ There are also 4 custom metrics provided by trunker:
 | `trunker_invalid_request_counter` | counter | The counter of invalid request, with reason
 | `trunker_udp_request_latency_us`  |histogram| The latency of udp request in microseconds.
 | `trunker_udp_request_counter`     | counter | The counter of udp request, with request action
+| `trunker_announce_counter`        | counter | The counter of announce request, tagged with client and source
 |==========================================================================================
