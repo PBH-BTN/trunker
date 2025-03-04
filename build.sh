@@ -6,8 +6,25 @@ mkdir -p output/bin output/conf
 cp script/* output/
 chmod +x output/bootstrap.sh
 cp conf/* output/conf/
-if [ "$BUILD_TYPE" != "test" ]; then
-    CGO_ENABLED=1 go build -trimpath -ldflags="-w -s -X 'main.Commit=$1'" -tags="gc_opt poll_opt re2_cgo" -o output/bin/${RUN_NAME}
+
+if [ -z $1 ];then
+  VERSION="$(git describe --tags --always 2> /dev/null)"
 else
-    go build -trimpath -gcflags="all=-N -l -X 'main.Commit=$1'" -o output/bin/${RUN_NAME}
+  VERSION=$1
+fi
+if [ -z $2 ];then
+    COMMIT_HASH="$(git rev-parse --short HEAD)"
+else
+    COMMIT_HASH=$2
+fi
+BUILD_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+LDFLAGS=(
+  "-X 'main.Version=${VERSION}'"
+  "-X 'main.Commit=${COMMIT_HASH}'"
+  "-X 'main.BuildTimestamp=${BUILD_TIMESTAMP}'"
+)
+if [ "$BUILD_TYPE" != "test" ]; then
+    CGO_ENABLED=1 go build -trimpath -ldflags="-w -s ${LDFLAGS[*]}" -tags="gc_opt poll_opt re2_cgo" -o output/bin/${RUN_NAME}
+else
+    go build -trimpath -gcflags="all=-N -l ${LDFLAGS[*]}" -o output/bin/${RUN_NAME}
 fi

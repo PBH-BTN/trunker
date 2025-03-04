@@ -6,9 +6,12 @@ import (
 )
 
 var (
-	Commit string
+	Commit         = "n/a"
+	Version        = "dev"
+	BuildTimestamp = "n/a"
 )
 
 func init() {
-	log.Printf("Runtime: %s\tCommit: %s \n", runtime.Version(), Commit)
+	log.Printf("Version: %s\tCommit:%s\n", Version, Commit)
+	log.Printf("Runtime: %s\tBuild Time: %s\n", runtime.Version(), BuildTimestamp)
 }

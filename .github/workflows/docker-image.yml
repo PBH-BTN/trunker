@@ -23,6 +23,13 @@ jobs:
           } 
           
     - uses: actions/checkout@v4
+    - name: Find Tag
+      id: tagger
+      uses: jimschubert/query-tag-action@v1
+      with:
+        include: 'v*'
+        exclude: '*-rc*'
+        commit-ish: 'HEAD~'
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v5
@@ -55,3 +62,4 @@ jobs:
         cache-to: type=gha,mode=max
         build-args: |
           COMMIT_SHA=${{ github.sha }}
+          VERSION=${{steps.tagger.outputs.tag}}

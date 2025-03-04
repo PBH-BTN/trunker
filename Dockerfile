@@ -1,10 +1,11 @@
 FROM golang:alpine AS build
 ARG COMMIT_SHA
+ARG VERSION
 ARG TARGETPLATFORM
 WORKDIR /build
 COPY . .
 RUN apk add build-base pkgconfig re2-dev
-RUN export GOARCH=${TARGETPLATFORM#*/} && sh build.sh $COMMIT_SHA
+RUN export GOARCH=${TARGETPLATFORM#*/} && sh build.sh $VERSION $COMMIT_SHA
 
 FROM alpine
 WORKDIR /app
