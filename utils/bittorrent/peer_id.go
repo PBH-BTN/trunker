@@ -17,12 +17,12 @@ var (
 
 // ParsePeerID Parse the client name from the peer_id
 func ParsePeerID(peerIdRaw string) string {
-	if len(peerIdRaw) < 8 { // peer_id must have 20 bytes, this will never happen
-		return ""
-	}
 	peerId := strings.TrimFunc(peerIdRaw, func(r rune) bool {
-		return !unicode.IsGraphic(r)
+		return unicode.MaxASCII < r
 	})
+	if len(peerId) < 8 { // peer_id must have 20 bytes, this will never happen
+		return "unknown"
+	}
 	if strings.HasPrefix(peerId, "-FD51") { //-FD51]�-FdrWCsIvJAk4
 		return "-FD51"
 	}
