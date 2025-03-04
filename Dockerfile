@@ -4,8 +4,8 @@ ARG VERSION
 ARG TARGETPLATFORM
 WORKDIR /build
 COPY . .
-RUN apk add build-base pkgconfig re2-dev
-RUN export GOARCH=${TARGETPLATFORM#*/} && sh build.sh $VERSION $COMMIT_SHA
+RUN apk add build-base pkgconfig re2-dev bash
+RUN export GOARCH=${TARGETPLATFORM#*/} && bash build.sh $VERSION $COMMIT_SHA
 
 FROM alpine
 WORKDIR /app
