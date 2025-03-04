@@ -20,9 +20,6 @@ func ParsePeerID(peerIdRaw string) string {
 	peerId := strings.TrimFunc(peerIdRaw, func(r rune) bool {
 		return unicode.MaxASCII < r
 	})
-	if len(peerId) < 8 { // peer_id must have 20 bytes, this will never happen
-		return "unknown"
-	}
 	if strings.HasPrefix(peerId, "-FD51") { //-FD51]�-FdrWCsIvJAk4
 		return "-FD51"
 	}
