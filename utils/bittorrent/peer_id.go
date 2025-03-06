@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	commonClients  = regexp.MustCompile(`^-.+-`)                          // common clients, use for qbitorrent, utorrent, vuze, bittorrent, etc
+	commonClients  = regexp.MustCompile(`^-[^-]+-`)                       // common clients, use for qbitorrent, utorrent, vuze, bittorrent, etc
 	btSpritClients = regexp.MustCompile(`^-[a-zA-Z]+[0-9]{1,4}`)          // btsprit-like clients, no second -
 	aria2Clients   = regexp.MustCompile(`^A2-[0-9]+-[0-9]+-[0-9]+-`)      // Aria2 clients A2-1-35-0-xxxx
 	mgClients      = regexp.MustCompile(`^MG-[0-9]+\.[0-9]+\.[0-9]{1,4}`) // MG clients MG-1-35-0-xxxx

@@ -41,7 +41,7 @@ func TestParsePeerID(t *testing.T) {
 		{
 			name:     "peerIDWithLessThanEightCharacters",
 			peerID:   "qB452B",
-			expected: "",
+			expected: "unknown",
 		},
 		{
 			name:     "aria21",
@@ -82,6 +82,11 @@ func TestParsePeerID(t *testing.T) {
 			name:     "MG",
 			peerID:   "MG-3.01.43194l*c0n8.",
 			expected: "MG-3.01.4319",
+		},
+		{
+			name:     "qbt",
+			peerID:   "-qB5040-aDF2_bJ-PlEs",
+			expected: "-qB5040",
 		},
 	}
 
