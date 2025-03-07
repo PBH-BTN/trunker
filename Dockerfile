@@ -5,7 +5,7 @@ ARG TARGETPLATFORM
 WORKDIR /build
 COPY . .
 RUN apt-get update && if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then apt-get install -y crossbuild-essential-arm64 libre2-dev;else apt-get install -y build-essential libre2-dev; fi
-RUN export GOARCH=${TARGETPLATFORM#*/} && if [ "$GOARCH" = "arm64" ]; then export CC=aarch64-linux-gnu-gcc && export CXX=aarch64-linux-gnu-c++;fi && bash build.sh $VERSION $COMMIT_SHA
+RUN export GOARCH=${TARGETPLATFORM#*/} && if [ "$GOARCH" = "arm64" ]; then export CC=aarch64-linux-gnu-gcc && export CXX=aarch64-linux-gnu-cpp && export AR=ar;fi && bash build.sh $VERSION $COMMIT_SHA
 
 FROM debian:stable-slim
 WORKDIR /app
