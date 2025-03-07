@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+env
 RUN_NAME="pbh.btn.trunker"
 mkdir -p output
 
