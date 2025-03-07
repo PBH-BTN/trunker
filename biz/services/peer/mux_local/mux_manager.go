@@ -13,18 +13,15 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
+	"github.com/PBH-BTN/trunker/biz/services/peer/mux_local/ban"
 	"github.com/PBH-BTN/trunker/utils/conv"
-	"github.com/bits-and-blooms/bloom/v3"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/xxjwxc/gowp/workpool"
 )
 
 type MuxLocalManager struct {
-	localList       []*local.Manager
-	banInfoHashLock sync.RWMutex
-	banPeerLock     sync.RWMutex
-	banInfoHash     *bloom.BloomFilter
-	banPeerId       *bloom.BloomFilter
+	localList []*local.Manager
+	ban       *ban.Manager
 }
 
 func NewMuxLocalManager(num int) *MuxLocalManager {
@@ -37,11 +34,8 @@ func NewMuxLocalManager(num int) *MuxLocalManager {
 		list = append(list, local.NewLocalManger())
 	}
 	return &MuxLocalManager{
-		localList:       list,
-		banPeerLock:     sync.RWMutex{},
-		banInfoHashLock: sync.RWMutex{},
-		banInfoHash:     bloom.NewWithEstimates(uint(10000), 0.01),
-		banPeerId:       bloom.NewWithEstimates(uint(10000), 0.01),
+		localList: list,
+		ban:       ban.NewBanManager(),
 	}
 }
 
@@ -53,52 +47,40 @@ func (m *MuxLocalManager) pickWorker(hashBytes []byte) *local.Manager {
 
 }
 
-func (m *MuxLocalManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) ([]*common.Peer, error) {
-	// process block list
-	m.banInfoHashLock.RLock()
-	banned := m.banInfoHash.Test(conv.UnsafeStringToBytes(req.InfoHash))
-	m.banInfoHashLock.RUnlock()
-	if banned {
-		hlog.CtxInfof(ctx, "info hash %s is banned", req.InfoHash)
-		return nil, errors.New("banned")
-	}
-	m.banPeerLock.RLock()
-	banned = m.banPeerId.Test(conv.UnsafeStringToBytes(req.PeerID))
-	m.banPeerLock.RUnlock()
-	if banned {
-		hlog.CtxInfof(ctx, "peer id %s is banned", req.PeerID)
-		return nil, errors.New("banned")
-	}
-
-	worker := m.pickWorker(conv.UnsafeStringToBytes(req.InfoHash))
-	return worker.HandleAnnouncePeer(ctx, req)
-}
-
 func (m *MuxLocalManager) BanInfoHash(ctx context.Context, infoHash string) error {
-	m.banInfoHashLock.Lock()
-	m.banInfoHash.AddString(infoHash)
-	m.banInfoHashLock.Unlock()
+	err := m.ban.AddBan(ban.BanTypeInfoHash, infoHash)
+	if err != nil {
+		return err
+	}
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
 	return worker.BanInfoHash(ctx, infoHash)
 }
 
 func (m *MuxLocalManager) BanPeer(_ context.Context, peerID string) error {
-	m.banPeerLock.Lock()
-	m.banPeerId.AddString(peerID)
-	m.banPeerLock.Unlock()
-	return nil
+	return m.ban.AddBan(ban.BanTypePeerId, peerID)
 }
 
 func (m *MuxLocalManager) ClearBanInfoHash() {
-	m.banPeerLock.Lock()
-	m.banPeerId.ClearAll()
-	m.banPeerLock.Unlock()
+	m.ban.Clear(ban.BanTypeInfoHash)
 }
 
 func (m *MuxLocalManager) ClearBanPeer() {
-	m.banPeerLock.Lock()
-	m.banPeerId.ClearAll()
-	m.banPeerLock.Unlock()
+	m.ban.Clear(ban.BanTypePeerId)
+}
+
+func (m *MuxLocalManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequest) ([]*common.Peer, error) {
+	// process block list
+	if m.ban.Test(ban.BanTypeInfoHash, req.InfoHash) {
+		hlog.CtxInfof(ctx, "info hash %s is banned", req.InfoHash)
+		return nil, errors.New("banned info_hash")
+	}
+	if m.ban.Test(ban.BanTypePeerId, req.PeerID) {
+		hlog.CtxInfof(ctx, "peer id %s is banned", req.PeerID)
+		return nil, errors.New("banned peer_id")
+	}
+
+	worker := m.pickWorker(conv.UnsafeStringToBytes(req.InfoHash))
+	return worker.HandleAnnouncePeer(ctx, req)
 }
 
 func (m *MuxLocalManager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {

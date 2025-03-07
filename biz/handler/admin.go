@@ -25,7 +25,11 @@ func HandleBanInfoHash(ctx context.Context, c *app.RequestContext) {
 	}
 	manager := peer.GetPeerManager()
 	for _, infoHash := range req.Hash {
-		manager.BanInfoHash(ctx, infoHash)
+		err := manager.BanInfoHash(ctx, infoHash)
+		if err != nil {
+			http.ResponseErr(c, err)
+			return
+		}
 	}
 	http.ResponseOK(c, fmt.Sprintf("%d info hash banned", len(req.Hash)))
 	return
@@ -61,7 +65,11 @@ func HandleBanPeer(ctx context.Context, c *app.RequestContext) {
 	}
 	manager := peer.GetPeerManager()
 	for _, infoHash := range req.PeerId {
-		manager.BanPeer(ctx, infoHash)
+		err := manager.BanPeer(ctx, infoHash)
+		if err != nil {
+			http.ResponseErr(c, err)
+			return
+		}
 	}
 	http.ResponseOK(c, fmt.Sprintf("%d peer banned", len(req.PeerId)))
 	return
