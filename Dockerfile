@@ -10,5 +10,5 @@ RUN export GOARCH=${TARGETPLATFORM#*/} && if [ "$GOARCH" = "arm64" ]; then expor
 FROM debian:stable-slim
 WORKDIR /app
 COPY --from=build /build/output .
-RUN apt-get update && apt-get install -y libre2 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libre2-5 && rm -rf /var/lib/apt/lists/*
 ENTRYPOINT ["./bootstrap.sh"]
