@@ -1,14 +1,14 @@
-FROM golang:alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.23 AS build
 ARG COMMIT_SHA
 ARG VERSION
 ARG TARGETPLATFORM
 WORKDIR /build
 COPY . .
-RUN apk add build-base pkgconfig re2-dev bash
-RUN export GOARCH=${TARGETPLATFORM#*/} && bash build.sh $VERSION $COMMIT_SHA
+RUN bash build_docker.sh
 
-FROM alpine
+
+FROM debian:stable-slim
 WORKDIR /app
 COPY --from=build /build/output .
-RUN apk add --no-cache re2
+RUN apt-get update && apt-get install -y 'libre2-[0-9]+' && rm -rf /var/lib/apt/lists/*
 ENTRYPOINT ["./bootstrap.sh"]

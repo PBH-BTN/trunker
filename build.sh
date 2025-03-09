@@ -7,15 +7,19 @@ cp script/* output/
 chmod +x output/bootstrap.sh
 cp conf/* output/conf/
 
-if [ -z $1 ];then
-  VERSION="$(git describe --tags --always 2> /dev/null)"
-else
-  VERSION=$1
+if [ -z $VERSION ];then
+  if [ -z $1 ];then
+    VERSION="$(git describe --tags --always 2> /dev/null)"
+  else
+    VERSION=$1
+  fi
 fi
-if [ -z $2 ];then
-    COMMIT_HASH="$(git rev-parse --short HEAD)"
-else
-    COMMIT_HASH=$2
+if [ -z $COMMIT_HASH ];then
+  if [ -z $2 ];then
+      COMMIT_HASH="$(git rev-parse --short HEAD)"
+  else
+      COMMIT_HASH=$2
+  fi
 fi
 BUILD_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 LDFLAGS=(
