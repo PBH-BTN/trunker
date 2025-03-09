@@ -10,7 +10,7 @@ RUN_NAME="pbh.btn.trunker"
 exec bin/${RUN_NAME} &
 pid=$!
 # Trap the SIGTERM signal and forward it to the main process
-trap 'kill -SIGINT $pid; wait $pid' TERM
+trap 'kill -INT $pid; wait $pid' TERM
 
 # Wait for the main process to complete
 wait $pid
