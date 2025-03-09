@@ -27,7 +27,7 @@ type MuxLocalManager struct {
 func NewMuxLocalManager(num int) *MuxLocalManager {
 	hlog.Info("running as memory mode")
 	if config.AppConfig.Tracker.Memory.EnableWS {
-		hlog.Info("enable websocket support")
+		hlog.Info("websocket support enabled")
 	}
 	list := make([]*local.Manager, 0, num)
 	for i := 0; i < num; i++ {

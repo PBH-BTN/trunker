@@ -21,7 +21,7 @@ if [ -z $COMMIT_HASH ];then
       COMMIT_HASH=$2
   fi
 fi
-BUILD_TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+BUILD_TIMESTAMP=$(date +%s)
 LDFLAGS=(
   "-X 'main.Version=${VERSION}'"
   "-X 'main.Commit=${COMMIT_HASH}'"
