@@ -16,7 +16,7 @@ type Map[V any] struct {
 var _ SyncStringMap[int] = &Map[int]{}
 
 func (m *Map[V]) Delete(key string) bool {
-	_, ok := m.LoadAndDelete(key)
+	_, ok := m.m.LoadAndDelete(key)
 	if ok {
 		atomic.AddInt64(&m.length, -1)
 	}
@@ -35,8 +35,10 @@ func (m *Map[V]) LoadAndDelete(key string) (value V, loaded bool) {
 	v, loaded := m.m.LoadAndDelete(key)
 	if loaded {
 		atomic.AddInt64(&m.length, -1)
+		return v.(V), loaded
 	}
-	return v.(V), loaded
+	var empty V
+	return empty, loaded
 }
 
 func (m *Map[V]) LoadOrStore(key string, value V) (actual V, loaded bool) {
