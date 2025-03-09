@@ -48,14 +48,13 @@ func (p *Peer) ToModel() *model.Peer {
 func PeersToCompact(peerList []*Peer) ([]byte, []byte) {
 	var peers []byte
 	var peers6 []byte
+	port := make([]byte, 2)
 	for _, peer := range peerList {
 		if ip := peer.GetIP().To4(); ip != nil { // IPv4 address
-			port := make([]byte, 2)
 			binary.BigEndian.PutUint16(port, uint16(peer.Port))
 			peers = append(peers, ip...)
 			peers = append(peers, port...)
 		} else if ip := peer.GetIP().To16(); ip != nil { // IPv6 address
-			port := make([]byte, 2)
 			binary.BigEndian.PutUint16(port, uint16(peer.Port))
 			peers6 = append(peers6, ip...)
 			peers6 = append(peers6, port...)
@@ -123,6 +122,7 @@ func (e PeerEvent) String() string {
 
 // IsPeerConnectable Check If Peer is connectable
 func IsPeerConnectable(peer *Peer) bool {
+	return true
 	if peer.Type == model.PeerTypeBittorrent {
 		return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
 	} else if peer.Type == model.PeerTypeWebtorrent {
