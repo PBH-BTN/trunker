@@ -4,7 +4,7 @@ ARG VERSION
 ARG TARGETPLATFORM
 WORKDIR /build
 COPY . .
-RUN build_docker.sh
+RUN bash build_docker.sh
 
 
 FROM debian:stable-slim
