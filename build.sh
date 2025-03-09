@@ -7,14 +7,14 @@ cp script/* output/
 chmod +x output/bootstrap.sh
 cp conf/* output/conf/
 
-if [ -z $VERSION];then
+if [ -z $VERSION ];then
   if [ -z $1 ];then
     VERSION="$(git describe --tags --always 2> /dev/null)"
   else
     VERSION=$1
   fi
 fi
-if [ -z $COMMIT_HASH];then
+if [ -z $COMMIT_HASH ];then
   if [ -z $2 ];then
       COMMIT_HASH="$(git rev-parse --short HEAD)"
   else
