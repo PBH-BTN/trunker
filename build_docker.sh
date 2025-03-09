@@ -12,6 +12,7 @@ if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
   export AR=aarch64-linux-gnu-ar
   export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
 else
+  apt-get update
   apt-get install -y build-essential libre2-dev
 fi
 ./build.sh $VERSION $COMMIT_SHA
