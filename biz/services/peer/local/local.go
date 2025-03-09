@@ -13,34 +13,34 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/producer"
 	"github.com/PBH-BTN/trunker/utils"
+	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
 	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/zhangyunhao116/skipmap"
 )
 
 type InfoHashRoot struct {
-	peerMap   *skipmap.OrderedMap[string, *common.Peer]
+	peerMap   mapx.SyncStringMap[*common.Peer]
 	lastClean time.Time
 	infoHash  string
 }
 
 func NewInfoHashRoot(infoHash string) *InfoHashRoot {
 	return &InfoHashRoot{
-		peerMap:   skipmap.New[string, *common.Peer](),
+		peerMap:   mapx.New[*common.Peer](),
 		lastClean: time.Now(),
 		infoHash:  infoHash,
 	}
 }
 
 type Manager struct {
-	infoHashMap *skipmap.OrderedMap[string, *InfoHashRoot]
+	infoHashMap mapx.SyncStringMap[*InfoHashRoot]
 }
 
 func NewLocalManger() *Manager {
 	return &Manager{
-		infoHashMap: skipmap.New[string, *InfoHashRoot](),
+		infoHashMap: mapx.New[*InfoHashRoot](),
 	}
 }
 
