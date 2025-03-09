@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"math/rand"
 	"strings"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -15,6 +14,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
 	"github.com/PBH-BTN/trunker/utils/http"
+	"github.com/bytedance/gopkg/lang/fastrand"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -62,7 +62,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	}
 	if req.Compact == 0 {
 		bencode.ResponseOk(c, model.AnnounceBasicResponse{
-			Interval: config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
+			Interval: config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
 			Peers: utils.Map(res, func(p *common.Peer) *model.Peer {
 				return p.ToModel()
 			}),
@@ -72,7 +72,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		})
 	} else {
 		resp := hertz.H{
-			"interval":    config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
+			"interval":    config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
 			"external ip": req.ClientIP,
 			"incomplete":  scrape.Incomplete,
 			"complete":    scrape.Complete,
