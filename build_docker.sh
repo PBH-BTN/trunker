@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-env
-COMMIT_SHA=$1
-VERSION=$2
-TARGETPLATFORM=$3
 if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
   dpkg --add-architecture arm64
   apt-get update
