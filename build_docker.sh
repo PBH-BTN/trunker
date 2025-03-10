@@ -11,5 +11,6 @@ if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
 else
   apt-get update
   apt-get install -y build-essential libre2-dev
+  export GOAMD64=v4
 fi
 ./build.sh $VERSION $COMMIT_SHA
