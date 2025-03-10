@@ -72,14 +72,14 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Peers: utils.Map(res, func(p *common.Peer) *model.Peer {
 				return p.ToModel()
 			}),
-			ExternalIp: conv.UnsafeBytesToString(conv.TransUTF8To8859_1(req.ClientIP)),
+			ExternalIp: conv.UnsafeBytesToString(req.ClientIP),
 			Incomplete: scrape.Incomplete,
 			Complete:   scrape.Complete,
 		})
 	} else {
 		resp := hertz.H{
 			"interval":    config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
-			"external ip": conv.UnsafeBytesToString(conv.TransUTF8To8859_1(req.ClientIP)),
+			"external ip": conv.UnsafeBytesToString(req.ClientIP),
 			"incomplete":  scrape.Incomplete,
 			"complete":    scrape.Complete,
 		}
