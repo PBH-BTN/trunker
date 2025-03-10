@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"net"
+	"runtime"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -20,6 +20,7 @@ import (
 	"github.com/bytedance/gopkg/util/gopool"
 	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/xxjwxc/gowp/workpool"
 )
 
 type InfoHashRoot struct {
@@ -184,29 +185,27 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 		}, nil
 	}
 	var complete, incomplete, downloaded, seeder atomic.Int64
-	wg := sync.WaitGroup{}
+	p := workpool.New(runtime.NumCPU() * 2)
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
-		wg.Add(1)
-		gopool.CtxGo(ctx, func() {
-			defer wg.Done()
+		p.Do(func() error {
 			if value.Left == 0 {
 				downloaded.Add(1)
 				complete.Add(1)
 				if value.Event != common.PeerEvent_Stopped {
 					seeder.Add(1)
 				}
-				return
+				return nil
 			}
 			if value.Event == common.PeerEvent_Completed {
 				complete.Add(1)
 			} else {
 				incomplete.Add(1)
 			}
-			return
+			return nil
 		})
 		return true
 	})
-	wg.Wait()
+	_ = p.Wait()
 	return &model.ScrapeFile{
 		Seeder:     int(seeder.Load()),
 		Complete:   int(complete.Load()),
