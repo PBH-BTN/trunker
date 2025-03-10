@@ -13,6 +13,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
+	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/bytedance/gopkg/lang/fastrand"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -47,6 +48,9 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		})
 	}()
 	req.ClientIP = http.GetClientIP(ctx, c)
+	if v4 := req.ClientIP.To4(); v4 != nil {
+		req.ClientIP = v4
+	}
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
 	if req.NumWant == 0 || req.NumWant > 500 {
 		req.NumWant = 50
@@ -68,14 +72,14 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Peers: utils.Map(res, func(p *common.Peer) *model.Peer {
 				return p.ToModel()
 			}),
-			ExternalIp: req.ClientIP,
+			ExternalIp: conv.UnsafeBytesToString(conv.TransUTF8To8859_1(req.ClientIP)),
 			Incomplete: scrape.Incomplete,
 			Complete:   scrape.Complete,
 		})
 	} else {
 		resp := hertz.H{
 			"interval":    config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
-			"external ip": req.ClientIP,
+			"external ip": conv.UnsafeBytesToString(conv.TransUTF8To8859_1(req.ClientIP)),
 			"incomplete":  scrape.Incomplete,
 			"complete":    scrape.Complete,
 		}
