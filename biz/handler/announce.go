@@ -13,7 +13,6 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
-	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/bytedance/gopkg/lang/fastrand"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -72,16 +71,16 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Peers: utils.Map(res, func(p *common.Peer) *model.Peer {
 				return p.ToModel()
 			}),
-			ExternalIp: conv.UnsafeBytesToString(req.ClientIP),
+			//ExternalIp: conv.UnsafeBytesToString(req.ClientIP),
 			Incomplete: scrape.Incomplete,
 			Complete:   scrape.Complete,
 		})
 	} else {
 		resp := hertz.H{
-			"interval":    config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
-			"external ip": conv.UnsafeBytesToString(req.ClientIP),
-			"incomplete":  scrape.Incomplete,
-			"complete":    scrape.Complete,
+			"interval": config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
+			//"external ip": conv.UnsafeBytesToString(req.ClientIP),
+			"incomplete": scrape.Incomplete,
+			"complete":   scrape.Complete,
 		}
 		peers, peers6 := common.PeersToCompact(res)
 		resp["peers"] = peers
