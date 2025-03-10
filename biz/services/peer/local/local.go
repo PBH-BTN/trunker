@@ -6,6 +6,8 @@ import (
 	"errors"
 	"net"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -117,8 +119,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	var oldestTime *time.Time
 	var oldestPeer *common.Peer
 	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent
+	expireTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second) // last seen time after this should be ejected
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
-		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
+		if expireTime.After(value.LastSeen) {
 			// timeout!
 			timeoutPeer = append(timeoutPeer, value)
 			return true
@@ -163,14 +166,14 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	}
 	if shouldEject && oldestPeer != nil {
 		gopool.CtxGo(ctx, func() {
-			hlog.CtxDebugf(ctx, "info hash %s eject %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
+			hlog.CtxDebugf(ctx, "info hash %s ejected %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
 			root.peerMap.Delete(oldestPeer.GetKey())
 		})
 	}
 	return resp, nil
 }
 
-func (m *Manager) Scrape(_ context.Context, infoHash string) (*model.ScrapeFile, error) {
+func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
 	root, ok := m.infoHashMap.Load(infoHash)
 	if !ok {
 		return &model.ScrapeFile{
@@ -180,28 +183,35 @@ func (m *Manager) Scrape(_ context.Context, infoHash string) (*model.ScrapeFile,
 			Seeder:     0,
 		}, nil
 	}
-	var complete, incomplete, downloaded, seeder int
+	var complete, incomplete, downloaded, seeder atomic.Int64
+	wg := sync.WaitGroup{}
 	root.peerMap.Range(func(_ string, value *common.Peer) bool {
-		if value.Left == 0 {
-			downloaded++
-			complete++
-			if value.Event != common.PeerEvent_Stopped {
-				seeder++
+		wg.Add(1)
+		gopool.CtxGo(ctx, func() {
+			defer wg.Done()
+			if value.Left == 0 {
+				downloaded.Add(1)
+				complete.Add(1)
+				if value.Event != common.PeerEvent_Stopped {
+					seeder.Add(1)
+				}
+				return
 			}
-			return true
-		}
-		if value.Event == common.PeerEvent_Completed {
-			complete++
-		} else {
-			incomplete++
-		}
+			if value.Event == common.PeerEvent_Completed {
+				complete.Add(1)
+			} else {
+				incomplete.Add(1)
+			}
+			return
+		})
 		return true
 	})
+	wg.Wait()
 	return &model.ScrapeFile{
-		Seeder:     seeder,
-		Complete:   complete,
-		Incomplete: incomplete,
-		Downloaded: downloaded, // 这个目前不实现
+		Seeder:     int(seeder.Load()),
+		Complete:   int(complete.Load()),
+		Incomplete: int(incomplete.Load()),
+		Downloaded: int(downloaded.Load()), // 这个目前不实现
 	}, nil
 }
 
