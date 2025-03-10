@@ -79,6 +79,6 @@ func (m *Map[V]) Len() int {
 	return int(atomic.LoadInt64(&m.length))
 }
 
-func New[V any]() SyncStringMap[V] {
+func NewSyncMap[V any]() SyncStringMap[V] {
 	return &Map[V]{}
 }

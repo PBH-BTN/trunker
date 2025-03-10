@@ -31,7 +31,7 @@ type InfoHashRoot struct {
 
 func NewInfoHashRoot(infoHash string) *InfoHashRoot {
 	return &InfoHashRoot{
-		peerMap:   mapx.New[*common.Peer](),
+		peerMap:   mapx.NewSkipMap[*common.Peer](),
 		lastClean: time.Now(),
 		infoHash:  infoHash,
 	}
@@ -43,7 +43,7 @@ type Manager struct {
 
 func NewLocalManger() *Manager {
 	return &Manager{
-		infoHashMap: mapx.New[*InfoHashRoot](),
+		infoHashMap: mapx.NewSkipMap[*InfoHashRoot](),
 	}
 }
 
