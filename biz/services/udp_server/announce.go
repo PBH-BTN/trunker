@@ -48,10 +48,12 @@ func (s *UDPServer) handleAnnounce(ctx context.Context, remote *net.UDPAddr, tid
 	req.ClientIP = remote.IP
 	req.Type = model.PeerTypeBittorrent
 	req.Source = model.SourceUDP
-	go metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
-		metrics.LabelSource: "udp",
-		metrics.LabelClient: bittorrent.ParsePeerID(req.PeerID),
-	})
+	go func() {
+		metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
+			metrics.LabelSource: "udp",
+			metrics.LabelClient: bittorrent.ParsePeerID(req.PeerID),
+		})
+	}()
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	if err != nil {
 		return err
