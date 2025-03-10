@@ -122,7 +122,6 @@ func (e PeerEvent) String() string {
 
 // IsPeerConnectable Check If Peer is connectable
 func IsPeerConnectable(peer *Peer) bool {
-	return true
 	if peer.Type == model.PeerTypeBittorrent {
 		return !(peer.GetIP().IsPrivate() || peer.GetIP().IsLoopback() || peer.Port == 0 || peer.Port == 1)
 	} else if peer.Type == model.PeerTypeWebtorrent {
