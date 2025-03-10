@@ -174,7 +174,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	return resp, nil
 }
 
-func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
+func (m *Manager) Scrape(_ context.Context, infoHash string) (*model.ScrapeFile, error) {
 	root, ok := m.infoHashMap.Load(infoHash)
 	if !ok {
 		return &model.ScrapeFile{

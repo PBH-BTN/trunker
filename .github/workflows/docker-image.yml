@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "miao"]
+    branches: [ "miao","1.23"]
     tags:
       - 'v*'
   pull_request:
@@ -37,6 +37,7 @@ jobs:
         images: |
           gaojianli2333/trunker
         tags: |
+          type=ref,event=branch,enable=${{ github.ref == format('refs/heads/{0}', '1.23') }}
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{major}}
