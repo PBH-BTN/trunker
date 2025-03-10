@@ -20,6 +20,9 @@ func ParsePeerID(peerIdRaw string) string {
 	peerId := strings.TrimFunc(peerIdRaw, func(r rune) bool {
 		return unicode.MaxASCII < r
 	})
+	if strings.HasPrefix(peerId, "-XL0019") {
+		return "-XL0019" // 这是一个 trick，但是考虑到 2900 的请求中有 2100 都是迅雷贡献的，这个改动非常值得，允许这个方法快速返回而无需进行正则判断。
+	}
 	if strings.HasPrefix(peerId, "-FD51") { //-FD51]�-FdrWCsIvJAk4
 		return "-FD51"
 	}
