@@ -1,6 +1,6 @@
 module github.com/PBH-BTN/trunker
 
-go 1.24
+go 1.23
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
