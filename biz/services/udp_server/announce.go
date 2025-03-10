@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
-	"math/rand"
 	"net"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -13,6 +12,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
+	"github.com/bytedance/gopkg/lang/fastrand"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/panjf2000/gnet/v2"
 )
@@ -61,10 +61,10 @@ func (s *UDPServer) handleAnnounce(ctx context.Context, remote *net.UDPAddr, tid
 		return err
 	}
 	buf := bytes.NewBuffer(make([]byte, 0, 8+12+len(res)*18))
-	writeHeader(buf, ActionAnnounce, tid)                                                                   // 8
-	_ = binary.Write(buf, binary.BigEndian, uint32(config.AppConfig.Tracker.TTL+int64(rand.Intn(201)-100))) // interval 4
-	_ = binary.Write(buf, binary.BigEndian, uint32(scrape.Incomplete))                                      // leechers 4
-	_ = binary.Write(buf, binary.BigEndian, uint32(scrape.Seeder))                                          // seeders 4
+	writeHeader(buf, ActionAnnounce, tid)                                                                       // 8
+	_ = binary.Write(buf, binary.BigEndian, uint32(config.AppConfig.Tracker.TTL+int64(fastrand.Intn(201)-100))) // interval 4
+	_ = binary.Write(buf, binary.BigEndian, uint32(scrape.Incomplete))                                          // leechers 4
+	_ = binary.Write(buf, binary.BigEndian, uint32(scrape.Seeder))                                              // seeders 4
 	for _, p := range res {
 		var ip net.IP
 		if isIPv6 {

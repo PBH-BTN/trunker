@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"math/rand"
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
@@ -15,6 +14,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/PBH-BTN/trunker/utils/webtorrent"
+	"github.com/bytedance/gopkg/lang/fastrand"
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -148,7 +148,7 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	}
 	resp := hertz.H{
 		"action":     "announce",
-		"interval":   config.AppConfig.Tracker.TTL + int64(rand.Intn(201)-100),
+		"interval":   config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
 		"incomplete": scrape.Incomplete,
 		"complete":   scrape.Complete,
 		"info_hash":  conv.UnsafeBytesToString(conv.Trans8859_1ToUTF8(conv.UnsafeStringToBytes(req.InfoHash))),
