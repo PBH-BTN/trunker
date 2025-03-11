@@ -7,7 +7,9 @@ require (
 	github.com/bits-and-blooms/bloom/v3 v3.7.0
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/sonic v1.13.1
+	github.com/cloudwego/gopkg v0.1.4
 	github.com/cloudwego/hertz v0.9.6
+	github.com/cloudwego/kitex v0.12.3
 	github.com/cristalhq/bencode v0.4.0
 	github.com/gofrs/flock v0.12.1
 	github.com/hertz-contrib/monitor-prometheus v0.1.3
@@ -40,16 +42,28 @@ require (
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
+	github.com/cloudwego/configmanager v0.2.2 // indirect
+	github.com/cloudwego/dynamicgo v0.5.2 // indirect
+	github.com/cloudwego/fastpb v0.0.5 // indirect
+	github.com/cloudwego/frugal v0.2.3 // indirect
+	github.com/cloudwego/iasm v0.2.0 // indirect
+	github.com/cloudwego/localsession v0.1.2 // indirect
 	github.com/cloudwego/netpoll v0.6.5 // indirect
+	github.com/cloudwego/runtimex v0.1.1 // indirect
+	github.com/cloudwego/thriftgo v0.3.18 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
+	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-sql-driver/mysql v1.9.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/pprof v0.0.0-20250302191652-9094ed2288e7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/iancoleman/strcase v0.2.0 // indirect
+	github.com/jhump/protoreflect v1.8.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -80,9 +94,13 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.15.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
+	google.golang.org/genproto v0.0.0-20210513213006-bf773b8c8384 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	stathat.com/c/consistent v1.0.0 // indirect
 )
+
+replace github.com/apache/thrift => github.com/apache/thrift v0.13.0

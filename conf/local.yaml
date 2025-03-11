@@ -5,7 +5,7 @@ cache:
 tracker:
   ttl: 3600
   intervalTask: 600 # 10分钟执行一次定时任务
-  mode: db # memory or db
+  mode: memory # memory or db
   memory:
     enablePersist: true
     persistFile: persist.dat

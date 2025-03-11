@@ -1,6 +1,2 @@
-init_api:
-	hz new --model_dir biz/hertz_gen -mod github.com/PBH-BTN/trunker -idl idl/api.thrift
-
-
-update_api:
-	hz update --model_dir biz/hertz_gen -idl idl/api.thrift
+update_idl:
+	kitex -module "github.com/PBH-BTN/trunker" -thrift frugal_tag,template=slim,no_default_serdes idl/server.thrift

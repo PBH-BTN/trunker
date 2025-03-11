@@ -42,6 +42,7 @@ type TrackerConfig struct {
 	Memory              memoryConfig   `yaml:"memory" json:"memory"`
 	UDPServer           udpConfig      `yaml:"udpServer" json:"udpServer"`
 	Mode                runningMode    `yaml:"mode" json:"mode"`
+	RPC                 rpcConfig      `yaml:"rpc" json:"rpc"`
 	HostPorts           string         `yaml:"hostPorts" json:"hostPorts"`
 	MetricsHostPorts    string         `yaml:"metricsHostPorts" json:"metricsHostPorts"`
 	TTL                 int64          `yaml:"ttl" json:"ttl"`
@@ -50,6 +51,11 @@ type TrackerConfig struct {
 	UseAnnounceIP       bool           `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
 	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
+}
+
+type rpcConfig struct {
+	Enable    bool   `yaml:"enable" json:"enable"`
+	HostPorts string `yaml:"hostPorts" json:"hostPorts"`
 }
 
 type udpConfig struct {
