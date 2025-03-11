@@ -115,7 +115,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		}
 	})
 	// get return
-	resp := make([]*common.Peer, 0, min(max(root.peerMap.Len(), 0), req.NumWant, config.AppConfig.Tracker.Memory.MaxPeersPerTorrent))
+	resp := make([]*common.Peer, 0, utils.Positive(min(root.peerMap.Len(), req.NumWant)))
 	timeoutPeer := make([]*common.Peer, 0)
 	var oldestTime *time.Time
 	var oldestPeer *common.Peer

@@ -52,7 +52,10 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		req.ClientIP = v4
 	}
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
-	if req.NumWant == 0 || req.NumWant > 500 {
+	if req.NumWant > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent {
+		req.NumWant = config.AppConfig.Tracker.Memory.MaxPeersPerTorrent
+	}
+	if req.NumWant <= 0 || req.NumWant > 500 {
 		req.NumWant = 50
 	}
 	req.Type = model.PeerTypeBittorrent
