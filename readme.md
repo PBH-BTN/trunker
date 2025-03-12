@@ -9,8 +9,6 @@
 
 A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego, with [observability](./docs/metrics.adoc).
 
-This tracker is hosted as https://btn-prod.ghostchu-services.top/announce
-
 For benchmark, please refer to the [Benchmark](#benchmark) section.
 
 ## How to run
