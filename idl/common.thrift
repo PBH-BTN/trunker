@@ -12,9 +12,9 @@ enum PeerType {
 }
 
 enum Source{
-    HTTP = 0
-    UDP = 1
-    WS = 2
+    HTTP = 0,
+    UDP = 1,
+    WS = 2,
 }
 
 struct Offer{

@@ -13,4 +13,5 @@ else
   apt-get install -y build-essential libre2-dev
   export GOAMD64=v4
 fi
+make install_tool && make update_idl
 ./build.sh $VERSION $COMMIT_SHA

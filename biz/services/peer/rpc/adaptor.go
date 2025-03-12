@@ -10,6 +10,9 @@ import (
 )
 
 func announceRequestCommonToIDL(req *model.AnnounceRequest) *trunker.AnnounceRequest {
+	if req == nil {
+		return nil
+	}
 	return &trunker.AnnounceRequest{
 		InfoHash:   req.InfoHash,
 		PeerId:     req.PeerID,
@@ -39,6 +42,9 @@ func announceRequestCommonToIDL(req *model.AnnounceRequest) *trunker.AnnounceReq
 }
 
 func peerIDLToCommon(p *trunker.Peer) *common.Peer {
+	if p == nil {
+		return nil
+	}
 	return &common.Peer{
 		IP:       p.Ip,
 		IPv4:     p.Ipv4,
