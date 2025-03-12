@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+make install_tool && make update_idl
 if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
   dpkg --add-architecture arm64
   apt-get update
@@ -13,5 +14,4 @@ else
   apt-get install -y build-essential libre2-dev
   export GOAMD64=v4
 fi
-make install_tool && make update_idl
 ./build.sh $VERSION $COMMIT_SHA
