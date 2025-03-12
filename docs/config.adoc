@@ -8,7 +8,7 @@ The configuration file is in YAML format, you can find the example configuration
 
 |ttl |The time of a peer announce next time. |3600s 
 |intervalTask |The interval of the task to clean the expired peers. |600s 
-|*mode* |trunker provides 2 running mode: memory and db |*required*,`memory`
+|*mode* |trunker provides 3 running mode: memory, db and rpc|*required*,`memory`
 |memory/database |Depends on your mode, this can be 2 different struct. | 
 |useUnixSocket |Use Unix Socket instead tcp |false 
 |hostPorts |The host and port of the server, For unix socket mode, this is the file name of the sock file. |`127.0.0.1:8888`
@@ -58,6 +58,50 @@ If your mode is `database`, following configuration are *required*.
 |port |The database port. |*required*, no default 
 |user |The database user. |*required*, no default 
 |pass |The database password. |*required*, no default 
+|===
+
+== RPC Mode
+=== What is RPC mode?
+In certain situations, due to the presence of bots like MarkScan, you might want to hide your Tracker server behind a secure ExitNode. For HTTP requests, such protection can be achieved through methods like reverse proxy. However, for UDP Trackers, forwarding can affect UDP communication. Therefore, trunker provides an RPC mode. By setting up two trunker instances on different devices, with one running as an RPC server and the other configured in RPC Mode, all requests sent to the client will be forwarded to the server via RPC, effectively hiding the real server.
+[source]
+----
+                                                                              |
+                                                                              |
+                                                                              |
+                                                                              | HTTP Announce
+                                                                              |
+                                                                              |
+                                                                              |
+                                                                              |
+                                                                              |
+                                                              +---------------v-----------------+
+                                                              |                                 |
+                                                              |              CDN                |
+                                                              |                                 |
+                                                              +---------------+-----------------+
+                 |                                                            |
+                 |                                                            |
+                 | UDP Announce                                               |
+                 |                                                            |
+                 |                                                            |
+                 |                                                            |
+                 |                                            +---------------v----------------+
++----------------v--------------+                             |                                |
+|                               |                             |                                |
+|                               |          RPC Call           |                                |
+|    Trunker on the exit-node   +---------------------------->|     The Real Tunker Server     |
+|                               |                             |                                |
+|                               |                             |                                |
++-------------------------------+                             +--------------------------------+
+----
+If your mode is `rpc`, following configuration are *required*.
+[cols="<,<,<"]
+|===
+|Name |Description |Default
+
+|enableServer|Enable the rpc server of not|`false`
+|hostPort|The host and port of the rpc server listening|**required** if server is enabled
+|remoteServer|The remote server address|**required** for rpc mode
 |===
 
 == UDP Server
