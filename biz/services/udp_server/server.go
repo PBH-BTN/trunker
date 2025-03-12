@@ -65,11 +65,11 @@ func (s *UDPServer) OnTraffic(conn gnet.Conn) gnet.Action {
 			metrics.LabelReason: err.Error(),
 			metrics.LabelAction: "unknown",
 		})
-		if conn.Context() == nil {
-			conn.SetContext("unknown")
-		}
-	}
 
+	}
+	if conn.Context() == nil {
+		conn.SetContext("unknown")
+	}
 	metrics.EmitCounter(metrics.CounterUDPRequest, 1, map[string]string{
 		metrics.LabelAction: conn.Context().(string),
 	})
