@@ -5,9 +5,53 @@ package trunker
 import (
 	"bytes"
 	"context"
+	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"strings"
 )
+
+type BanType int64
+
+const (
+	BanType_InfoHash BanType = 0
+	BanType_PeerID   BanType = 1
+)
+
+func (p BanType) String() string {
+	switch p {
+	case BanType_InfoHash:
+		return "InfoHash"
+	case BanType_PeerID:
+		return "PeerID"
+	}
+	return "<UNSET>"
+}
+
+func BanTypeFromString(s string) (BanType, error) {
+	switch s {
+	case "InfoHash":
+		return BanType_InfoHash, nil
+	case "PeerID":
+		return BanType_PeerID, nil
+	}
+	return BanType(0), fmt.Errorf("not a valid BanType string")
+}
+
+func BanTypePtr(v BanType) *BanType { return &v }
+func (p *BanType) Scan(value interface{}) (err error) {
+	var result sql.NullInt64
+	err = result.Scan(value)
+	*p = BanType(result.Int64)
+	return
+}
+
+func (p *BanType) Value() (driver.Value, error) {
+	if p == nil {
+		return nil, nil
+	}
+	return int64(*p), nil
+}
 
 type AnnounceRequest struct {
 	Offers     []*Offer  `thrift:"offers,1,optional" frugal:"1,optional,list<Offer>" json:"offers,omitempty"`
@@ -390,6 +434,454 @@ func (p *AnnounceResponse) Field1DeepEqual(src []*Peer) bool {
 	return true
 }
 
+type ScrapeRequest struct {
+	InfoHashes []string `thrift:"info_hashes,1,required" frugal:"1,required,list<string>" json:"info_hashes"`
+}
+
+func NewScrapeRequest() *ScrapeRequest {
+	return &ScrapeRequest{}
+}
+
+func (p *ScrapeRequest) InitDefault() {
+}
+
+func (p *ScrapeRequest) GetInfoHashes() (v []string) {
+	return p.InfoHashes
+}
+func (p *ScrapeRequest) SetInfoHashes(val []string) {
+	p.InfoHashes = val
+}
+
+func (p *ScrapeRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ScrapeRequest(%+v)", *p)
+}
+
+func (p *ScrapeRequest) DeepEqual(ano *ScrapeRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.InfoHashes) {
+		return false
+	}
+	return true
+}
+
+func (p *ScrapeRequest) Field1DeepEqual(src []string) bool {
+
+	if len(p.InfoHashes) != len(src) {
+		return false
+	}
+	for i, v := range p.InfoHashes {
+		_src := src[i]
+		if strings.Compare(v, _src) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+type ScrapeResponse struct {
+	Res map[string]*ScrapeFile `thrift:"res,1,required" frugal:"1,required,map<string:ScrapeFile>" json:"res"`
+}
+
+func NewScrapeResponse() *ScrapeResponse {
+	return &ScrapeResponse{}
+}
+
+func (p *ScrapeResponse) InitDefault() {
+}
+
+func (p *ScrapeResponse) GetRes() (v map[string]*ScrapeFile) {
+	return p.Res
+}
+func (p *ScrapeResponse) SetRes(val map[string]*ScrapeFile) {
+	p.Res = val
+}
+
+func (p *ScrapeResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ScrapeResponse(%+v)", *p)
+}
+
+func (p *ScrapeResponse) DeepEqual(ano *ScrapeResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Res) {
+		return false
+	}
+	return true
+}
+
+func (p *ScrapeResponse) Field1DeepEqual(src map[string]*ScrapeFile) bool {
+
+	if len(p.Res) != len(src) {
+		return false
+	}
+	for k, v := range p.Res {
+		_src := src[k]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
+type GetStatisticRequest struct {
+}
+
+func NewGetStatisticRequest() *GetStatisticRequest {
+	return &GetStatisticRequest{}
+}
+
+func (p *GetStatisticRequest) InitDefault() {
+}
+
+func (p *GetStatisticRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetStatisticRequest(%+v)", *p)
+}
+
+func (p *GetStatisticRequest) DeepEqual(ano *GetStatisticRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	return true
+}
+
+type GetStatisticResponse struct {
+	Info *StatisticInfo `thrift:"info,1,required" frugal:"1,required,StatisticInfo" json:"info"`
+}
+
+func NewGetStatisticResponse() *GetStatisticResponse {
+	return &GetStatisticResponse{}
+}
+
+func (p *GetStatisticResponse) InitDefault() {
+}
+
+var GetStatisticResponse_Info_DEFAULT *StatisticInfo
+
+func (p *GetStatisticResponse) GetInfo() (v *StatisticInfo) {
+	if !p.IsSetInfo() {
+		return GetStatisticResponse_Info_DEFAULT
+	}
+	return p.Info
+}
+func (p *GetStatisticResponse) SetInfo(val *StatisticInfo) {
+	p.Info = val
+}
+
+func (p *GetStatisticResponse) IsSetInfo() bool {
+	return p.Info != nil
+}
+
+func (p *GetStatisticResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetStatisticResponse(%+v)", *p)
+}
+
+func (p *GetStatisticResponse) DeepEqual(ano *GetStatisticResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Info) {
+		return false
+	}
+	return true
+}
+
+func (p *GetStatisticResponse) Field1DeepEqual(src *StatisticInfo) bool {
+
+	if !p.Info.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type BanRequest struct {
+	Type   BanType `thrift:"type,1,required" frugal:"1,required,BanType" json:"type"`
+	Target string  `thrift:"target,2,required" frugal:"2,required,string" json:"target"`
+}
+
+func NewBanRequest() *BanRequest {
+	return &BanRequest{}
+}
+
+func (p *BanRequest) InitDefault() {
+}
+
+func (p *BanRequest) GetType() (v BanType) {
+	return p.Type
+}
+
+func (p *BanRequest) GetTarget() (v string) {
+	return p.Target
+}
+func (p *BanRequest) SetType(val BanType) {
+	p.Type = val
+}
+func (p *BanRequest) SetTarget(val string) {
+	p.Target = val
+}
+
+func (p *BanRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("BanRequest(%+v)", *p)
+}
+
+func (p *BanRequest) DeepEqual(ano *BanRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Type) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Target) {
+		return false
+	}
+	return true
+}
+
+func (p *BanRequest) Field1DeepEqual(src BanType) bool {
+
+	if p.Type != src {
+		return false
+	}
+	return true
+}
+func (p *BanRequest) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Target, src) != 0 {
+		return false
+	}
+	return true
+}
+
+type BanResponse struct {
+}
+
+func NewBanResponse() *BanResponse {
+	return &BanResponse{}
+}
+
+func (p *BanResponse) InitDefault() {
+}
+
+func (p *BanResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("BanResponse(%+v)", *p)
+}
+
+func (p *BanResponse) DeepEqual(ano *BanResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	return true
+}
+
+type DeleteInfoHashRequest struct {
+	Target string `thrift:"target,1,required" frugal:"1,required,string" json:"target"`
+}
+
+func NewDeleteInfoHashRequest() *DeleteInfoHashRequest {
+	return &DeleteInfoHashRequest{}
+}
+
+func (p *DeleteInfoHashRequest) InitDefault() {
+}
+
+func (p *DeleteInfoHashRequest) GetTarget() (v string) {
+	return p.Target
+}
+func (p *DeleteInfoHashRequest) SetTarget(val string) {
+	p.Target = val
+}
+
+func (p *DeleteInfoHashRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("DeleteInfoHashRequest(%+v)", *p)
+}
+
+func (p *DeleteInfoHashRequest) DeepEqual(ano *DeleteInfoHashRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Target) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteInfoHashRequest) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Target, src) != 0 {
+		return false
+	}
+	return true
+}
+
+type DeleteInfoHashResponse struct {
+}
+
+func NewDeleteInfoHashResponse() *DeleteInfoHashResponse {
+	return &DeleteInfoHashResponse{}
+}
+
+func (p *DeleteInfoHashResponse) InitDefault() {
+}
+
+func (p *DeleteInfoHashResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("DeleteInfoHashResponse(%+v)", *p)
+}
+
+func (p *DeleteInfoHashResponse) DeepEqual(ano *DeleteInfoHashResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	return true
+}
+
+type GetPeerRequest struct {
+	InfoHash string `thrift:"info_hash,1,required" frugal:"1,required,string" json:"info_hash"`
+}
+
+func NewGetPeerRequest() *GetPeerRequest {
+	return &GetPeerRequest{}
+}
+
+func (p *GetPeerRequest) InitDefault() {
+}
+
+func (p *GetPeerRequest) GetInfoHash() (v string) {
+	return p.InfoHash
+}
+func (p *GetPeerRequest) SetInfoHash(val string) {
+	p.InfoHash = val
+}
+
+func (p *GetPeerRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetPeerRequest(%+v)", *p)
+}
+
+func (p *GetPeerRequest) DeepEqual(ano *GetPeerRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.InfoHash) {
+		return false
+	}
+	return true
+}
+
+func (p *GetPeerRequest) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.InfoHash, src) != 0 {
+		return false
+	}
+	return true
+}
+
+type GetPeerResponse struct {
+	Peers []*Peer `thrift:"peers,1,required" frugal:"1,required,list<Peer>" json:"peers"`
+}
+
+func NewGetPeerResponse() *GetPeerResponse {
+	return &GetPeerResponse{}
+}
+
+func (p *GetPeerResponse) InitDefault() {
+}
+
+func (p *GetPeerResponse) GetPeers() (v []*Peer) {
+	return p.Peers
+}
+func (p *GetPeerResponse) SetPeers(val []*Peer) {
+	p.Peers = val
+}
+
+func (p *GetPeerResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetPeerResponse(%+v)", *p)
+}
+
+func (p *GetPeerResponse) DeepEqual(ano *GetPeerResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Peers) {
+		return false
+	}
+	return true
+}
+
+func (p *GetPeerResponse) Field1DeepEqual(src []*Peer) bool {
+
+	if len(p.Peers) != len(src) {
+		return false
+	}
+	for i, v := range p.Peers {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
 type TrunkerService interface {
 	Announce(ctx context.Context, request *AnnounceRequest) (r *AnnounceResponse, err error)
+
+	Scrape(ctx context.Context, request *ScrapeRequest) (r *ScrapeResponse, err error)
+
+	GetStatistic(ctx context.Context, request *GetStatisticRequest) (r *GetStatisticResponse, err error)
+
+	Ban(ctx context.Context, request *BanRequest) (r *BanResponse, err error)
+
+	DeleteInfoHash(ctx context.Context, request *DeleteInfoHashRequest) (r *DeleteInfoHashResponse, err error)
+
+	GetPeer(ctx context.Context, request *GetPeerRequest) (r *GetPeerResponse, err error)
 }

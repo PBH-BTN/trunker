@@ -12,6 +12,10 @@ tracker:
     maxPeersPerTorrent: 1500
     shard: 40
     enableWS: true
+  rpc:
+    enableServer: false
+    hostPorts: 0.0.0.0:6789
+    remoteServer: localhost:6789
   database:
     database: test
     host: localhost

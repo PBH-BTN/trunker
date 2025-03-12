@@ -7,34 +7,6 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 )
 
-func announceRequestCommonToIDL(req *model.AnnounceRequest) *trunker.AnnounceRequest {
-	return &trunker.AnnounceRequest{
-		InfoHash:   req.InfoHash,
-		PeerId:     req.PeerID,
-		Ip:         req.IP,
-		Port:       int32(req.Port),
-		Ipv4:       req.IPv4,
-		Ipv6:       req.IPv6,
-		ClientIp:   req.ClientIP,
-		Uploaded:   int64(req.Uploaded),
-		Downloaded: int64(req.Downloaded),
-		Left:       int64(req.Left),
-		NumWant:    int64(req.NumWant),
-		Type:       trunker.PeerType(req.Type),
-		Compact:    req.Compact == 1,
-		Source:     trunker.Source(req.Source),
-		Event:      trunker.PeerEvent(common.ParsePeerEvent(req.Event)),
-		Offers: utils.Map(req.Offers, func(o *model.Offer) *trunker.Offer {
-			return &trunker.Offer{
-				OfferId: o.OfferID,
-				Offer: &trunker.OfferDetail{
-					Type: o.Offer.Type,
-					Sdp:  o.Offer.SDP,
-				},
-			}
-		}),
-	}
-}
 func announceRequestIDLToCommon(req *trunker.AnnounceRequest) *model.AnnounceRequest {
 	return &model.AnnounceRequest{
 		HttpAnnounceRequest: model.HttpAnnounceRequest{

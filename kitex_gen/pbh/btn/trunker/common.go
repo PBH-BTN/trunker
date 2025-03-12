@@ -597,3 +597,198 @@ func (p *Peer) Field15DeepEqual(src Source) bool {
 	}
 	return true
 }
+
+type ScrapeFile struct {
+	Complete   int64 `thrift:"complete,1,required" frugal:"1,required,i64" json:"complete"`
+	Downloaded int64 `thrift:"downloaded,2,required" frugal:"2,required,i64" json:"downloaded"`
+	Incomplete int64 `thrift:"incomplete,3,required" frugal:"3,required,i64" json:"incomplete"`
+	Seeder     int64 `thrift:"seeder,4,required" frugal:"4,required,i64" json:"seeder"`
+}
+
+func NewScrapeFile() *ScrapeFile {
+	return &ScrapeFile{}
+}
+
+func (p *ScrapeFile) InitDefault() {
+}
+
+func (p *ScrapeFile) GetComplete() (v int64) {
+	return p.Complete
+}
+
+func (p *ScrapeFile) GetDownloaded() (v int64) {
+	return p.Downloaded
+}
+
+func (p *ScrapeFile) GetIncomplete() (v int64) {
+	return p.Incomplete
+}
+
+func (p *ScrapeFile) GetSeeder() (v int64) {
+	return p.Seeder
+}
+func (p *ScrapeFile) SetComplete(val int64) {
+	p.Complete = val
+}
+func (p *ScrapeFile) SetDownloaded(val int64) {
+	p.Downloaded = val
+}
+func (p *ScrapeFile) SetIncomplete(val int64) {
+	p.Incomplete = val
+}
+func (p *ScrapeFile) SetSeeder(val int64) {
+	p.Seeder = val
+}
+
+func (p *ScrapeFile) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ScrapeFile(%+v)", *p)
+}
+
+func (p *ScrapeFile) DeepEqual(ano *ScrapeFile) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Complete) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Downloaded) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Incomplete) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Seeder) {
+		return false
+	}
+	return true
+}
+
+func (p *ScrapeFile) Field1DeepEqual(src int64) bool {
+
+	if p.Complete != src {
+		return false
+	}
+	return true
+}
+func (p *ScrapeFile) Field2DeepEqual(src int64) bool {
+
+	if p.Downloaded != src {
+		return false
+	}
+	return true
+}
+func (p *ScrapeFile) Field3DeepEqual(src int64) bool {
+
+	if p.Incomplete != src {
+		return false
+	}
+	return true
+}
+func (p *ScrapeFile) Field4DeepEqual(src int64) bool {
+
+	if p.Seeder != src {
+		return false
+	}
+	return true
+}
+
+type StatisticInfo struct {
+	TotalPeers    int64                     `thrift:"total_peers,1,required" frugal:"1,required,i64" json:"total_peers"`
+	TotalTorrents int64                     `thrift:"total_torrents,2,required" frugal:"2,required,i64" json:"total_torrents"`
+	Shards        map[string]*StatisticInfo `thrift:"shards,3,optional" frugal:"3,optional,map<string:StatisticInfo>" json:"shards,omitempty"`
+}
+
+func NewStatisticInfo() *StatisticInfo {
+	return &StatisticInfo{}
+}
+
+func (p *StatisticInfo) InitDefault() {
+}
+
+func (p *StatisticInfo) GetTotalPeers() (v int64) {
+	return p.TotalPeers
+}
+
+func (p *StatisticInfo) GetTotalTorrents() (v int64) {
+	return p.TotalTorrents
+}
+
+var StatisticInfo_Shards_DEFAULT map[string]*StatisticInfo
+
+func (p *StatisticInfo) GetShards() (v map[string]*StatisticInfo) {
+	if !p.IsSetShards() {
+		return StatisticInfo_Shards_DEFAULT
+	}
+	return p.Shards
+}
+func (p *StatisticInfo) SetTotalPeers(val int64) {
+	p.TotalPeers = val
+}
+func (p *StatisticInfo) SetTotalTorrents(val int64) {
+	p.TotalTorrents = val
+}
+func (p *StatisticInfo) SetShards(val map[string]*StatisticInfo) {
+	p.Shards = val
+}
+
+func (p *StatisticInfo) IsSetShards() bool {
+	return p.Shards != nil
+}
+
+func (p *StatisticInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("StatisticInfo(%+v)", *p)
+}
+
+func (p *StatisticInfo) DeepEqual(ano *StatisticInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.TotalPeers) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.TotalTorrents) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Shards) {
+		return false
+	}
+	return true
+}
+
+func (p *StatisticInfo) Field1DeepEqual(src int64) bool {
+
+	if p.TotalPeers != src {
+		return false
+	}
+	return true
+}
+func (p *StatisticInfo) Field2DeepEqual(src int64) bool {
+
+	if p.TotalTorrents != src {
+		return false
+	}
+	return true
+}
+func (p *StatisticInfo) Field3DeepEqual(src map[string]*StatisticInfo) bool {
+
+	if len(p.Shards) != len(src) {
+		return false
+	}
+	for k, v := range p.Shards {
+		_src := src[k]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}

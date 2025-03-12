@@ -20,6 +20,41 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"Scrape": kitex.NewMethodInfo(
+		scrapeHandler,
+		newTrunkerServiceScrapeArgs,
+		newTrunkerServiceScrapeResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetStatistic": kitex.NewMethodInfo(
+		getStatisticHandler,
+		newTrunkerServiceGetStatisticArgs,
+		newTrunkerServiceGetStatisticResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"Ban": kitex.NewMethodInfo(
+		banHandler,
+		newTrunkerServiceBanArgs,
+		newTrunkerServiceBanResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"DeleteInfoHash": kitex.NewMethodInfo(
+		deleteInfoHashHandler,
+		newTrunkerServiceDeleteInfoHashArgs,
+		newTrunkerServiceDeleteInfoHashResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetPeer": kitex.NewMethodInfo(
+		getPeerHandler,
+		newTrunkerServiceGetPeerArgs,
+		newTrunkerServiceGetPeerResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -104,6 +139,96 @@ func newTrunkerServiceAnnounceResult() interface{} {
 	return trunker.NewTrunkerServiceAnnounceResult()
 }
 
+func scrapeHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*trunker.TrunkerServiceScrapeArgs)
+	realResult := result.(*trunker.TrunkerServiceScrapeResult)
+	success, err := handler.(trunker.TrunkerService).Scrape(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newTrunkerServiceScrapeArgs() interface{} {
+	return trunker.NewTrunkerServiceScrapeArgs()
+}
+
+func newTrunkerServiceScrapeResult() interface{} {
+	return trunker.NewTrunkerServiceScrapeResult()
+}
+
+func getStatisticHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*trunker.TrunkerServiceGetStatisticArgs)
+	realResult := result.(*trunker.TrunkerServiceGetStatisticResult)
+	success, err := handler.(trunker.TrunkerService).GetStatistic(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newTrunkerServiceGetStatisticArgs() interface{} {
+	return trunker.NewTrunkerServiceGetStatisticArgs()
+}
+
+func newTrunkerServiceGetStatisticResult() interface{} {
+	return trunker.NewTrunkerServiceGetStatisticResult()
+}
+
+func banHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*trunker.TrunkerServiceBanArgs)
+	realResult := result.(*trunker.TrunkerServiceBanResult)
+	success, err := handler.(trunker.TrunkerService).Ban(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newTrunkerServiceBanArgs() interface{} {
+	return trunker.NewTrunkerServiceBanArgs()
+}
+
+func newTrunkerServiceBanResult() interface{} {
+	return trunker.NewTrunkerServiceBanResult()
+}
+
+func deleteInfoHashHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*trunker.TrunkerServiceDeleteInfoHashArgs)
+	realResult := result.(*trunker.TrunkerServiceDeleteInfoHashResult)
+	success, err := handler.(trunker.TrunkerService).DeleteInfoHash(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newTrunkerServiceDeleteInfoHashArgs() interface{} {
+	return trunker.NewTrunkerServiceDeleteInfoHashArgs()
+}
+
+func newTrunkerServiceDeleteInfoHashResult() interface{} {
+	return trunker.NewTrunkerServiceDeleteInfoHashResult()
+}
+
+func getPeerHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*trunker.TrunkerServiceGetPeerArgs)
+	realResult := result.(*trunker.TrunkerServiceGetPeerResult)
+	success, err := handler.(trunker.TrunkerService).GetPeer(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newTrunkerServiceGetPeerArgs() interface{} {
+	return trunker.NewTrunkerServiceGetPeerArgs()
+}
+
+func newTrunkerServiceGetPeerResult() interface{} {
+	return trunker.NewTrunkerServiceGetPeerResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -119,6 +244,56 @@ func (p *kClient) Announce(ctx context.Context, request *trunker.AnnounceRequest
 	_args.Request = request
 	var _result trunker.TrunkerServiceAnnounceResult
 	if err = p.c.Call(ctx, "Announce", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) Scrape(ctx context.Context, request *trunker.ScrapeRequest) (r *trunker.ScrapeResponse, err error) {
+	var _args trunker.TrunkerServiceScrapeArgs
+	_args.Request = request
+	var _result trunker.TrunkerServiceScrapeResult
+	if err = p.c.Call(ctx, "Scrape", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetStatistic(ctx context.Context, request *trunker.GetStatisticRequest) (r *trunker.GetStatisticResponse, err error) {
+	var _args trunker.TrunkerServiceGetStatisticArgs
+	_args.Request = request
+	var _result trunker.TrunkerServiceGetStatisticResult
+	if err = p.c.Call(ctx, "GetStatistic", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) Ban(ctx context.Context, request *trunker.BanRequest) (r *trunker.BanResponse, err error) {
+	var _args trunker.TrunkerServiceBanArgs
+	_args.Request = request
+	var _result trunker.TrunkerServiceBanResult
+	if err = p.c.Call(ctx, "Ban", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteInfoHash(ctx context.Context, request *trunker.DeleteInfoHashRequest) (r *trunker.DeleteInfoHashResponse, err error) {
+	var _args trunker.TrunkerServiceDeleteInfoHashArgs
+	_args.Request = request
+	var _result trunker.TrunkerServiceDeleteInfoHashResult
+	if err = p.c.Call(ctx, "DeleteInfoHash", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetPeer(ctx context.Context, request *trunker.GetPeerRequest) (r *trunker.GetPeerResponse, err error) {
+	var _args trunker.TrunkerServiceGetPeerArgs
+	_args.Request = request
+	var _result trunker.TrunkerServiceGetPeerResult
+	if err = p.c.Call(ctx, "GetPeer", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

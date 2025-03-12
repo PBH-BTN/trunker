@@ -44,3 +44,16 @@ struct Peer{
     14: required PeerEvent event
     15: required Source source
 }
+
+struct ScrapeFile{
+    1: required i64 complete
+    2: required i64 downloaded
+    3: required i64 incomplete
+    4: required i64 seeder
+}
+
+struct StatisticInfo {
+    1: required i64 total_peers
+    2: required i64 total_torrents
+    3: optional map<string,StatisticInfo> shards
+}
