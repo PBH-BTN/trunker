@@ -42,6 +42,7 @@ docker run -d --name trunker -e ADMIN_KEY=aabbcc -p 8888:8888 gaojianli2333/trun
 - [x] Eventbus support
 - [x] Websocket support
 - [x] Prometheus based [metrics](./docs/metrics.adoc)
+- [x] RPC mode to support cluster. Powered by [Kitex](https://github.com/cloudwego/kitex)
 
 ## Wiki
 Trunker provides much config and observability capabilities, if you want to run trunker in production, please see the [Wiki](./docs/toc.adoc).
