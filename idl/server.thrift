@@ -3,6 +3,11 @@ namespace go pbh.btn.trunker
 
 service TrunkerService{
     AnnounceResponse Announce(1:AnnounceRequest request)
+    ScrapeResponse Scrape(1:ScrapeRequest request)
+    GetStatisticResponse GetStatistic(1:GetStatisticRequest request)
+    BanResponse Ban(1: BanRequest request)
+    DeleteInfoHashResponse DeleteInfoHash(1: DeleteInfoHashRequest request)
+    GetPeerResponse GetPeer(1: GetPeerRequest request)
 }
 
 struct AnnounceRequest{
@@ -26,5 +31,47 @@ struct AnnounceRequest{
 }
 
 struct AnnounceResponse{
+    1: required list<common.Peer> peers
+}
+
+struct ScrapeRequest{
+    1: required list<string> info_hashes
+}
+
+struct ScrapeResponse{
+    1: required map<string,common.ScrapeFile> res
+}
+
+struct GetStatisticRequest{
+}
+
+struct GetStatisticResponse{
+    1: required common.StatisticInfo info
+}
+
+enum BanType{
+    InfoHash = 0
+    PeerID = 1
+}
+
+struct BanRequest {
+    1: required BanType type
+    2: required string target
+}
+
+struct BanResponse{}
+
+
+struct DeleteInfoHashRequest{
+    1: required string target
+}
+
+struct DeleteInfoHashResponse{}
+
+struct GetPeerRequest{
+    1: required string info_hash
+}
+
+struct GetPeerResponse{
     1: required list<common.Peer> peers
 }

@@ -35,6 +35,7 @@ type runningMode string
 const (
 	RunningModeMemory runningMode = "memory"
 	RunningModeDB     runningMode = "db"
+	RunningModeRPC    runningMode = "rpc"
 )
 
 type TrackerConfig struct {
@@ -54,8 +55,9 @@ type TrackerConfig struct {
 }
 
 type rpcConfig struct {
-	Enable    bool   `yaml:"enable" json:"enable"`
-	HostPorts string `yaml:"hostPorts" json:"hostPorts"`
+	EnableServer bool   `yaml:"enableServer" json:"enableServer"`
+	HostPorts    string `yaml:"hostPorts" json:"hostPorts"`
+	RemoteServer string `yaml:"remoteServer" json:"remoteServer"`
 }
 
 type udpConfig struct {
@@ -84,6 +86,11 @@ func injectDefaultValue(conf *Config) {
 	if conf.Tracker.Mode == RunningModeMemory {
 		if conf.Tracker.Memory.PersistFile == "" {
 			conf.Tracker.Memory.PersistFile = "persist.dat"
+		}
+	}
+	if conf.Tracker.Mode == RunningModeRPC {
+		if conf.Tracker.RPC.RemoteServer == "" {
+			panic("rpc remote server is required")
 		}
 	}
 	if conf.Tracker.MetricsHostPorts == "" {

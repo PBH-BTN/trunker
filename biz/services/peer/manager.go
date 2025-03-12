@@ -8,6 +8,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/database"
 	muxlocal "github.com/PBH-BTN/trunker/biz/services/peer/mux_local"
+	"github.com/PBH-BTN/trunker/biz/services/peer/rpc"
 )
 
 type PeerManager interface {
@@ -43,6 +44,8 @@ func InitPeerManager() {
 		manager.LoadFromPersist()
 	case config.RunningModeDB:
 		manager = database.NewDBManager()
+	case config.RunningModeRPC:
+		manager = rpc.NewManager(config.AppConfig.Tracker.RPC.RemoteServer)
 	default:
 		panic("unknown tracker mode")
 	}

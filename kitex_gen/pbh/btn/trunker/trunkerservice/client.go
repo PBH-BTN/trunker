@@ -12,6 +12,11 @@ import (
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
 	Announce(ctx context.Context, request *trunker.AnnounceRequest, callOptions ...callopt.Option) (r *trunker.AnnounceResponse, err error)
+	Scrape(ctx context.Context, request *trunker.ScrapeRequest, callOptions ...callopt.Option) (r *trunker.ScrapeResponse, err error)
+	GetStatistic(ctx context.Context, request *trunker.GetStatisticRequest, callOptions ...callopt.Option) (r *trunker.GetStatisticResponse, err error)
+	Ban(ctx context.Context, request *trunker.BanRequest, callOptions ...callopt.Option) (r *trunker.BanResponse, err error)
+	DeleteInfoHash(ctx context.Context, request *trunker.DeleteInfoHashRequest, callOptions ...callopt.Option) (r *trunker.DeleteInfoHashResponse, err error)
+	GetPeer(ctx context.Context, request *trunker.GetPeerRequest, callOptions ...callopt.Option) (r *trunker.GetPeerResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -46,4 +51,29 @@ type kTrunkerServiceClient struct {
 func (p *kTrunkerServiceClient) Announce(ctx context.Context, request *trunker.AnnounceRequest, callOptions ...callopt.Option) (r *trunker.AnnounceResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.Announce(ctx, request)
+}
+
+func (p *kTrunkerServiceClient) Scrape(ctx context.Context, request *trunker.ScrapeRequest, callOptions ...callopt.Option) (r *trunker.ScrapeResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.Scrape(ctx, request)
+}
+
+func (p *kTrunkerServiceClient) GetStatistic(ctx context.Context, request *trunker.GetStatisticRequest, callOptions ...callopt.Option) (r *trunker.GetStatisticResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetStatistic(ctx, request)
+}
+
+func (p *kTrunkerServiceClient) Ban(ctx context.Context, request *trunker.BanRequest, callOptions ...callopt.Option) (r *trunker.BanResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.Ban(ctx, request)
+}
+
+func (p *kTrunkerServiceClient) DeleteInfoHash(ctx context.Context, request *trunker.DeleteInfoHashRequest, callOptions ...callopt.Option) (r *trunker.DeleteInfoHashResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteInfoHash(ctx, request)
+}
+
+func (p *kTrunkerServiceClient) GetPeer(ctx context.Context, request *trunker.GetPeerRequest, callOptions ...callopt.Option) (r *trunker.GetPeerResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetPeer(ctx, request)
 }

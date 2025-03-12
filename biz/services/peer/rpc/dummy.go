@@ -23,3 +23,11 @@ func (m Manager) StoreToPersist() {
 func (m Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error {
 	return errors.New("not supported")
 }
+
+func (m Manager) ClearBanInfoHash() {
+	hlog.Info("not supported for rpc mode, skip")
+}
+
+func (m Manager) ClearBanPeer() {
+	hlog.Info("not supported for rpc mode, skip")
+}

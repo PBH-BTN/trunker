@@ -6,6 +6,7 @@ import (
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
+	"github.com/PBH-BTN/trunker/biz/services/rpc"
 	"github.com/PBH-BTN/trunker/biz/services/udp_server"
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/service/mq/producer"
@@ -27,6 +28,10 @@ func Init() {
 	if config.AppConfig.Tracker.UDPServer.Enable {
 		go initUDPServer()
 	}
+	if config.AppConfig.Tracker.RPC.EnableServer {
+		go rpc.StartRPCServer(config.AppConfig.Tracker.RPC.HostPorts)
+	}
+
 }
 
 func getServerOption() []hertzConfig.Option {
