@@ -16,6 +16,8 @@ For benchmark, please refer to the [Benchmark](#benchmark) section.
 ## How to run
 
 ```bash
+make install_tool
+make update_idl
 ./build.sh
 cd output
 ./bootstrap.sh

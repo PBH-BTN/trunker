@@ -13,7 +13,7 @@ import (
 func StartRPCServer(hostPort string) {
 	addr, err := net.ResolveTCPAddr("tcp", hostPort)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("invalid rpc listen address:", err.Error())
 	}
 	svr := trunker.NewServer(newTrunkerServiceImpl(),
 		server.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
@@ -23,6 +23,6 @@ func StartRPCServer(hostPort string) {
 	err = svr.Run()
 
 	if err != nil {
-		log.Println(err.Error())
+		hlog.Fatal("run rpc server error:", err.Error())
 	}
 }
