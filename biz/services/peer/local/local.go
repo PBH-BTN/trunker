@@ -183,7 +183,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		resp = append(resp, value)
 		return true
 	})
-	if root.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
+	if root.peerMap[root.currentActive].Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
 		hlog.CtxDebugf(ctx, "[info_hash %s]active set full, currentActive %d, size: 1: %d 2:%d 3:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive, root.peerMap[0].Len(), root.peerMap[1].Len(), root.peerMap[2].Len())
 		current := root.currentActive
 		if atomic.CompareAndSwapUint32(&root.currentActive, current, (current+1)%3) { // write head switch to next
