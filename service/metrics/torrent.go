@@ -16,6 +16,7 @@ const (
 )
 
 var info *common.StatisticInfo
+var fetchCount int = 0 // fetch is a very expensive operation, so we only do it every 10 times
 
 func gaugeSet(gaugeVec *prometheus.GaugeVec, value uint64, labels prometheus.Labels) error {
 	gauge, err := gaugeVec.GetMetricWith(labels)
@@ -43,9 +44,14 @@ func registerGauge(registry *prometheus.Registry) map[counterMetrics]prometheus.
 		Help: "Total Torrent numbers",
 	}, func() float64 {
 		var err error
-		info, err = peer.GetPeerManager().GetStatistic(context.Background())
-		if err != nil {
-			return 0
+		if fetchCount == 20 {
+			info, err = peer.GetPeerManager().GetStatistic(context.Background())
+			if err != nil {
+				return 0
+			}
+			fetchCount = 0
+		} else {
+			fetchCount++
 		}
 		for s, v := range info.Shards {
 			_ = gaugeSet(m[GaugePeer].(*prometheus.GaugeVec), v.TotalPeers, prometheus.Labels{LabelShards: s})
