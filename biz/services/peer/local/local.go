@@ -191,7 +191,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			// empty the oldest map
 			hlog.CtxDebugf(ctx, "[info_hash %s] clean oldest set %d, len:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), (current+2)%3, root.peerMap[(current+2)%3].Len())
 			root.peerMap[(current+2)%3] = mapx.NewSkipMap[*common.Peer]()
-			go runtime.GC()
 		}
 	}
 
