@@ -31,8 +31,9 @@ func (m *Manager) cleanUp(root *InfoHashRoot) int64 {
 		return 0
 	}
 	toClean := make([]string, 0)
+	expireTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second)
 	root.Range(func(key string, value *common.Peer) bool {
-		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
+		if expireTime.After(value.LastSeen) {
 			toClean = append(toClean, key)
 			if value.Type == model.PeerTypeWebtorrent && value.Conn != nil {
 				_ = value.Conn.Close()
