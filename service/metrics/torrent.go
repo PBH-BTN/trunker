@@ -44,7 +44,7 @@ func registerGauge(registry *prometheus.Registry) map[counterMetrics]prometheus.
 		Help: "Total Torrent numbers",
 	}, func() float64 {
 		var err error
-		if fetchCount == 20 {
+		if info == nil || fetchCount == 20 {
 			info, err = peer.GetPeerManager().GetStatistic(context.Background())
 			if err != nil {
 				return 0
