@@ -188,7 +188,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		if atomic.CompareAndSwapUint32(&root.currentActive, current, current+1%3) { // write head switch to next
 			// empty the oldest map
 			root.peerMap[current+2%3] = mapx.NewSkipMap[*common.Peer]()
-			runtime.GC()
+			go runtime.GC()
 		}
 	}
 
