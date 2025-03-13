@@ -133,6 +133,10 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil, nil
 	}
+	if peer.Event == common.PeerEvent_Stopped { // stopped peer must remove and return nothing
+		root.LoadAndDelete(peer.GetKey())
+		return nil, nil
+	}
 	// add to peer list
 	gopool.CtxGo(ctx, func() {
 		if knownPeer, ok := root.LoadAndDelete(peer.GetKey()); ok {
@@ -179,7 +183,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		resp = append(resp, value)
 		return true
 	})
-	if root.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent { // reach max, start to eject
+	if root.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
 		current := root.currentActive
 		if atomic.CompareAndSwapUint32(&root.currentActive, current, current+1%3) { // write head switch to next
 			// empty the oldest map
