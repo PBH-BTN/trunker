@@ -186,7 +186,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	if root.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
 		hlog.CtxDebugf(ctx, "[info_hash %s]active set full, currentActive %d, size: 1: %d 2:%d 3:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive, root.peerMap[0].Len(), root.peerMap[1].Len(), root.peerMap[2].Len())
 		current := root.currentActive
-		if atomic.CompareAndSwapUint32(&root.currentActive, current, current+1%3) { // write head switch to next
+		if atomic.CompareAndSwapUint32(&root.currentActive, current, (current+1)%3) { // write head switch to next
 			hlog.CtxDebugf(ctx, "[info_hash %s] active set swapped! current:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive)
 			// empty the oldest map
 			hlog.CtxDebugf(ctx, "[info_hash %s] clean oldest set %d, len:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), current+2%3, root.peerMap[current+2%3].Len())
