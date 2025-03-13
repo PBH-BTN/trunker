@@ -189,8 +189,8 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		if atomic.CompareAndSwapUint32(&root.currentActive, current, (current+1)%3) { // write head switch to next
 			hlog.CtxDebugf(ctx, "[info_hash %s] active set swapped! current:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive)
 			// empty the oldest map
-			hlog.CtxDebugf(ctx, "[info_hash %s] clean oldest set %d, len:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), current+2%3, root.peerMap[current+2%3].Len())
-			root.peerMap[current+2%3] = mapx.NewSkipMap[*common.Peer]()
+			hlog.CtxDebugf(ctx, "[info_hash %s] clean oldest set %d, len:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), (current+2)%3, root.peerMap[(current+2)%3].Len())
+			root.peerMap[(current+2)%3] = mapx.NewSkipMap[*common.Peer]()
 			go runtime.GC()
 		}
 	}
