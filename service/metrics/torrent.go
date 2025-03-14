@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"sync/atomic"
 
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
@@ -16,7 +17,7 @@ const (
 )
 
 var info *common.StatisticInfo
-var fetchCount int = 0 // fetch is a very expensive operation, so we only do it every 10 times
+var fetchCount uint32 = 0 // fetch is a very expensive operation, so we only do it every 10 times
 
 func gaugeSet(gaugeVec *prometheus.GaugeVec, value uint64, labels prometheus.Labels) error {
 	gauge, err := gaugeVec.GetMetricWith(labels)
@@ -49,9 +50,9 @@ func registerGauge(registry *prometheus.Registry) map[counterMetrics]prometheus.
 			if err != nil {
 				return 0
 			}
-			fetchCount = 0
+			atomic.StoreUint32(&fetchCount, 0)
 		} else {
-			fetchCount++
+			atomic.AddUint32(&fetchCount, 1)
 		}
 		for s, v := range info.Shards {
 			_ = gaugeSet(m[GaugePeer].(*prometheus.GaugeVec), v.TotalPeers, prometheus.Labels{LabelShards: s})

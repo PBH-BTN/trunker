@@ -53,12 +53,17 @@ func (i *InfoHashRoot) Load(key string) (*common.Peer, bool) {
 }
 
 func (i *InfoHashRoot) LoadAndDelete(key string) (*common.Peer, bool) {
+	var foundPeer *common.Peer
+	var found bool
 	for _, peerMap := range i.peerMap {
 		if v, ok := peerMap.LoadAndDelete(key); ok {
-			return v, ok
+			found = true
+			if foundPeer == nil || v.LastSeen.After(foundPeer.LastSeen) {
+				foundPeer = v
+			}
 		}
 	}
-	return nil, false
+	return foundPeer, found
 }
 
 func (i *InfoHashRoot) LoadOrStore(key string, peer *common.Peer) (*common.Peer, bool) {
