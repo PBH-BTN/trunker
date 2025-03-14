@@ -126,7 +126,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 		logger.Errorf("open file error")
 		return
 	}
-	writer := zstd.NewWriter(bufio.NewWriter(file))
+	writer := zstd.NewWriterLevel(bufio.NewWriter(file), 10)
 	logger.Infof("start to store peers to persist")
 	count := 0
 	for _, manager := range m.localList {
