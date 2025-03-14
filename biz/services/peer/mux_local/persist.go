@@ -2,6 +2,7 @@ package mux_local
 
 import (
 	"bufio"
+	"crypto/rand"
 	"encoding/binary"
 	"io"
 	"os"
@@ -112,20 +113,12 @@ func (m *MuxLocalManager) StoreToPersist() {
 		logger.Infof("persist not enabled, skip...")
 		return
 	}
-	file, err := os.OpenFile(config.AppConfig.Tracker.Memory.PersistFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	tempFile := config.AppConfig.Tracker.Memory.PersistFile + rand.Text()[:8]
+	file, err := os.OpenFile(tempFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Errorf("open file error")
 		return
 	}
-	defer file.Close()
-	lock := flock.New(config.AppConfig.Tracker.Memory.PersistFile)
-	if err := lock.Lock(); err != nil {
-		logger.Errorf("failed to obtain write lock: %s", err.Error())
-		return
-	}
-	defer func() {
-		_ = lock.Unlock()
-	}()
 
 	writer := bufio.NewWriter(file)
 	logger.Infof("start to store peers to persist")
@@ -183,5 +176,24 @@ func (m *MuxLocalManager) StoreToPersist() {
 		})
 	}
 	_ = writer.Flush()
+	err = file.Close()
+	if err != nil {
+		logger.Errorf("close file error:%s", err.Error())
+		return
+	}
+	lock := flock.New(config.AppConfig.Tracker.Memory.PersistFile)
+	if err := lock.Lock(); err != nil {
+		logger.Errorf("failed to obtain write lock: %s", err.Error())
+		_ = file.Close()
+		return
+	}
+	defer func() {
+		_ = lock.Unlock()
+	}()
+	err = os.Rename(tempFile, config.AppConfig.Tracker.Memory.PersistFile)
+	if err != nil {
+		logger.Errorf("failed to rename file from %s to %s: %s", tempFile, config.AppConfig.Tracker.Memory.PersistFile, err.Error())
+		return
+	}
 	logger.Infof("store to persist done. %d peers stored", count)
 }
