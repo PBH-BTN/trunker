@@ -4,12 +4,17 @@
 
 ![image](https://github.com/user-attachments/assets/6f3676a8-4b51-4f14-9107-d08a35868238)
 
-
 ## Introduction
 
 A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://github.com/cloudwego/hertz) from cloudwego, with [observability](./docs/metrics.adoc).
 
 For benchmark, please refer to the [Benchmark](#benchmark) section.
+
+### Official Instance 
+HTTPS `https://tracker.ghostchu-services.top/announce`  
+HTTP `http://tracker.ghostchu-services.top/announce`  
+WebSocket (for WebTorrent Protocol) `wss://tracker.ghostchu-services.top/announce`  
+UDP `udp://utracker.ghostchu-services.top:6969`
 
 ## How to run
 
