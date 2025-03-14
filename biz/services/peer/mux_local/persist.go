@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/DataDog/zstd"
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
@@ -30,21 +31,27 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		logger.Errorf("open file error:%s", err.Error())
 		return
 	}
-	defer file.Close()
-	reader := bufio.NewReader(file)
+	reader := zstd.NewReader(bufio.NewReader(file))
+	defer func() {
+		_ = reader.Close()
+		_ = file.Close()
+	}()
 	count := 0
 	expired := 0
+	now := time.Now()
+	data := make([]byte, 0, 400)
+	raminBuf := make([]byte, 0, 400)
+	var size uint32
 	for {
-		var size uint32
 		// Decode data length
 		if err := binary.Read(reader, binary.LittleEndian, &size); err != nil {
-			if err == io.EOF { // end of file
+			if err == io.EOF || strings.Contains(err.Error(), "EOF") { // end of file
 				break
 			}
 			logger.Errorf("Failed to decode data length:%s", err.Error())
 			return
 		}
-		data := make([]byte, size)
+		data = data[:size]
 		if readCount, err := reader.Read(data); err != nil {
 			logger.Errorf("Failed to decode data length:%s", err.Error())
 			return
@@ -52,25 +59,25 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			// read more
 			remain := size - uint32(readCount)
 			for remain > 0 {
-				tmp := make([]byte, remain)
-				n, err := reader.Read(tmp)
+				raminBuf = raminBuf[:remain]
+				n, err := reader.Read(raminBuf)
 				if err != nil {
 					logger.Errorf("Failed to decode data length:%s", err.Error())
 					return
 				}
 				remain -= uint32(n)
-				data = append(data[0:readCount], tmp...)
+				data = append(data[0:readCount], raminBuf...)
 			}
 		}
 
 		// Unmarshal to protobuf SomeStruct
 		pbStruct := &PeerInfo{}
-		if err := proto.Unmarshal(data, pbStruct); err != nil {
+		if err := proto.Unmarshal(data[:size], pbStruct); err != nil {
 			logger.Errorf("Failed to decode data length:%s", err.Error())
 			break
 		}
 		lastSeen := time.Unix(pbStruct.LastSeen, 0)
-		if lastSeen.Add(time.Duration(config.AppConfig.Tracker.TTL) * time.Second).Before(time.Now()) {
+		if lastSeen.Add(time.Duration(config.AppConfig.Tracker.TTL) * time.Second).Before(now) {
 			// expired, skip
 			expired++
 			continue
@@ -119,8 +126,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 		logger.Errorf("open file error")
 		return
 	}
-
-	writer := bufio.NewWriter(file)
+	writer := zstd.NewWriter(bufio.NewWriter(file))
 	logger.Infof("start to store peers to persist")
 	count := 0
 	for _, manager := range m.localList {
@@ -176,6 +182,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 		})
 	}
 	_ = writer.Flush()
+	_ = writer.Close()
 	err = file.Close()
 	if err != nil {
 		logger.Errorf("close file error:%s", err.Error())
