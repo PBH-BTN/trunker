@@ -9,6 +9,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/hertz-contrib/limiter"
 	"github.com/hertz-contrib/pprof"
 )
 
@@ -21,6 +22,7 @@ func main() {
 	pprof.Register(h)
 	register(h)
 	h.Use(middleware.LogSlowQuery)
+	h.Use(limiter.AdaptiveLimit())
 	h.Engine.OnShutdown = append(h.Engine.OnShutdown, func(_ context.Context) {
 		// here save current data
 		peer.GetPeerManager().StoreToPersist()
