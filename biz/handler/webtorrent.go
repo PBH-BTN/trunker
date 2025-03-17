@@ -159,25 +159,26 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
 		return err
 	}
-	if len(req.Offers) == len(res) {
-		for i, to := range res {
-			if to.ID != req.PeerID && i < len(req.Offers) {
-				if err := sendOffer(ctx, to, req.Offers[i], req.InfoHash, req.PeerID); err != nil {
-					hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+	if len(req.Offers) > 0 {
+		if len(req.Offers) == len(res) {
+			for i, to := range res {
+				if to.ID != req.PeerID && i < len(req.Offers) {
+					if err := sendOffer(ctx, to, req.Offers[i], req.InfoHash, req.PeerID); err != nil {
+						hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+					}
 				}
 			}
-		}
-	} else {
-		picker := choose.Slice(req.Offers)
-		for _, p := range res {
-			if p.ID != req.PeerID {
-				if err := sendOffer(ctx, p, picker.One(), req.InfoHash, req.PeerID); err != nil {
-					hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+		} else {
+			picker := choose.Slice(req.Offers)
+			for _, p := range res {
+				if p.ID != req.PeerID {
+					if err := sendOffer(ctx, p, picker.One(), req.InfoHash, req.PeerID); err != nil {
+						hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+					}
 				}
 			}
 		}
 	}
-
 	return nil
 
 }
