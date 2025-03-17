@@ -66,7 +66,7 @@ func (m *manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		hlog.CtxWarnf(ctx, "invalid ipv6 address,actual: %s", peer.IPv6.String())
 		return nil, errors.New("invalid address")
 	}
-	hlog.CtxDebugf(ctx, "handle peer announce %s from %s", peer.ID, hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)))
+	hlog.CtxDebugf(ctx, "[%s]handle peer announce %s from %s", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), conv.Trans8859_1ToUTF8([]byte(peer.ID)), peer.GetIP().String())
 
 	root, ok := m.infoHashMap.LoadOrStoreLazy(req.InfoHash, func() *infoHashRoot {
 		return &infoHashRoot{
