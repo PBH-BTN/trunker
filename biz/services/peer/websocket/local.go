@@ -75,7 +75,7 @@ func (m *manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		}
 	})
 	peer.Conn.CloseCallback = func() {
-		hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close", peer.ID, hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)))
+		hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close, ip: %s", conv.Trans8859_1ToUTF8([]byte(peer.ID)), hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), peer.GetIP().String())
 		if v, ok := root.peerMap.LoadAndDelete(req.PeerID); ok {
 			v.Conn = nil
 		}
