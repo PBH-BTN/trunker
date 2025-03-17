@@ -109,7 +109,7 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 	if err != nil {
 		return err
 	}
-	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash)))
+	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(peerId)))
 	hlog.CtxDebugf(ctx, "[info_hash %s] answer to peer %s", hex.EncodeToString(conv.UnsafeStringToBytes(infoHash)), peerId)
 	return peer.GetWSManager().AnswerToPeer(ctx, infoHash, peerId, msg)
 }
