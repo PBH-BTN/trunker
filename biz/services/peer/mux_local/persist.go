@@ -14,11 +14,12 @@ import (
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
-	"github.com/PBH-BTN/trunker/utils"
+	"github.com/PBH-BTN/trunker/biz/services/peer/rpc"
+	"github.com/PBH-BTN/trunker/kitex_gen/pbh/btn/trunker"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/logger"
+	"github.com/cloudwego/frugal"
 	"github.com/gofrs/flock"
-	"google.golang.org/protobuf/proto"
 )
 
 func (m *MuxLocalManager) LoadFromPersist() {
@@ -71,49 +72,20 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			}
 		}
 
-		// Unmarshal to protobuf SomeStruct
-		pbStruct := &PeerInfo{}
-		if err := proto.Unmarshal(data[:size], pbStruct); err != nil {
+		pbStruct := trunker.Store{}
+		if _, err = frugal.DecodeObject(data[:size], &pbStruct); err != nil {
 			logger.Errorf("Failed to decode data length:%s", err.Error())
 			break
 		}
-		lastSeen := time.Unix(pbStruct.LastSeen, 0)
+		lastSeen := time.Unix(pbStruct.Peer.LastSeen, 0)
 		if lastSeen.Add(time.Duration(config.AppConfig.Tracker.TTL) * time.Second).Before(now) {
-			// expired, skip
 			expired++
 			continue
 		}
-		if pbStruct.Type == PeerType_Webtorrent { // impossible to load webtorrent peer
-			continue
-		}
-		m.pickWorker(pbStruct.InfoHash).DirectStore(string(pbStruct.InfoHash), &common.Peer{
-			ID:         string(pbStruct.PeerId),
-			IP:         pbStruct.Ip.ReportIp,
-			IPv4:       pbStruct.Ip.ReportV4,
-			IPv6:       pbStruct.Ip.ReportV6,
-			ClientIP:   pbStruct.Ip.ClientIp,
-			Port:       int(pbStruct.Port),
-			Left:       pbStruct.Left,
-			Uploaded:   pbStruct.Uploaded,
-			Downloaded: pbStruct.Downloaded,
-			LastSeen:   lastSeen,
-			UserAgent:  pbStruct.UserAgent,
-			Event:      common.PeerEvent(pbStruct.Event),
-			Type:       common.PeerType(pbStruct.Type),
-			Offers: utils.Map(pbStruct.Offers, func(o *Offer) *common.Offer {
-				return &common.Offer{
-					OfferID: o.OfferId,
-					Offer: common.OfferDetail{
-						Type: o.Offer.Type,
-						SDP:  o.Offer.Sdp,
-					},
-				}
-			}),
-			Source: common.PeerSource(pbStruct.Source),
-		})
+		m.pickWorker(conv.UnsafeStringToBytes(pbStruct.InfoHash)).DirectStore(pbStruct.InfoHash, rpc.PeerIDLToCommon(pbStruct.Peer))
 		count++
 	}
-	logger.Infof("load from persist done. %d peers loaded,%d peers expired", count, expired)
+	logger.Infof("load from persist done. %d peers loaded, %d peers expired", count, expired)
 }
 
 func (m *MuxLocalManager) StoreToPersist() {
@@ -130,49 +102,25 @@ func (m *MuxLocalManager) StoreToPersist() {
 	writer := zstd.NewWriterLevel(bufio.NewWriter(file), 10)
 	logger.Infof("start to store peers to persist")
 	count := 0
+	data := make([]byte, 800)
 	for _, manager := range m.localList {
 		manager.RangeMap(func(infoHash string, value *local.InfoHashRoot) bool {
 			value.Range(func(key string, value *common.Peer) bool {
-				peerPB := &PeerInfo{
-					PeerId:   conv.UnsafeStringToBytes(value.ID),
-					InfoHash: conv.UnsafeStringToBytes(infoHash),
-					Ip: &IPInfo{
-						ClientIp: value.ClientIP,
-						ReportIp: value.IP,
-						ReportV4: value.IPv4,
-						ReportV6: value.IPv6,
-					},
-					Port:       int32(value.Port),
-					Left:       value.Left,
-					Downloaded: value.Downloaded,
-					Uploaded:   value.Uploaded,
-					LastSeen:   value.LastSeen.Unix(),
-					UserAgent:  strings.ToValidUTF8(value.UserAgent, ""),
-					Event:      PeerEvent(value.Event),
-					Offers: utils.Map(value.Offers, func(o *common.Offer) *Offer {
-						return &Offer{
-							OfferId: o.OfferID,
-							Offer:   &OfferDetail{Type: o.Offer.Type, Sdp: o.Offer.SDP},
-						}
-					}),
-					Type:   PeerType(value.Type),
-					Source: PeerSource(value.Source),
+				obj := trunker.Store{
+					InfoHash: infoHash,
+					Peer:     rpc.PeerCommonToIDL(value),
 				}
-				if value.Conn != nil {
-					_ = value.Conn.Close()
-				}
-				data, err := proto.Marshal(peerPB)
+				n, err := frugal.EncodeObject(data, nil, obj)
 				if err != nil {
 					logger.Error("failed to marshal to pb:", err.Error())
 					return true
 				}
-
 				// Encode data length
-				if err := binary.Write(writer, binary.LittleEndian, uint32(len(data))); err != nil {
+				if err := binary.Write(writer, binary.LittleEndian, uint32(n)); err != nil {
 					logger.Error("Failed to encode data length:", err.Error())
 					return true
 				}
-				if _, err := writer.Write(data); err != nil {
+				if _, err := writer.Write(data[:n]); err != nil {
 					logger.Error("Failed to write data:", err.Error())
 					return false
 				}

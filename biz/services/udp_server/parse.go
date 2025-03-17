@@ -40,9 +40,9 @@ func parseAnnounceRequestV4(buf []byte) *model.AnnounceRequest {
 	req := &model.AnnounceRequest{}
 	req.InfoHash = string(buf[0:20])
 	req.PeerID = string(buf[20:40])
-	req.Downloaded = binary.BigEndian.Uint64(buf[40:48])
-	req.Left = binary.BigEndian.Uint64(buf[48:56])
-	req.Uploaded = binary.BigEndian.Uint64(buf[56:64])
+	req.Downloaded = int64(binary.BigEndian.Uint64(buf[40:48]))
+	req.Left = int64(binary.BigEndian.Uint64(buf[48:56]))
+	req.Uploaded = int64(binary.BigEndian.Uint64(buf[56:64]))
 	event := common.PeerEvent(binary.BigEndian.Uint32(buf[64:68]))
 	if event == common.PeerEvent_Unknown { // some client not implemented event
 		event = common.PeerEvent_Started
@@ -59,9 +59,9 @@ func parseAnnounceRequestV6(buf []byte) *model.AnnounceRequest {
 	req := &model.AnnounceRequest{}
 	req.InfoHash = string(buf[0:20])
 	req.PeerID = string(buf[20:40])
-	req.Downloaded = binary.BigEndian.Uint64(buf[40:48])
-	req.Left = binary.BigEndian.Uint64(buf[48:56])
-	req.Uploaded = binary.BigEndian.Uint64(buf[56:64])
+	req.Downloaded = int64(binary.BigEndian.Uint64(buf[40:48]))
+	req.Left = int64(binary.BigEndian.Uint64(buf[48:56]))
+	req.Uploaded = int64(binary.BigEndian.Uint64(buf[56:64]))
 	event := common.PeerEvent(binary.BigEndian.Uint32(buf[64:68]))
 	if event == common.PeerEvent_Unknown { // some client not implemented event
 		event = common.PeerEvent_Started

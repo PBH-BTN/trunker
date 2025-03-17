@@ -45,6 +45,11 @@ struct Peer{
     15: required Source source
 }
 
+struct Store{
+    1: required string info_hash
+    2: required Peer peer
+}
+
 struct ScrapeFile{
     1: required i64 complete
     2: required i64 downloaded

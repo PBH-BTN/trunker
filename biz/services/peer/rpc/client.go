@@ -25,7 +25,7 @@ func (m Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequ
 		hlog.CtxErrorf(ctx, "remote call announce error:%s", err.Error())
 		return nil, err
 	}
-	return utils.Map(resp.Peers, peerIDLToCommon), nil
+	return utils.Map(resp.Peers, PeerIDLToCommon), nil
 }
 
 func (m Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
@@ -92,7 +92,7 @@ func (m Manager) GetPeers(ctx context.Context, infoHash string) ([]*common.Peer,
 		hlog.CtxErrorf(ctx, "remote call GetPeer error:%s", err.Error())
 		return nil, err
 	}
-	return utils.Map(res.Peers, peerIDLToCommon), nil
+	return utils.Map(res.Peers, PeerIDLToCommon), nil
 }
 
 func (m Manager) DeleteInfoHash(ctx context.Context, infoHash string) error {

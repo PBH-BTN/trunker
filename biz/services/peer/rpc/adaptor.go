@@ -21,9 +21,9 @@ func announceRequestCommonToIDL(req *model.AnnounceRequest) *trunker.AnnounceReq
 		Ipv4:       req.IPv4,
 		Ipv6:       req.IPv6,
 		ClientIp:   req.ClientIP,
-		Uploaded:   int64(req.Uploaded),
-		Downloaded: int64(req.Downloaded),
-		Left:       int64(req.Left),
+		Uploaded:   req.Uploaded,
+		Downloaded: req.Downloaded,
+		Left:       req.Left,
 		NumWant:    int64(req.NumWant),
 		Type:       trunker.PeerType(req.Type),
 		Compact:    req.Compact == 1,
@@ -41,7 +41,7 @@ func announceRequestCommonToIDL(req *model.AnnounceRequest) *trunker.AnnounceReq
 	}
 }
 
-func peerIDLToCommon(p *trunker.Peer) *common.Peer {
+func PeerIDLToCommon(p *trunker.Peer) *common.Peer {
 	if p == nil {
 		return nil
 	}
@@ -69,5 +69,36 @@ func peerIDLToCommon(p *trunker.Peer) *common.Peer {
 		Type:       model.PeerType(p.Type),
 		Event:      common.PeerEvent(p.Event),
 		Source:     model.Source(p.Source),
+	}
+}
+
+func PeerCommonToIDL(p *common.Peer) *trunker.Peer {
+	if p == nil {
+		return nil
+	}
+	return &trunker.Peer{
+		Ip:       p.IP,
+		Ipv4:     p.IPv4,
+		Ipv6:     p.IPv6,
+		ClientIp: p.ClientIP,
+		LastSeen: p.LastSeen.Unix(),
+		Offers: utils.Map(p.Offers, func(o *common.Offer) *trunker.Offer {
+			return &trunker.Offer{
+				OfferId: o.OfferID,
+				Offer: &trunker.OfferDetail{
+					Type: o.Offer.Type,
+					Sdp:  o.Offer.SDP,
+				},
+			}
+		}),
+		Id:         p.ID,
+		UserAgent:  p.UserAgent,
+		Port:       int32(p.Port),
+		Uploaded:   int64(p.Uploaded),
+		Downloaded: int64(p.Downloaded),
+		Left:       int64(p.Left),
+		Type:       trunker.PeerType(p.Type),
+		Event:      trunker.PeerEvent(p.Event),
+		Source:     trunker.Source(p.Source),
 	}
 }
