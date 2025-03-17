@@ -32,6 +32,9 @@ tracker:
   udpServer:
     enable: true
     hostPorts: 127.0.0.1:6881
+  wsServer:
+    enable: true
+    shard: 10
   trackerId: default
 rocketmq:
   topic: TrunkerEvent

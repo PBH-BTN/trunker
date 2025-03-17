@@ -7,8 +7,8 @@ import (
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
-	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
+	peer "github.com/PBH-BTN/trunker/biz/services/peer/websocket"
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
 	"github.com/PBH-BTN/trunker/utils/conv"
@@ -108,7 +108,7 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 		return err
 	}
 	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash)))
-	return peer.GetPeerManager().AnswerToPeer(ctx, infoHash, peerId, msg)
+	return peer.GetWSManager().AnswerToPeer(ctx, infoHash, peerId, msg)
 }
 
 func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, conn *model.Conn) error {
@@ -140,11 +140,11 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	req.Conn = conn
 	req.Type = model.PeerTypeWebtorrent
 	req.Source = model.SourceWS
-	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &req)
+	res, err := peer.GetWSManager().HandleAnnouncePeer(ctx, &req)
 	if err != nil {
 		return err
 	}
-	scrape, err := peer.GetPeerManager().Scrape(ctx, req.InfoHash)
+	scrape, err := peer.GetWSManager().Scrape(ctx, req.InfoHash)
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func handleWSScrape(ctx context.Context, req []byte, conn *model.Conn) error {
 		return errors.New("info_hash can't be empty")
 	}
 	ret := make(map[string]*model.ScrapeFile)
-	manager := peer.GetPeerManager()
+	manager := peer.GetWSManager()
 	for _, infoHash := range infoHashes {
 		var err error
 		ret[infoHash], err = manager.Scrape(ctx, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash))))

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"net"
 	"runtime"
-	"strings"
 	"sync/atomic"
 	"time"
 
@@ -19,7 +18,6 @@ import (
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
-	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/xxjwxc/gowp/workpool"
 )
@@ -322,31 +320,5 @@ func (m *Manager) GetPeers(_ context.Context, infoHash string) ([]*common.Peer, 
 
 func (m *Manager) DeleteInfoHash(_ context.Context, infoHash string) error {
 	m.infoHashMap.Delete(infoHash)
-	return nil
-}
-
-func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error {
-	root, ok := m.infoHashMap.Load(infoHash)
-	if !ok {
-		return errors.New("info hash not found")
-	}
-	peer, ok := root.Load(peerID)
-	if !ok {
-		return errors.New("peer not found")
-	}
-	if peer.Conn == nil {
-		return errors.New("peer not connected")
-	}
-	resp := map[string]any{}
-	_ = json.Unmarshal(answerBody, &resp)
-	delete(resp, "to_peer_id")
-	err := peer.Conn.WriteJSON(resp)
-	if err != nil {
-		if strings.Contains(err.Error(), "close") {
-			peer.Conn = nil
-			return errors.New("remote peer offline")
-		}
-		return err
-	}
 	return nil
 }

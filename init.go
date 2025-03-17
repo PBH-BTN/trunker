@@ -6,6 +6,7 @@ import (
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/services/peer"
+	"github.com/PBH-BTN/trunker/biz/services/peer/websocket"
 	"github.com/PBH-BTN/trunker/biz/services/rpc"
 	"github.com/PBH-BTN/trunker/biz/services/udp_server"
 	"github.com/PBH-BTN/trunker/service/cache"
@@ -25,6 +26,9 @@ func Init() {
 	}
 	if config.AppConfig.Cache.Enable {
 		cache.Init()
+	}
+	if config.AppConfig.Tracker.WSServer.Enable {
+		websocket.InitWSMuxLocalManager()
 	}
 	metrics.Init()
 	//cache.Init()

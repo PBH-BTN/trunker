@@ -72,6 +72,7 @@ type OfferDetail struct {
 type ErrorResponse struct {
 	FailureReason string `json:"failureReason" bencode:"failure reason"`
 	Retry         string `json:"retry" bencode:"retry in"`
+	TrackerId     string `json:"trackerId" bencode:"tracker id"`
 }
 
 type ScrapeRequest struct {
