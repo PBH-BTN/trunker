@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"context"
-	"encoding/hex"
 	"errors"
 	"net"
 	"runtime"
@@ -17,7 +16,6 @@ import (
 	"github.com/PBH-BTN/trunker/service/cache"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
-	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
 	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -66,7 +64,6 @@ func (m *manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		hlog.CtxWarnf(ctx, "invalid ipv6 address,actual: %s", peer.IPv6.String())
 		return nil, errors.New("invalid address")
 	}
-	hlog.CtxDebugf(ctx, "[info_hash %s]handle peer announce %s from %s", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), conv.Trans8859_1ToUTF8([]byte(peer.ID)), peer.GetIP().String())
 
 	root, ok := m.infoHashMap.LoadOrStoreLazy(req.InfoHash, func() *infoHashRoot {
 		return &infoHashRoot{
@@ -75,7 +72,6 @@ func (m *manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		}
 	})
 	peer.Conn.CloseCallback = func() {
-		hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close, ip: %s", conv.Trans8859_1ToUTF8([]byte(peer.ID)), hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), peer.GetIP().String())
 		if v, ok := root.peerMap.LoadAndDelete(req.PeerID); ok {
 			v.Conn = nil
 		}

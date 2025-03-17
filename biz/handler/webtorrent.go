@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 
@@ -95,7 +94,6 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 	}
 }
 func handleWSAnswer(ctx context.Context, msg []byte) error {
-	hlog.CtxDebugf(ctx, "websocket answer: %s", msg)
 	infoHashRaw, err := sonic.Get(msg, "info_hash")
 	if err != nil {
 		return err
@@ -114,7 +112,6 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 		return err
 	}
 	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(peerId)))
-	hlog.CtxDebugf(ctx, "[info_hash %s] answer to peer %s", hex.EncodeToString(conv.UnsafeStringToBytes(infoHash)), peerId)
 	return peer.GetWSManager().AnswerToPeer(ctx, infoHash, peerId, msg)
 }
 
@@ -130,7 +127,6 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	req.InfoHash = conv.UnsafeBytesToString(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(req.InfoHash)))
 	req.PeerID = conv.UnsafeBytesToString(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(req.PeerID)))
 	if !validAnnounceReq(&req.HttpAnnounceRequest) {
-		hlog.CtxDebugf(ctx, "invalid request:%s", msg)
 		return errors.New("invalid request")
 	}
 	go func() {

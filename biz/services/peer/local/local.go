@@ -124,7 +124,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	})
 	if peer.Type == model.PeerTypeWebtorrent && req.Conn != nil {
 		peer.Conn.CloseCallback = func() {
-			hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close", peer.ID, hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)))
 			if v, ok := root.LoadAndDelete(req.PeerID); ok {
 				v.Conn = nil
 			}
@@ -188,12 +187,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		return true
 	})
 	if root.peerMap[root.currentActive].Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
-		hlog.CtxDebugf(ctx, "[info_hash %s] active set full, currentActive %d, size: 0: %d 1:%d 2:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive, root.peerMap[0].Len(), root.peerMap[1].Len(), root.peerMap[2].Len())
 		current := root.currentActive
 		if atomic.CompareAndSwapUint32(&root.currentActive, current, (current+1)%3) { // write head switch to next
-			hlog.CtxDebugf(ctx, "[info_hash %s] active set swapped! current:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive)
 			// empty the oldest map
-			hlog.CtxDebugf(ctx, "[info_hash %s] clean oldest set %d, len:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), (current+2)%3, root.peerMap[(current+2)%3].Len())
 			root.peerMap[(current+2)%3] = mapx.NewSkipMap[*common.Peer]()
 		}
 	}
