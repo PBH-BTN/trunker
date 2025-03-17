@@ -6,7 +6,9 @@ import (
 
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/kitex_gen/pbh/btn/trunker"
+	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils"
+	"github.com/PBH-BTN/trunker/utils/bittorrent"
 )
 
 // TrunkerServiceImpl implements the last service interface defined in the IDL.
@@ -26,6 +28,12 @@ func (s *TrunkerServiceImpl) Announce(ctx context.Context, request *trunker.Anno
 	if err != nil {
 		return nil, err
 	}
+	go func() {
+		metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
+			metrics.LabelSource: sourceToMetrics(request.Source),
+			metrics.LabelClient: bittorrent.ParsePeerID(request.PeerId),
+		})
+	}()
 	return &trunker.AnnounceResponse{Peers: utils.Map(resp, peerCommonToIDL)}, nil
 }
 

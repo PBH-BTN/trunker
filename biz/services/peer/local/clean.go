@@ -31,8 +31,9 @@ func (m *Manager) cleanUp(root *InfoHashRoot) int64 {
 		return 0
 	}
 	toClean := make([]string, 0)
-	root.peerMap.Range(func(key string, value *common.Peer) bool {
-		if time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second).After(value.LastSeen) {
+	expireTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second)
+	root.Range(func(key string, value *common.Peer) bool {
+		if expireTime.After(value.LastSeen) {
 			toClean = append(toClean, key)
 			if value.Type == model.PeerTypeWebtorrent && value.Conn != nil {
 				_ = value.Conn.Close()
@@ -42,10 +43,10 @@ func (m *Manager) cleanUp(root *InfoHashRoot) int64 {
 		return true
 	})
 	for _, key := range toClean {
-		root.peerMap.Delete(key)
+		root.LoadAndDelete(key)
 	}
 	root.lastClean = time.Now()
-	if root.peerMap.Len() == 0 {
+	if root.Len() == 0 {
 		m.infoHashMap.Delete(root.infoHash)
 	}
 	return int64(len(toClean))

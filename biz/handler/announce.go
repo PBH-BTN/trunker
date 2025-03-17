@@ -23,7 +23,7 @@ import (
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
-	if config.AppConfig.Tracker.Mode == config.RunningModeMemory && config.AppConfig.Tracker.Memory.EnableWS {
+	if config.AppConfig.Tracker.Mode == config.RunningModeMemory && config.AppConfig.Tracker.WSServer.Enable {
 		if strings.EqualFold(c.Request.Header.Get(consts.HeaderConnection), "Upgrade") && strings.EqualFold(c.Request.Header.Get("Upgrade"), "websocket") {
 			HandleWebTorrent(ctx, c)
 			return
@@ -77,6 +77,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			}),
 			ExternalIp: conv.UnsafeBytesToString(req.ClientIP),
 			Incomplete: scrape.Incomplete,
+			TrackerId:  config.AppConfig.Tracker.TrackerId,
 			Complete:   scrape.Complete,
 		})
 	} else {
@@ -84,6 +85,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			"interval":    config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
 			"external ip": conv.UnsafeBytesToString(req.ClientIP),
 			"incomplete":  scrape.Incomplete,
+			"tracker id":  config.AppConfig.Tracker.TrackerId,
 			"complete":    scrape.Complete,
 		}
 		peers, peers6 := common.PeersToCompact(res)

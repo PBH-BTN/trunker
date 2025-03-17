@@ -20,7 +20,6 @@ func Get[T any](ctx context.Context, key string) (*T, bool) {
 		hlog.CtxWarnf(ctx, "failed to unmarshal value, key: %s, value: %s , error:%s", key, str, err)
 		return nil, false
 	}
-	hlog.CtxDebugf(ctx, "get value from redis, key: "+key)
 	return &value, true
 }
 
@@ -35,7 +34,6 @@ func GetList[T any](ctx context.Context, key string) ([]*T, bool) {
 		hlog.CtxWarnf(ctx, "failed to unmarshal value, key: %s, value: %s , error:%s", key, str, err)
 		return nil, false
 	}
-	hlog.CtxDebugf(ctx, "get value from redis, key: "+key)
 	return value, true
 }
 

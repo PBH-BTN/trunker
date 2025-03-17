@@ -2,13 +2,14 @@ package handler
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
-	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
+	peer "github.com/PBH-BTN/trunker/biz/services/peer/websocket"
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
 	"github.com/PBH-BTN/trunker/utils/conv"
@@ -64,6 +65,10 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 				if answerRaw, err = sonic.Get(message, "answer"); err == nil {
 					if answerRaw.Valid() {
 						err = handleWSAnswer(ctx, message)
+						if err != nil {
+							hlog.CtxErrorf(ctx, "handle answer error: %s", err.Error())
+							err = nil
+						}
 						break
 					}
 				}
@@ -90,6 +95,7 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 	}
 }
 func handleWSAnswer(ctx context.Context, msg []byte) error {
+	hlog.CtxDebugf(ctx, "websocket answer: %s", msg)
 	infoHashRaw, err := sonic.Get(msg, "info_hash")
 	if err != nil {
 		return err
@@ -107,8 +113,9 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 	if err != nil {
 		return err
 	}
-	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash)))
-	return peer.GetPeerManager().AnswerToPeer(ctx, infoHash, peerId, msg)
+	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(peerId)))
+	hlog.CtxDebugf(ctx, "[info_hash %s] answer to peer %s", hex.EncodeToString(conv.UnsafeStringToBytes(infoHash)), peerId)
+	return peer.GetWSManager().AnswerToPeer(ctx, infoHash, peerId, msg)
 }
 
 func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, conn *model.Conn) error {
@@ -140,11 +147,11 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	req.Conn = conn
 	req.Type = model.PeerTypeWebtorrent
 	req.Source = model.SourceWS
-	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, &req)
+	res, err := peer.GetWSManager().HandleAnnouncePeer(ctx, &req)
 	if err != nil {
 		return err
 	}
-	scrape, err := peer.GetPeerManager().Scrape(ctx, req.InfoHash)
+	scrape, err := peer.GetWSManager().Scrape(ctx, req.InfoHash)
 	if err != nil {
 		return err
 	}
@@ -159,25 +166,26 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		hlog.CtxErrorf(ctx, "write response error: %s", err.Error())
 		return err
 	}
-	if len(req.Offers) == len(res) {
-		for i, to := range res {
-			if to.ID != req.PeerID && i < len(req.Offers) {
-				if err := sendOffer(ctx, to, req.Offers[i], req.InfoHash, req.PeerID); err != nil {
-					hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+	if len(req.Offers) > 0 {
+		if len(req.Offers) == len(res) {
+			for i, to := range res {
+				if to.ID != req.PeerID && i < len(req.Offers) {
+					if err := sendOffer(ctx, to, req.Offers[i], req.InfoHash, req.PeerID); err != nil {
+						hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+					}
 				}
 			}
-		}
-	} else {
-		picker := choose.Slice(req.Offers)
-		for _, p := range res {
-			if p.ID != req.PeerID {
-				if err := sendOffer(ctx, p, picker.One(), req.InfoHash, req.PeerID); err != nil {
-					hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+		} else {
+			picker := choose.Slice(req.Offers)
+			for _, p := range res {
+				if p.ID != req.PeerID {
+					if err := sendOffer(ctx, p, picker.One(), req.InfoHash, req.PeerID); err != nil {
+						hlog.CtxErrorf(ctx, "failed to send offer: %s", err.Error())
+					}
 				}
 			}
 		}
 	}
-
 	return nil
 
 }
@@ -191,20 +199,20 @@ func handleWSScrape(ctx context.Context, req []byte, conn *model.Conn) error {
 	if tryArray, err := infoHashRaw.Array(); err == nil {
 		for _, v := range tryArray {
 			if s, ok := v.(string); ok {
-				infoHashes = append(infoHashes, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(s))))
+				infoHashes = append(infoHashes, s)
 			}
 		}
 	} else if tryString, err := infoHashRaw.String(); err == nil {
-		infoHashes = append(infoHashes, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(tryString))))
+		infoHashes = append(infoHashes, tryString)
 	}
 	if len(infoHashes) == 0 {
 		return errors.New("info_hash can't be empty")
 	}
 	ret := make(map[string]*model.ScrapeFile)
-	manager := peer.GetPeerManager()
+	manager := peer.GetWSManager()
 	for _, infoHash := range infoHashes {
 		var err error
-		ret[infoHash], err = manager.Scrape(ctx, infoHash)
+		ret[infoHash], err = manager.Scrape(ctx, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash))))
 		if err != nil {
 			return err
 		}

@@ -1,4 +1,5 @@
 cache:
+  enable: false
   host: localhost
   port: 6379
 
@@ -11,7 +12,6 @@ tracker:
     persistFile: persist.dat
     maxPeersPerTorrent: 1500
     shard: 40
-    enableWS: true
   rpc:
     enableServer: false
     hostPorts: 0.0.0.0:6789
@@ -31,6 +31,10 @@ tracker:
   udpServer:
     enable: true
     hostPorts: :6881
+  wsServer:
+    enable: true
+    shard: 10
+  trackerId: default # https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol
 rocketmq:
   topic: TrunkerEvent
   endpoint: localhost:8081

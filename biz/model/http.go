@@ -55,6 +55,7 @@ type AnnounceBasicResponse struct {
 	Interval   int64    `json:"interval" bencode:"interval"`
 	Peers      []*Peer  `json:"peers" bencode:"peers"`
 	ExternalIp string   `json:"externalIp" bencode:"external ip"`
+	TrackerId  string   `json:"trackerId" bencode:"tracker id"`
 	Complete   int      `json:"complete" bencode:"complete"`
 	Incomplete int      `json:"incomplete" bencode:"incomplete"`
 	Offers     []*Offer `json:"offers,omitempty" bencode:"offers,omitempty"`
@@ -71,6 +72,7 @@ type OfferDetail struct {
 type ErrorResponse struct {
 	FailureReason string `json:"failureReason" bencode:"failure reason"`
 	Retry         string `json:"retry" bencode:"retry in"`
+	TrackerId     string `json:"trackerId" bencode:"tracker id"`
 }
 
 type ScrapeRequest struct {

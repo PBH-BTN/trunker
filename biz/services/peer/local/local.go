@@ -6,7 +6,6 @@ import (
 	"errors"
 	"net"
 	"runtime"
-	"strings"
 	"sync/atomic"
 	"time"
 
@@ -14,27 +13,72 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/producer"
+	"github.com/PBH-BTN/trunker/service/cache"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
-	json "github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/xxjwxc/gowp/workpool"
 )
 
 type InfoHashRoot struct {
-	peerMap   mapx.SyncStringMap[*common.Peer]
-	lastClean time.Time
-	infoHash  string
+	peerMap       [3]mapx.SyncStringMap[*common.Peer] // always keep 3 map, one for write, one for readonly and one keeps empty
+	lastClean     time.Time
+	infoHash      string
+	currentActive uint32
 }
 
 func NewInfoHashRoot(infoHash string) *InfoHashRoot {
 	return &InfoHashRoot{
-		peerMap:   mapx.NewSkipMap[*common.Peer](),
+		currentActive: 0,
+		peerMap: [3]mapx.SyncStringMap[*common.Peer]{
+			mapx.NewSkipMap[*common.Peer](),
+			mapx.NewSkipMap[*common.Peer](),
+			mapx.NewSkipMap[*common.Peer](),
+		},
 		lastClean: time.Now(),
 		infoHash:  infoHash,
 	}
+}
+
+func (i *InfoHashRoot) Load(key string) (*common.Peer, bool) {
+	for _, peerMap := range i.peerMap {
+		if v, ok := peerMap.Load(key); ok {
+			return v, ok
+		}
+	}
+	return nil, false
+}
+
+func (i *InfoHashRoot) LoadAndDelete(key string) (*common.Peer, bool) {
+	var foundPeer *common.Peer
+	var found bool
+	for _, peerMap := range i.peerMap {
+		if v, ok := peerMap.LoadAndDelete(key); ok {
+			found = true
+			if foundPeer == nil || v.LastSeen.After(foundPeer.LastSeen) {
+				foundPeer = v
+			}
+		}
+	}
+	return foundPeer, found
+}
+
+func (i *InfoHashRoot) LoadOrStore(key string, peer *common.Peer) (*common.Peer, bool) {
+	return i.peerMap[i.currentActive].LoadOrStore(key, peer)
+}
+
+func (i *InfoHashRoot) Store(key string, peer *common.Peer) {
+	i.peerMap[i.currentActive].Store(key, peer)
+}
+
+func (i *InfoHashRoot) Len() int {
+	count := 0
+	for _, s := range i.peerMap {
+		count += s.Len()
+	}
+	return count
 }
 
 type Manager struct {
@@ -81,21 +125,25 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	if peer.Type == model.PeerTypeWebtorrent && req.Conn != nil {
 		peer.Conn.CloseCallback = func() {
 			hlog.CtxDebugf(ctx, "delete peer %s from %s due to connect close", peer.ID, hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)))
-			if v, ok := root.peerMap.LoadAndDelete(req.PeerID); ok {
+			if v, ok := root.LoadAndDelete(req.PeerID); ok {
 				v.Conn = nil
 			}
 		}
 	}
 	if !ok { // first seen torrent
 		if common.IsPeerConnectable(peer) {
-			root.peerMap.LoadOrStore(peer.GetKey(), peer)
+			root.LoadOrStore(peer.GetKey(), peer)
 		}
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil, nil
 	}
+	if peer.Event == common.PeerEvent_Stopped { // stopped peer must remove and return nothing
+		root.LoadAndDelete(peer.GetKey())
+		return nil, nil
+	}
 	// add to peer list
 	gopool.CtxGo(ctx, func() {
-		if knownPeer, ok := root.peerMap.Load(peer.GetKey()); ok {
+		if knownPeer, ok := root.LoadAndDelete(peer.GetKey()); ok {
 			// update current record
 			if (knownPeer.Left != 0 && peer.Left == 0) || knownPeer.Event != peer.Event {
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
@@ -106,27 +154,18 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			knownPeer.Event = peer.Event
 			knownPeer.Left = peer.Left
 			knownPeer.Event = peer.Event
+			root.Store(knownPeer.GetKey(), knownPeer)
 		} else {
 			// new peer!
 			if common.IsPeerConnectable(peer) { // skip private ip
-				root.peerMap.LoadOrStore(peer.GetKey(), peer)
+				root.LoadOrStore(peer.GetKey(), peer)
 				go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 			}
 		}
 	})
 	// get return
-	resp := make([]*common.Peer, 0, utils.Positive(min(root.peerMap.Len(), req.NumWant)))
-	timeoutPeer := make([]*common.Peer, 0)
-	var oldestTime *time.Time
-	var oldestPeer *common.Peer
-	shouldEject := root.peerMap.Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent
-	expireTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second) // last seen time after this should be ejected
-	root.peerMap.Range(func(_ string, value *common.Peer) bool {
-		if expireTime.After(value.LastSeen) {
-			// timeout!
-			timeoutPeer = append(timeoutPeer, value)
-			return true
-		}
+	resp := make([]*common.Peer, 0, utils.Positive(min(root.Len(), req.NumWant)))
+	root.Range(func(_ string, value *common.Peer) bool {
 		if value.Type != peer.Type { // same type peer only
 			return true
 		}
@@ -138,17 +177,7 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		if value.Event == common.PeerEvent_Stopped { // stopped peer should not return
 			return true
 		}
-		if shouldEject {
-			if oldestTime == nil {
-				oldestTime = &value.LastSeen
-				oldestPeer = value
-			} else {
-				if value.LastSeen.Before(*oldestTime) {
-					oldestTime = &value.LastSeen
-					oldestPeer = value
-				}
-			}
-		}
+
 		if len(resp) >= req.NumWant {
 			return false
 		}
@@ -158,23 +187,26 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		resp = append(resp, value)
 		return true
 	})
-	if len(timeoutPeer) > 0 {
-		gopool.CtxGo(ctx, func() {
-			for _, toClean := range timeoutPeer {
-				root.peerMap.Delete(toClean.GetKey())
-			}
-		})
+	if root.peerMap[root.currentActive].Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
+		hlog.CtxDebugf(ctx, "[info_hash %s] active set full, currentActive %d, size: 0: %d 1:%d 2:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive, root.peerMap[0].Len(), root.peerMap[1].Len(), root.peerMap[2].Len())
+		current := root.currentActive
+		if atomic.CompareAndSwapUint32(&root.currentActive, current, (current+1)%3) { // write head switch to next
+			hlog.CtxDebugf(ctx, "[info_hash %s] active set swapped! current:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), root.currentActive)
+			// empty the oldest map
+			hlog.CtxDebugf(ctx, "[info_hash %s] clean oldest set %d, len:%d", hex.EncodeToString(conv.UnsafeStringToBytes(req.InfoHash)), (current+2)%3, root.peerMap[(current+2)%3].Len())
+			root.peerMap[(current+2)%3] = mapx.NewSkipMap[*common.Peer]()
+		}
 	}
-	if shouldEject && oldestPeer != nil {
-		gopool.CtxGo(ctx, func() {
-			hlog.CtxDebugf(ctx, "info hash %s ejected %s:%d(%s) %s, last seen:%s", hex.EncodeToString(conv.UnsafeStringToBytes(root.infoHash)), oldestPeer.GetIP().String(), oldestPeer.Port, oldestPeer.ID, oldestPeer.UserAgent, oldestTime.Format(time.DateTime))
-			root.peerMap.Delete(oldestPeer.GetKey())
-		})
-	}
+
 	return resp, nil
 }
 
 func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
+	if config.AppConfig.Cache.Enable {
+		if v, ok := cache.Get[model.ScrapeFile](ctx, "scrape_"+infoHash); ok {
+			return v, nil
+		}
+	}
 	root, ok := m.infoHashMap.Load(infoHash)
 	if !ok {
 		return &model.ScrapeFile{
@@ -186,38 +218,45 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 	}
 	var complete, incomplete, downloaded, seeder atomic.Int64
 	p := workpool.New(runtime.NumCPU() * 2)
-	root.peerMap.Range(func(_ string, value *common.Peer) bool {
-		p.Do(func() error {
-			if value.Left == 0 {
-				downloaded.Add(1)
-				complete.Add(1)
-				if value.Event != common.PeerEvent_Stopped {
-					seeder.Add(1)
+	for _, s := range root.peerMap {
+		s.Range(func(_ string, value *common.Peer) bool {
+			p.Do(func() error {
+				if value.Left == 0 {
+					downloaded.Add(1)
+					complete.Add(1)
+					if value.Event != common.PeerEvent_Stopped {
+						seeder.Add(1)
+					}
+					return nil
+				}
+				if value.Event == common.PeerEvent_Completed {
+					complete.Add(1)
+				} else {
+					incomplete.Add(1)
 				}
 				return nil
-			}
-			if value.Event == common.PeerEvent_Completed {
-				complete.Add(1)
-			} else {
-				incomplete.Add(1)
-			}
-			return nil
+			})
+			return true
 		})
-		return true
-	})
+	}
+
 	_ = p.Wait()
-	return &model.ScrapeFile{
+	ret := &model.ScrapeFile{
 		Seeder:     int(seeder.Load()),
 		Complete:   int(complete.Load()),
 		Incomplete: int(incomplete.Load()),
 		Downloaded: int(downloaded.Load()), // 这个目前不实现
-	}, nil
+	}
+	if config.AppConfig.Cache.Enable {
+		_ = cache.Set(ctx, "scrape_"+infoHash, ret, time.Minute*5)
+	}
+	return ret, nil
 }
 
 func (m *Manager) GetStatistic(_ context.Context) *common.StatisticInfo {
 	peerCount := 0
 	m.infoHashMap.Range(func(_ string, value *InfoHashRoot) bool {
-		peerCount += value.peerMap.Len()
+		peerCount += value.Len()
 		return true
 	})
 	return &common.StatisticInfo{
@@ -235,11 +274,13 @@ func (m *Manager) DirectStore(infoHash string, peer *common.Peer) {
 	root, _ := m.infoHashMap.LoadOrStoreLazy(infoHash, func() *InfoHashRoot {
 		return NewInfoHashRoot(infoHash)
 	})
-	root.peerMap.Store(peer.GetKey(), peer)
+	root.Store(peer.GetKey(), peer)
 }
 
 func (i *InfoHashRoot) Range(f func(key string, value *common.Peer) bool) {
-	i.peerMap.Range(f)
+	for _, s := range i.peerMap {
+		s.Range(f)
+	}
 }
 
 func (m *Manager) StoreToPersist() {
@@ -274,36 +315,10 @@ func (m *Manager) GetPeers(_ context.Context, infoHash string) ([]*common.Peer, 
 	if !ok {
 		return []*common.Peer{}, nil
 	}
-	return utils.SkipMapToSlice(peerMap.peerMap), nil
+	return utils.SkipMapToSlice(peerMap), nil
 }
 
 func (m *Manager) DeleteInfoHash(_ context.Context, infoHash string) error {
 	m.infoHashMap.Delete(infoHash)
-	return nil
-}
-
-func (m *Manager) AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error {
-	root, ok := m.infoHashMap.Load(infoHash)
-	if !ok {
-		return errors.New("info hash not found")
-	}
-	peer, ok := root.peerMap.Load(peerID)
-	if !ok {
-		return errors.New("peer not found")
-	}
-	if peer.Conn == nil {
-		return errors.New("peer not connected")
-	}
-	resp := map[string]any{}
-	_ = json.Unmarshal(answerBody, &resp)
-	delete(resp, "to_peer_id")
-	err := peer.Conn.WriteJSON(resp)
-	if err != nil {
-		if strings.Contains(err.Error(), "close") {
-			peer.Conn = nil
-			return errors.New("remote peer offline")
-		}
-		return err
-	}
 	return nil
 }

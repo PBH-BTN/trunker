@@ -9,7 +9,6 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
@@ -25,10 +24,7 @@ type MuxLocalManager struct {
 }
 
 func NewMuxLocalManager(num int) *MuxLocalManager {
-	hlog.Info("running as memory mode")
-	if config.AppConfig.Tracker.Memory.EnableWS {
-		hlog.Info("websocket support enabled")
-	}
+	hlog.Info("running as memory mode, shard: ", num)
 	list := make([]*local.Manager, 0, num)
 	for i := 0; i < num; i++ {
 		list = append(list, local.NewLocalManger())
@@ -133,9 +129,4 @@ func (m *MuxLocalManager) GetPeers(ctx context.Context, infoHash string) ([]*com
 func (m *MuxLocalManager) DeleteInfoHash(ctx context.Context, infoHash string) error {
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
 	return worker.DeleteInfoHash(ctx, infoHash)
-}
-
-func (m *MuxLocalManager) AnswerToPeer(ctx context.Context, infoHash string, peerID string, answerBody []byte) error {
-	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
-	return worker.AnswerToPeer(ctx, infoHash, peerID, answerBody)
 }

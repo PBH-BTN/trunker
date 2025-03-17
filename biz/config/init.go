@@ -26,8 +26,9 @@ type RocketMqConfig struct {
 }
 
 type RedisConfig struct {
-	Host string `yaml:"host" json:"host"`
-	Port int    `yaml:"port" json:"port"`
+	Enable bool   `yaml:"enable" json:"enable"`
+	Host   string `yaml:"host" json:"host"`
+	Port   int    `yaml:"port" json:"port"`
 }
 
 type runningMode string
@@ -42,6 +43,7 @@ type TrackerConfig struct {
 	Database            databaseConfig `yaml:"database" json:"database"`
 	Memory              memoryConfig   `yaml:"memory" json:"memory"`
 	UDPServer           udpConfig      `yaml:"udpServer" json:"udpServer"`
+	WSServer            wsConfig       `yaml:"wsServer" json:"wsServer"`
 	Mode                runningMode    `yaml:"mode" json:"mode"`
 	RPC                 rpcConfig      `yaml:"rpc" json:"rpc"`
 	HostPorts           string         `yaml:"hostPorts" json:"hostPorts"`
@@ -52,6 +54,12 @@ type TrackerConfig struct {
 	UseAnnounceIP       bool           `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
 	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
+	TrackerId           string         `yaml:"trackerId" json:"trackerId"`
+}
+
+type wsConfig struct {
+	Enable bool `yaml:"enable" json:"enable"`
+	Shard  int  `yaml:"shard" json:"shard"`
 }
 
 type rpcConfig struct {
@@ -70,7 +78,6 @@ type memoryConfig struct {
 	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent" json:"maxPeersPerTorrent"`
 	Shard              int    `yaml:"shard" json:"shard"`
 	EnablePersist      bool   `yaml:"enablePersist" json:"enablePersist"`
-	EnableWS           bool   `yaml:"enableWS" json:"enableWS"`
 }
 
 type Config struct {
@@ -95,6 +102,9 @@ func injectDefaultValue(conf *Config) {
 	}
 	if conf.Tracker.MetricsHostPorts == "" {
 		conf.Tracker.MetricsHostPorts = "127.0.0.1:9091"
+	}
+	if conf.Tracker.TrackerId == "" {
+		conf.Tracker.TrackerId = "default"
 	}
 }
 func Init() {
