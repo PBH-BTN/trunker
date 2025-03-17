@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"math"
 	"net"
 	"sync"
 	"time"
@@ -50,11 +51,11 @@ func (m *DBManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceR
 		IPv4:       net.ParseIP(req.IPv4),
 		IPv6:       net.ParseIP(req.IPv6),
 		ClientIP:   req.ClientIP,
-		Uploaded:   req.Uploaded,
+		Uploaded:   utils.If(req.Uploaded >= 0, uint64(req.Uploaded), 0),
 		Type:       req.Type,
-		Left:       req.Left,
+		Left:       utils.If(req.Left >= 0, uint64(req.Left), math.MaxUint64),
 		Port:       req.Port,
-		Downloaded: req.Downloaded,
+		Downloaded: utils.If(req.Downloaded >= 0, uint64(req.Downloaded), 0),
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),
 		Offers:     req.Offers,

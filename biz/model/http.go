@@ -14,9 +14,9 @@ type HttpAnnounceRequest struct {
 	IPv4       string   `query:"ipv4"`
 	IPv6       string   `query:"ipv6"`
 	Port       int      `json:"port" query:"port,required"`
-	Uploaded   uint64   `json:"uploaded" query:"uploaded"`
-	Downloaded uint64   `json:"downloaded" query:"downloaded"`
-	Left       uint64   `json:"left" query:"left"`
+	Uploaded   int64    `json:"uploaded" query:"uploaded"`
+	Downloaded int64    `json:"downloaded" query:"downloaded"`
+	Left       int64    `json:"left" query:"left"`
 	NumWant    int      `default:"50" json:"numwant" query:"numwant"`
 	Type       PeerType `json:"type" query:"type"`
 	Compact    int8     `default:"1" json:"compact" query:"compact"`

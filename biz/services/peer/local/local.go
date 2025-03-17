@@ -3,6 +3,7 @@ package local
 import (
 	"context"
 	"errors"
+	"math"
 	"net"
 	"runtime"
 	"sync/atomic"
@@ -96,11 +97,11 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		IPv4:       net.ParseIP(req.IPv4),
 		IPv6:       net.ParseIP(req.IPv6),
 		ClientIP:   req.ClientIP,
-		Uploaded:   req.Uploaded,
-		Left:       req.Left,
+		Uploaded:   utils.If(req.Uploaded >= 0, uint64(req.Uploaded), 0),
+		Left:       utils.If(req.Left >= 0, uint64(req.Left), math.MaxUint64),
 		Port:       req.Port,
 		Type:       req.Type,
-		Downloaded: req.Downloaded,
+		Downloaded: utils.If(req.Downloaded >= 0, uint64(req.Downloaded), 0),
 		Offers:     req.Offers,
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),
