@@ -17,3 +17,5 @@ There are also 4 custom metrics provided by trunker:
 | `trunker_udp_request_counter`     | counter | The counter of udp request, with request action
 | `trunker_announce_counter`        | counter | The counter of announce request, tagged with client and source
 |==========================================================================================
+
+Metrics example: https://grafana.ghostchu-services.top/public-dashboards/ae5337f1f1704ae2bd241f957317946c
