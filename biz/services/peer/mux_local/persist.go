@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"crypto/rand"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -120,7 +121,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 		logger.Infof("persist not enabled, skip...")
 		return
 	}
-	tempFile := config.AppConfig.Tracker.Memory.PersistFile + rand.Text()[:8]
+	tempFile := fmt.Sprintf("%s.%s", config.AppConfig.Tracker.Memory.PersistFile, rand.Text()[:8])
 	file, err := os.OpenFile(tempFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Errorf("open file error")

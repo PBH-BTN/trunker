@@ -65,6 +65,10 @@ func HandleWebTorrent(ctx context.Context, c *app.RequestContext) {
 				if answerRaw, err = sonic.Get(message, "answer"); err == nil {
 					if answerRaw.Valid() {
 						err = handleWSAnswer(ctx, message)
+						if err != nil {
+							hlog.CtxErrorf(ctx, "handle answer error: %s", err.Error())
+							err = nil
+						}
 						break
 					}
 				}
