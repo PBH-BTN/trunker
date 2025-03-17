@@ -53,6 +53,7 @@ type TrackerConfig struct {
 	UseAnnounceIP       bool           `yaml:"useAnnounceIP" json:"useAnnounceIP"` // allow peer to announce it external ip
 	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
+	TrackerId           string         `yaml:"trackerId" json:"trackerId"`
 }
 
 type rpcConfig struct {
@@ -96,6 +97,9 @@ func injectDefaultValue(conf *Config) {
 	}
 	if conf.Tracker.MetricsHostPorts == "" {
 		conf.Tracker.MetricsHostPorts = "127.0.0.1:9091"
+	}
+	if conf.Tracker.TrackerId == "" {
+		conf.Tracker.TrackerId = "default"
 	}
 }
 func Init() {
