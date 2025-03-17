@@ -71,3 +71,16 @@ func peerCommonToIDL(p *common.Peer) *trunker.Peer {
 		Source:     trunker.Source(p.Source),
 	}
 }
+
+func sourceToMetrics(s trunker.Source) string {
+	source := "http"
+	switch s {
+	case trunker.Source_HTTP:
+		source = "http"
+	case trunker.Source_UDP:
+		source = "udp"
+	case trunker.Source_WS:
+		source = "ws"
+	}
+	return source
+}
