@@ -191,11 +191,11 @@ func handleWSScrape(ctx context.Context, req []byte, conn *model.Conn) error {
 	if tryArray, err := infoHashRaw.Array(); err == nil {
 		for _, v := range tryArray {
 			if s, ok := v.(string); ok {
-				infoHashes = append(infoHashes, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(s))))
+				infoHashes = append(infoHashes, s)
 			}
 		}
 	} else if tryString, err := infoHashRaw.String(); err == nil {
-		infoHashes = append(infoHashes, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(tryString))))
+		infoHashes = append(infoHashes, tryString)
 	}
 	if len(infoHashes) == 0 {
 		return errors.New("info_hash can't be empty")
@@ -204,7 +204,7 @@ func handleWSScrape(ctx context.Context, req []byte, conn *model.Conn) error {
 	manager := peer.GetPeerManager()
 	for _, infoHash := range infoHashes {
 		var err error
-		ret[infoHash], err = manager.Scrape(ctx, infoHash)
+		ret[infoHash], err = manager.Scrape(ctx, string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash))))
 		if err != nil {
 			return err
 		}
