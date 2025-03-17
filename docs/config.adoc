@@ -122,3 +122,25 @@ CAUTION: UDP server can't be protected with CDN, you should protect it by yourse
 == JSON Config
 
 JSON config is also supported with env `TRUNKER_CONFIG`, this will be useful for docker.
+
+== Other Config
+=== Cache
+Trunker support to use redis as cache, which is useful for scrape.
+The redis config is in the `cache` field.
+[cols="<,<,<"]
+|===
+|Name |Description |Default
+
+|enable |Enable redis cache|false
+|host |Host of redis |
+|port |Port of redis |
+|===
+
+=== Rocketmq
+Trunker can send the peer event to the rocketmq, which is useful for the analysis.
+The rocketmq config is in the `rocketmq` field.
+[cols="<,<,<"]
+|===
+|Name |Description |Default
+|topic| The topic of the rocketmq|*required*, no default
+|endpoint| The endpoint of the rocketmq|*required*, no default

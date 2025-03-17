@@ -1,4 +1,5 @@
 cache:
+  enable: false
   host: localhost
   port: 6379
 

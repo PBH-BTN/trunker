@@ -14,6 +14,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/producer"
+	"github.com/PBH-BTN/trunker/service/cache"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/PBH-BTN/trunker/utils/conv"
@@ -203,6 +204,11 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 }
 
 func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
+	if config.AppConfig.Cache.Enable {
+		if v, ok := cache.Get[model.ScrapeFile](ctx, "scrape_"+infoHash); ok {
+			return v, nil
+		}
+	}
 	root, ok := m.infoHashMap.Load(infoHash)
 	if !ok {
 		return &model.ScrapeFile{
@@ -237,12 +243,16 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 	}
 
 	_ = p.Wait()
-	return &model.ScrapeFile{
+	ret := &model.ScrapeFile{
 		Seeder:     int(seeder.Load()),
 		Complete:   int(complete.Load()),
 		Incomplete: int(incomplete.Load()),
 		Downloaded: int(downloaded.Load()), // 这个目前不实现
-	}, nil
+	}
+	if config.AppConfig.Cache.Enable {
+		_ = cache.Set(ctx, "scrape_"+infoHash, ret, time.Minute*5)
+	}
+	return ret, nil
 }
 
 func (m *Manager) GetStatistic(_ context.Context) *common.StatisticInfo {

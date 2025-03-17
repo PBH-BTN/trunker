@@ -8,6 +8,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/biz/services/rpc"
 	"github.com/PBH-BTN/trunker/biz/services/udp_server"
+	"github.com/PBH-BTN/trunker/service/cache"
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/service/mq/producer"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -21,6 +22,9 @@ func Init() {
 	config.Init()
 	if config.AppConfig.Tracker.EnableEventProducer {
 		producer.Init()
+	}
+	if config.AppConfig.Cache.Enable {
+		cache.Init()
 	}
 	metrics.Init()
 	//cache.Init()
