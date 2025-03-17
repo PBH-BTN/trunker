@@ -2,7 +2,6 @@ package local
 
 import (
 	"context"
-	"encoding/hex"
 	"errors"
 	"net"
 	"runtime"
@@ -16,7 +15,6 @@ import (
 	"github.com/PBH-BTN/trunker/service/cache"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
-	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/xxjwxc/gowp/workpool"
