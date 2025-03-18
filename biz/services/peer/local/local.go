@@ -5,7 +5,6 @@ import (
 	"errors"
 	"math"
 	"net"
-	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -18,7 +17,6 @@ import (
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/xxjwxc/gowp/workpool"
 )
 
 type InfoHashRoot struct {
@@ -220,7 +218,7 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 				if value.Event != common.PeerEvent_Stopped {
 					seeder.Add(1)
 				}
-				return nil
+				return true
 			}
 			if value.Event == common.PeerEvent_Completed {
 				complete.Add(1)
