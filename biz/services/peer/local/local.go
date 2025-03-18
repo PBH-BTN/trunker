@@ -212,30 +212,25 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 		}, nil
 	}
 	var complete, incomplete, downloaded, seeder atomic.Int64
-	p := workpool.New(runtime.NumCPU() * 2)
 	for _, s := range root.peerMap {
 		s.Range(func(_ string, value *common.Peer) bool {
-			p.Do(func() error {
-				if value.Left == 0 {
-					downloaded.Add(1)
-					complete.Add(1)
-					if value.Event != common.PeerEvent_Stopped {
-						seeder.Add(1)
-					}
-					return nil
-				}
-				if value.Event == common.PeerEvent_Completed {
-					complete.Add(1)
-				} else {
-					incomplete.Add(1)
+			if value.Left == 0 {
+				downloaded.Add(1)
+				complete.Add(1)
+				if value.Event != common.PeerEvent_Stopped {
+					seeder.Add(1)
 				}
 				return nil
-			})
+			}
+			if value.Event == common.PeerEvent_Completed {
+				complete.Add(1)
+			} else {
+				incomplete.Add(1)
+			}
+
 			return true
 		})
 	}
-
-	_ = p.Wait()
 	ret := &model.ScrapeFile{
 		Seeder:     int(seeder.Load()),
 		Complete:   int(complete.Load()),

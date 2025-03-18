@@ -15,6 +15,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/PBH-BTN/trunker/utils/webtorrent"
 	"github.com/bytedance/gopkg/lang/fastrand"
+	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -129,12 +130,12 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 	if !validAnnounceReq(&req.HttpAnnounceRequest) {
 		return errors.New("invalid request")
 	}
-	go func() {
+	gopool.CtxGo(ctx, func() {
 		metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
 			metrics.LabelSource: "websocket",
 			metrics.LabelClient: bittorrent.ParsePeerID(req.PeerID),
 		})
-	}()
+	})
 	req.ClientIP = http.GetClientIP(ctx, c)
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
 	if req.NumWant == 0 || req.NumWant > 500 {

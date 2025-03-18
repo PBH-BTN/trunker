@@ -13,6 +13,7 @@ import (
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
 	"github.com/bytedance/gopkg/lang/fastrand"
+	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/panjf2000/gnet/v2"
 )
@@ -48,12 +49,12 @@ func (s *UDPServer) handleAnnounce(ctx context.Context, remote *net.UDPAddr, tid
 	req.ClientIP = remote.IP
 	req.Type = model.PeerTypeBittorrent
 	req.Source = model.SourceUDP
-	go func() {
+	gopool.CtxGo(ctx, func() {
 		metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
 			metrics.LabelSource: "udp",
 			metrics.LabelClient: bittorrent.ParsePeerID(req.PeerID),
 		})
-	}()
+	})
 	res, err := peer.GetPeerManager().HandleAnnouncePeer(ctx, req)
 	if err != nil {
 		return err

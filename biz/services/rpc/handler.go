@@ -9,6 +9,7 @@ import (
 	"github.com/PBH-BTN/trunker/service/metrics"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
+	"github.com/bytedance/gopkg/util/gopool"
 )
 
 // TrunkerServiceImpl implements the last service interface defined in the IDL.
@@ -28,12 +29,12 @@ func (s *TrunkerServiceImpl) Announce(ctx context.Context, request *trunker.Anno
 	if err != nil {
 		return nil, err
 	}
-	go func() {
+	gopool.CtxGo(ctx, func() {
 		metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
 			metrics.LabelSource: sourceToMetrics(request.Source),
 			metrics.LabelClient: bittorrent.ParsePeerID(request.PeerId),
 		})
-	}()
+	})
 	return &trunker.AnnounceResponse{Peers: utils.Map(resp, peerCommonToIDL)}, nil
 }
 

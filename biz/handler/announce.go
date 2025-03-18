@@ -16,6 +16,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/bytedance/gopkg/lang/fastrand"
+	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertz "github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -41,12 +42,12 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		bencode.ResponseErr(c, errors.New("bad request"))
 		return
 	}
-	go func() {
+	gopool.CtxGo(ctx, func() {
 		metrics.EmitCounter(metrics.CounterAnnounce, 1, map[string]string{
 			metrics.LabelSource: "http",
 			metrics.LabelClient: bittorrent.ParsePeerID(req.PeerID),
 		})
-	}()
+	})
 	req.ClientIP = http.GetClientIP(ctx, c)
 	if v4 := req.ClientIP.To4(); v4 != nil {
 		req.ClientIP = v4
