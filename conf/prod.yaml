@@ -1,7 +1,8 @@
 cache:
-  enable: false
-  host: localhost
-  port: 6379
+  enable: true
+  network: tcp # tcp or unix
+  addr: localhost:6379
+
 
 tracker:
   ttl: 3600

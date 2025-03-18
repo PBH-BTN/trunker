@@ -26,9 +26,9 @@ type RocketMqConfig struct {
 }
 
 type RedisConfig struct {
-	Enable bool   `yaml:"enable" json:"enable"`
-	Host   string `yaml:"host" json:"host"`
-	Port   int    `yaml:"port" json:"port"`
+	Enable  bool   `yaml:"enable" json:"enable"`
+	Network string `yaml:"network" json:"network"`
+	Addr    string `yaml:"addr" json:"addr"`
 }
 
 type runningMode string

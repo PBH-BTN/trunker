@@ -134,8 +134,8 @@ The redis config is in the `cache` field.
 |Name |Description |Default
 
 |enable |Enable redis cache|false
-|host |Host of redis |
-|port |Port of redis |
+|network |Network type of redis instance, `tcp` or `unix`|`tcp`
+|addr|Address of redis|127.0.0.1:6379
 |===
 
 === Rocketmq
