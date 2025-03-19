@@ -18,7 +18,6 @@ import (
 	"github.com/bytedance/gopkg/lang/fastrand"
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/app"
-	hertz "github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/thinkeridea/go-extend/exstrings"
 )
@@ -82,19 +81,16 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 			Complete:   scrape.Complete,
 		})
 	} else {
-		resp := hertz.H{
-			"interval":    config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
-			"external ip": conv.UnsafeBytesToString(req.ClientIP),
-			"incomplete":  scrape.Incomplete,
-			"tracker id":  config.AppConfig.Tracker.TrackerId,
-			"complete":    scrape.Complete,
-		}
 		peers, peers6 := common.PeersToCompact(res)
-		resp["peers"] = peers
-		if len(peers6) > 0 {
-			resp["peers6"] = peers6
-		}
-		bencode.ResponseOk(c, resp)
+		bencode.ResponseOk(c, bencode.FastBencode(&model.AnnounceCompactResponse{
+			Interval:   config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
+			Peers:      peers,
+			Peers6:     peers6,
+			ExternalIp: conv.UnsafeBytesToString(req.ClientIP),
+			TrackerId:  config.AppConfig.Tracker.TrackerId,
+			Complete:   scrape.Complete,
+			Incomplete: scrape.Incomplete,
+		}))
 	}
 }
 

@@ -11,9 +11,9 @@ func ResponseOk(c *app.RequestContext, data any) {
 }
 
 func ResponseErr(c *app.RequestContext, err error) {
-	c.Render(400, BencodeRender{model.ErrorResponse{FailureReason: err.Error(), Retry: "never", TrackerId: config.AppConfig.Tracker.TrackerId}})
+	c.Render(400, BencodeRender{FastBencode(&model.ErrorResponse{FailureReason: err.Error(), Retry: "never", TrackerId: config.AppConfig.Tracker.TrackerId})})
 }
 
 func ResponseErrWithRetry(c *app.RequestContext, err error) {
-	c.Render(400, BencodeRender{model.ErrorResponse{FailureReason: err.Error(), Retry: "600", TrackerId: config.AppConfig.Tracker.TrackerId}})
+	c.Render(400, BencodeRender{FastBencode(&model.ErrorResponse{FailureReason: err.Error(), Retry: "600", TrackerId: config.AppConfig.Tracker.TrackerId})})
 }

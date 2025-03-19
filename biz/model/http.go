@@ -52,13 +52,22 @@ type Peer struct {
 }
 
 type AnnounceBasicResponse struct {
-	Interval   int64    `json:"interval" bencode:"interval"`
-	Peers      []*Peer  `json:"peers" bencode:"peers"`
-	ExternalIp string   `json:"externalIp" bencode:"external ip"`
-	TrackerId  string   `json:"trackerId" bencode:"tracker id"`
-	Complete   int      `json:"complete" bencode:"complete"`
-	Incomplete int      `json:"incomplete" bencode:"incomplete"`
-	Offers     []*Offer `json:"offers,omitempty" bencode:"offers,omitempty"`
+	Interval   int64   `json:"interval" bencode:"interval"`
+	Peers      []*Peer `json:"peers" bencode:"peers"`
+	ExternalIp string  `json:"externalIp" bencode:"external ip"`
+	TrackerId  string  `json:"trackerId" bencode:"tracker id"`
+	Complete   int     `json:"complete" bencode:"complete"`
+	Incomplete int     `json:"incomplete" bencode:"incomplete"`
+}
+
+type AnnounceCompactResponse struct {
+	Interval   int64  `json:"interval" bencode:"interval"`
+	Peers      []byte `json:"peers" bencode:"peers,omitempty"`
+	Peers6     []byte `json:"peers6" bencode:"peers6,omitempty"`
+	ExternalIp string `json:"externalIp" bencode:"external ip"`
+	TrackerId  string `json:"trackerId" bencode:"tracker id"`
+	Complete   int    `json:"complete" bencode:"complete"`
+	Incomplete int    `json:"incomplete" bencode:"incomplete"`
 }
 
 type Offer struct {
