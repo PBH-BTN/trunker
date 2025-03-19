@@ -1,6 +1,7 @@
 package interval
 
 import (
+	"runtime"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -39,4 +40,5 @@ func doIntervalTask() {
 		task()
 	}
 	taskRunning = false
+	runtime.GC()
 }

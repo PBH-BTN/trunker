@@ -16,6 +16,7 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 type InfoHashRoot struct {
@@ -59,6 +60,14 @@ func (i *InfoHashRoot) LoadAndDelete(key string) (*common.Peer, bool) {
 		}
 	}
 	return foundPeer, found
+}
+
+func (i *InfoHashRoot) Delete(key string) bool {
+	result := false
+	for _, peerMap := range i.peerMap {
+		result = result || peerMap.Delete(key)
+	}
+	return result
 }
 
 func (i *InfoHashRoot) LoadOrStore(key string, peer *common.Peer) (*common.Peer, bool) {
@@ -156,9 +165,15 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			}
 		}
 	})
+	expireTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second)
+	expiredPeer := make([]string, 0)
 	// get return
 	resp := make([]*common.Peer, 0, utils.Positive(min(root.Len(), req.NumWant)))
-	root.Range(func(_ string, value *common.Peer) bool {
+	root.Range(func(k string, value *common.Peer) bool {
+		if expireTime.After(value.LastSeen) { // expired peer
+			expiredPeer = append(expiredPeer, k)
+			return true
+		}
 		if value.Type != peer.Type { // same type peer only
 			return true
 		}
@@ -180,6 +195,14 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		resp = append(resp, value)
 		return true
 	})
+	if len(expiredPeer) > 0 { // clear expired peer
+		gopool.CtxGo(ctx, func() {
+			for _, k := range expiredPeer {
+				root.Delete(k)
+			}
+			hlog.CtxDebugf(ctx, "clear %d expired peers", len(expiredPeer))
+		})
+	}
 	if root.peerMap[root.currentActive].Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
 		current := root.currentActive
 		if atomic.CompareAndSwapUint32(&root.currentActive, current, (current+1)%3) { // write head switch to next
@@ -206,9 +229,15 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 			return v, nil
 		}
 	}
+	expireTime := time.Now().Add(time.Duration(-1*config.AppConfig.Tracker.TTL) * time.Second)
+	expiredPeer := make([]string, 0)
 	var complete, incomplete, downloaded, seeder atomic.Int64
 	for _, s := range root.peerMap {
-		s.Range(func(_ string, value *common.Peer) bool {
+		s.Range(func(k string, value *common.Peer) bool {
+			if expireTime.After(value.LastSeen) { // expired peer
+				expiredPeer = append(expiredPeer, k)
+				return true
+			}
 			if value.Left == 0 {
 				downloaded.Add(1)
 				complete.Add(1)
@@ -224,6 +253,14 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 			}
 
 			return true
+		})
+	}
+	if len(expiredPeer) > 0 { // clear expired peer
+		gopool.CtxGo(ctx, func() {
+			for _, k := range expiredPeer {
+				root.Delete(k)
+			}
+			hlog.CtxDebugf(ctx, "clear %d expired peers", len(expiredPeer))
 		})
 	}
 	ret := &model.ScrapeFile{
