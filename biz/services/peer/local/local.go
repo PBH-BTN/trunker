@@ -195,11 +195,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 }
 
 func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
-	if config.AppConfig.Cache.Enable {
-		if v, ok := cache.Get[model.ScrapeFile](ctx, "scrape_"+infoHash); ok {
-			return v, nil
-		}
-	}
 	root, ok := m.infoHashMap.Load(infoHash)
 	if !ok {
 		return &model.ScrapeFile{
@@ -208,6 +203,11 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 			Downloaded: 0,
 			Seeder:     0,
 		}, nil
+	}
+	if config.AppConfig.Cache.Enable {
+		if v, ok := cache.Get[model.ScrapeFile](ctx, "scrape_"+infoHash); ok {
+			return v, nil
+		}
 	}
 	var complete, incomplete, downloaded, seeder atomic.Int64
 	for _, s := range root.peerMap {
