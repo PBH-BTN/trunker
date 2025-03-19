@@ -113,6 +113,9 @@ func handleWSAnswer(ctx context.Context, msg []byte) error {
 		return err
 	}
 	peerId = string(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(peerId)))
+	if len(peerId) == 0 {
+		return errors.New("invalid peerId")
+	}
 	return peer.GetWSManager().AnswerToPeer(ctx, infoHash, peerId, msg)
 }
 
