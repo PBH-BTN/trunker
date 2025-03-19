@@ -43,6 +43,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 	now := time.Now()
 	data := make([]byte, 0, 400)
 	raminBuf := make([]byte, 0, 400)
+	defer logger.Infof("load from persist done. %d peers loaded, %d peers expired", count, expired)
 	var size uint32
 	for {
 		// Decode data length
@@ -64,7 +65,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 				raminBuf = raminBuf[:remain]
 				n, err := reader.Read(raminBuf)
 				if err != nil {
-					logger.Errorf("Failed to decode data length:%s", err.Error())
+					logger.Errorf("Failed to read data:%s", err.Error())
 					return
 				}
 				remain -= uint32(n)
@@ -74,7 +75,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 
 		pbStruct := trunker.Store{}
 		if _, err = frugal.DecodeObject(data[:size], &pbStruct); err != nil {
-			logger.Errorf("Failed to decode data length:%s", err.Error())
+			logger.Errorf("Failed to decode peer:%s", err.Error())
 			break
 		}
 		lastSeen := time.Unix(pbStruct.Peer.LastSeen, 0)
@@ -85,7 +86,6 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		m.pickWorker(conv.UnsafeStringToBytes(pbStruct.InfoHash)).DirectStore(pbStruct.InfoHash, rpc.PeerIDLToCommon(pbStruct.Peer))
 		count++
 	}
-	logger.Infof("load from persist done. %d peers loaded, %d peers expired", count, expired)
 }
 
 func (m *MuxLocalManager) StoreToPersist() {

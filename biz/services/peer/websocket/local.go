@@ -19,7 +19,6 @@ import (
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/bytedance/gopkg/util/gopool"
 	json "github.com/bytedance/sonic"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/xxjwxc/gowp/workpool"
 )
 

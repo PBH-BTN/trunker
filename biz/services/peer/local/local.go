@@ -16,7 +16,6 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/bytedance/gopkg/util/gopool"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 type InfoHashRoot struct {
