@@ -16,7 +16,6 @@ import (
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/bytedance/gopkg/util/gopool"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 type InfoHashRoot struct {
@@ -200,7 +199,6 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 			for _, k := range expiredPeer {
 				root.Delete(k)
 			}
-			hlog.CtxDebugf(ctx, "clear %d expired peers", len(expiredPeer))
 		})
 	}
 	if root.peerMap[root.currentActive].Len() > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent/2 { // reach max, start to eject
@@ -260,14 +258,13 @@ func (m *Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFil
 			for _, k := range expiredPeer {
 				root.Delete(k)
 			}
-			hlog.CtxDebugf(ctx, "clear %d expired peers", len(expiredPeer))
 		})
 	}
 	ret := &model.ScrapeFile{
 		Seeder:     int(seeder.Load()),
 		Complete:   int(complete.Load()),
 		Incomplete: int(incomplete.Load()),
-		Downloaded: int(downloaded.Load()), // 这个目前不实现
+		Downloaded: int(downloaded.Load()),
 	}
 	if config.AppConfig.Cache.Enable {
 		_ = cache.Set(ctx, "scrape_"+infoHash, ret, time.Minute*5)
