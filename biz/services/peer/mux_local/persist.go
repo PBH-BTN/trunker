@@ -21,8 +21,8 @@ import (
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/frugal"
 	"github.com/gofrs/flock"
+	pool "github.com/libp2p/go-buffer-pool"
 	"github.com/xxjwxc/gowp/workpool"
-	"go.uber.org/zap/buffer"
 )
 
 const writeFileThread = 10
@@ -32,7 +32,6 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		logger.Infof("persist not enabled, skip...")
 		return
 	}
-	bufferPool := buffer.NewPool()
 	files, _ := filepath.Glob(config.AppConfig.Tracker.Memory.PersistFile + ".*")
 	count := atomic.Int64{}
 	expired := atomic.Int64{}
@@ -63,12 +62,10 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			}()
 
 			now := time.Now()
-			dataBuf := bufferPool.Get()
-			defer dataBuf.Free()
-			data := dataBuf.Bytes()
-			raminBuffer := bufferPool.Get()
-			defer raminBuffer.Free()
-			raminBuf := raminBuffer.Bytes()
+			data := pool.Get(400)
+			defer pool.Put(data)
+			raminBuf := pool.Get(400)
+			defer pool.Put(raminBuf)
 			var size uint32
 			for {
 				// Decode data length
@@ -125,7 +122,6 @@ func (m *MuxLocalManager) StoreToPersist() {
 	}
 	logger.Infof("start to store peers to persist")
 	count := atomic.Int64{}
-	bufferPool := buffer.NewPool()
 	wp := workpool.New(writeFileThread)
 	for i, manager := range m.localList {
 		fileName := fmt.Sprintf("%s.%d", config.AppConfig.Tracker.Memory.PersistFile, i)
@@ -150,13 +146,12 @@ func (m *MuxLocalManager) StoreToPersist() {
 						InfoHash: infoHash,
 						Peer:     rpc.PeerCommonToIDL(value),
 					}
-					var n int
-					buf := bufferPool.Get()
-					data := buf.Bytes()
-					defer buf.Free()
+					n := frugal.EncodedSize(obj)
+					data := pool.Get(n)
+					defer pool.Put(data)
 					n, err = frugal.EncodeObject(data, nil, obj)
 					if err != nil {
-						logger.Error("failed to marshal to pb:", err.Error())
+						logger.Error("failed to marshal to thrift:", err.Error())
 						return true
 					}
 					// Encode data length

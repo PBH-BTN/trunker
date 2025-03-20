@@ -8,6 +8,7 @@ require (
 	github.com/bits-and-blooms/bloom/v3 v3.7.0
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/sonic v1.13.1
+	github.com/cilium/fake v0.7.0
 	github.com/cloudwego/frugal v0.2.4
 	github.com/cloudwego/gopkg v0.1.4
 	github.com/cloudwego/hertz v0.9.6
@@ -20,6 +21,7 @@ require (
 	github.com/hertz-contrib/websocket v0.2.0
 	github.com/hitoshi44/go-uid64 v0.2.0
 	github.com/lestrrat-go/choose v0.0.0-20220106133416-f26c14db9cd7
+	github.com/libp2p/go-buffer-pool v0.1.0
 	github.com/panjf2000/gnet/v2 v2.7.2
 	github.com/prometheus/client_golang v1.21.1
 	github.com/redis/go-redis/v9 v9.7.1
@@ -28,6 +30,7 @@ require (
 	github.com/thinkeridea/go-extend v1.3.2
 	github.com/wasilibs/go-re2 v1.9.0
 	github.com/xxjwxc/gowp v0.0.0-20240929033016-5be68d222389
+	github.com/zhangyunhao116/fastrand v0.5.0
 	github.com/zhangyunhao116/skipmap v0.10.1
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 	golang.org/x/text v0.23.0
@@ -45,7 +48,6 @@ require (
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/c9s/goprocinfo v0.0.0-20210130143923-c95fcf8c64a8 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cilium/fake v0.7.0 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/cloudwego/configmanager v0.2.2 // indirect
 	github.com/cloudwego/dynamicgo v0.6.1 // indirect
@@ -93,7 +95,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb // indirect
 	github.com/xxjwxc/public v0.0.0-20210518123934-6cc0965f0bc5 // indirect
-	github.com/zhangyunhao116/fastrand v0.5.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
