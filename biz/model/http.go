@@ -62,7 +62,7 @@ type AnnounceBasicResponse struct {
 
 type AnnounceCompactResponse struct {
 	Interval   int64  `json:"interval" bencode:"interval"`
-	Peers      []byte `json:"peers" bencode:"peers,omitempty"`
+	Peers      []byte `json:"peers" bencode:"peers"`
 	Peers6     []byte `json:"peers6" bencode:"peers6,omitempty"`
 	ExternalIp string `json:"externalIp" bencode:"external ip"`
 	TrackerId  string `json:"trackerId" bencode:"tracker id"`

@@ -52,10 +52,8 @@ func (a *AnnounceCompactResponse) Bencode(w io.Writer) error {
 	writeInt(w, a.Incomplete)
 	_, _ = w.Write(conv.UnsafeStringToBytes("8:interval"))
 	writeInt(w, int(a.Interval))
-	if len(a.Peers) > 0 {
-		_, _ = w.Write(conv.UnsafeStringToBytes("5:peers"))
-		writeBytes(w, a.Peers)
-	}
+	_, _ = w.Write(conv.UnsafeStringToBytes("5:peers"))
+	writeBytes(w, a.Peers)
 	if len(a.Peers6) > 0 {
 		_, _ = w.Write(conv.UnsafeStringToBytes("6:peers6"))
 		writeBytes(w, a.Peers6)
