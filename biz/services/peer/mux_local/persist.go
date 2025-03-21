@@ -60,9 +60,8 @@ func (m *MuxLocalManager) LoadFromPersist() {
 				logger.Errorf("open file error:%s", err.Error())
 				return
 			}
-			reader := zstd.NewReader(bufio.NewReader(file))
+			reader := bufio.NewReader(file)
 			defer func() {
-				_ = reader.Close()
 				_ = file.Close()
 			}()
 
@@ -71,6 +70,8 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			defer pool.Put(data)
 			raminBuf := pool.Get(400)
 			defer pool.Put(raminBuf)
+			decompressBuf := pool.Get(400)
+			defer pool.Put(decompressBuf)
 			var size uint32
 			for {
 				// Decode data length
@@ -92,16 +93,21 @@ func (m *MuxLocalManager) LoadFromPersist() {
 						raminBuf = raminBuf[:remain]
 						n, err := reader.Read(raminBuf)
 						if err != nil {
-							logger.Errorf("Failed to read remain data:%s", err.Error())
+							logger.Errorf("Failed to read remain data from %s :%s ", fileName, err.Error())
 							return
 						}
 						remain -= uint32(n)
 						data = append(data[0:readCount], raminBuf...)
 					}
 				}
+				n, err := zstd.DecompressInto(decompressBuf, data)
+				if err != nil {
+					logger.Errorf("Failed to decompress data:%s", err.Error())
+					break
+				}
 
 				pbStruct := trunker.Store{}
-				if _, err = frugal.DecodeObject(data[:size], &pbStruct); err != nil {
+				if _, err = frugal.DecodeObject(decompressBuf[:n], &pbStruct); err != nil {
 					logger.Errorf("Failed to decode peer:%s", err.Error())
 					break
 				}
@@ -150,7 +156,7 @@ func (m *MuxLocalManager) StoreToPersist() {
 				logger.Error("open file error:", err.Error())
 				return err
 			}
-			writer := zstd.NewWriterLevel(bufio.NewWriter(file), 10)
+			writer := bufio.NewWriter(file)
 			manager.RangeMap(func(infoHash string, value *local.InfoHashRoot) bool {
 				value.Range(func(key string, value *common.Peer) bool {
 					obj := trunker.Store{
@@ -165,12 +171,19 @@ func (m *MuxLocalManager) StoreToPersist() {
 						logger.Error("failed to marshal to thrift:", err.Error())
 						return true
 					}
+					compressBuf := pool.Get(zstd.CompressBound(n))
+					defer pool.Put(compressBuf)
+					c, err := zstd.CompressLevel(compressBuf, data[:n], 10)
+					if err != nil {
+						logger.Error("Failed to compress data:", err.Error())
+						return false
+					}
 					// Encode data length
-					if err = binary.Write(writer, binary.LittleEndian, uint32(n)); err != nil {
-						logger.Error("Failed to encode data length:", err.Error())
+					if err = binary.Write(writer, binary.LittleEndian, uint32(len(c))); err != nil {
+						logger.Error("Failed to write data length:", err.Error())
 						return true
 					}
-					if _, err = writer.Write(data[:n]); err != nil {
+					if _, err = writer.Write(c); err != nil {
 						logger.Error("Failed to write data:", err.Error())
 						return false
 					}
@@ -179,8 +192,10 @@ func (m *MuxLocalManager) StoreToPersist() {
 				})
 				return true
 			})
-			_ = writer.Flush()
-			_ = writer.Close()
+			err = writer.Flush()
+			if err != nil {
+				logger.Error("flush writer error:", err.Error())
+			}
 			err = file.Close()
 			if err != nil {
 				logger.Errorf("close file error:%s", err.Error())
