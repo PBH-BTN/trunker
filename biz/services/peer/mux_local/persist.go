@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -36,8 +37,11 @@ func (m *MuxLocalManager) LoadFromPersist() {
 	count := atomic.Int64{}
 	expired := atomic.Int64{}
 	logger.Infof("start to load peers from persist, shard %d", len(files))
+	wg := sync.WaitGroup{}
 	for _, fileName := range files {
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			lock := flock.New(fileName)
 			ok, err := lock.TryRLock()
 			if err != nil {
@@ -46,6 +50,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 			}
 			if !ok {
 				logger.Warnf("file %s is writing, skip", fileName)
+				return
 			}
 			defer func() {
 				_ = lock.Unlock()
@@ -78,7 +83,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 				}
 				data = data[:size]
 				if readCount, err := reader.Read(data); err != nil {
-					logger.Errorf("Failed to decode data length:%s", err.Error())
+					logger.Errorf("Failed to read data:%s", err.Error())
 					return
 				} else if uint32(readCount) != size {
 					// read more
@@ -87,7 +92,7 @@ func (m *MuxLocalManager) LoadFromPersist() {
 						raminBuf = raminBuf[:remain]
 						n, err := reader.Read(raminBuf)
 						if err != nil {
-							logger.Errorf("Failed to read data:%s", err.Error())
+							logger.Errorf("Failed to read remain data:%s", err.Error())
 							return
 						}
 						remain -= uint32(n)
@@ -111,8 +116,14 @@ func (m *MuxLocalManager) LoadFromPersist() {
 		}()
 
 	}
+	wg.Wait()
+	for _, file := range files {
+		err := os.Remove(file)
+		if err != nil {
+			logger.Errorf("remove file error:%s", err.Error())
+		}
+	}
 	logger.Infof("load from persist done. %d peers loaded, %d peers expired", count.Load(), expired.Load())
-
 }
 
 func (m *MuxLocalManager) StoreToPersist() {
