@@ -24,7 +24,7 @@ require (
 	github.com/libp2p/go-buffer-pool v0.1.0
 	github.com/panjf2000/gnet/v2 v2.7.2
 	github.com/prometheus/client_golang v1.21.1
-	github.com/redis/go-redis/v9 v9.7.1
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/shamaton/msgpack/v2 v2.2.2
 	github.com/stretchr/testify v1.10.0
 	github.com/thinkeridea/go-extend v1.3.2
