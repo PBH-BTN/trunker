@@ -1,7 +1,6 @@
 package conv
 
 import (
-	"reflect"
 	"unsafe"
 )
 
@@ -10,17 +9,12 @@ import (
 // YOU HAVE BEEN WARNED.
 func UnsafeBytesToString(b []byte) string {
 	// same as strings.Builder::String()
-	return *(*string)(unsafe.Pointer(&b))
+	return unsafe.String(unsafe.SliceData(b), len(b))
 }
 
 // UnsafeStringToBytes returns the string as a byte slice
 // THIS IS EVIL CODE.
 // YOU HAVE BEEN WARNED.
 func UnsafeStringToBytes(s string) (b []byte) {
-	bh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	bh.Data = sh.Data
-	bh.Len = sh.Len
-	bh.Cap = sh.Len
-	return b
+	return unsafe.Slice(unsafe.StringData(s), len(s))
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
+	"github.com/PBH-BTN/trunker/utils/conv"
 	json "github.com/bytedance/sonic"
 	"github.com/cilium/fake"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +25,7 @@ func TestMuxLocalManager_StoreToPersist(t *testing.T) {
 		t.Fatal(err)
 	}
 	configStr := fmt.Sprintf(`{"tracker": {"memory": {"persistFile": "%s/persist.dat","enablePersist":true},"ttl":600}}`, tempDir)
-	err = json.Unmarshal([]byte(configStr), &config.AppConfig)
+	err = json.Unmarshal(conv.UnsafeStringToBytes(configStr), &config.AppConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +57,7 @@ func TestMuxLocalManager_StoreToPersist(t *testing.T) {
 			if fastrand.Uint64()%3 == 1 {
 				peer.IPv4 = nil
 			}
-			m.pickWorker([]byte(infoHash)).DirectStore(infoHash, peer)
+			m.pickWorker(conv.UnsafeStringToBytes(infoHash)).DirectStore(infoHash, peer)
 		}
 	}
 	// test store to persist
