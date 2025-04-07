@@ -49,9 +49,6 @@ const connectionTimeout = 2 * time.Minute
 
 // cleanConnection clean expire connection
 func (s *UDPServer) cleanConnection() {
-	if s.connectionList.Len() == 0 {
-		return
-	}
 	t := time.Now()
 	count := 0
 	s.connectionList.Range(func(id uint64, conn *connection) bool {
@@ -61,7 +58,7 @@ func (s *UDPServer) cleanConnection() {
 		}
 		return true
 	})
-	hlog.Info("cleaned expired connections:", count)
+	hlog.Info(count, " expired connections cleaned.")
 }
 
 func responseError(c gnet.Conn, tid uint32, err error) {

@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/PBH-BTN/trunker/service/metrics"
+	"github.com/PBH-BTN/trunker/utils/collections/mapx"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hitoshi44/go-uid64"
 	"github.com/panjf2000/gnet/v2"
-	"github.com/zhangyunhao116/skipmap"
 )
 
 type connection struct {
@@ -26,7 +26,7 @@ type UDPServer struct {
 
 	eng            gnet.Engine
 	id             *uid64.Generator
-	connectionList *skipmap.Uint64Map[*connection]
+	connectionList mapx.Map[uint64, *connection]
 }
 
 func (s *UDPServer) OnBoot(eng gnet.Engine) (action gnet.Action) {
@@ -43,7 +43,7 @@ func NewUDPServer() *UDPServer {
 	generator, _ := uid64.NewGenerator(0)
 	s := &UDPServer{
 		id:             generator,
-		connectionList: skipmap.NewUint64[*connection](),
+		connectionList: mapx.NewSyncMap[uint64, *connection](),
 	}
 	return s
 }

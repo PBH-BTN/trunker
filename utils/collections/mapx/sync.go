@@ -8,14 +8,14 @@ import (
 )
 
 // Map a wrapper for sync.Map to support generic
-type Map[V any] struct {
+type Map[K, V any] struct {
 	m      sync.Map
 	length int64
 }
 
-var _ SyncStringMap[int] = &Map[int]{}
+var _ SyncStringMap[int] = &Map[string, int]{}
 
-func (m *Map[V]) Delete(key string) bool {
+func (m *Map[K, V]) Delete(key K) bool {
 	_, ok := m.m.LoadAndDelete(key)
 	if ok {
 		atomic.AddInt64(&m.length, -1)
@@ -23,7 +23,7 @@ func (m *Map[V]) Delete(key string) bool {
 	return ok
 }
 
-func (m *Map[V]) Load(key string) (value V, ok bool) {
+func (m *Map[K, V]) Load(key K) (value V, ok bool) {
 	v, ok := m.m.Load(key)
 	if !ok {
 		return value, ok
@@ -31,7 +31,7 @@ func (m *Map[V]) Load(key string) (value V, ok bool) {
 	return v.(V), ok
 }
 
-func (m *Map[V]) LoadAndDelete(key string) (value V, loaded bool) {
+func (m *Map[K, V]) LoadAndDelete(key K) (value V, loaded bool) {
 	v, loaded := m.m.LoadAndDelete(key)
 	if loaded {
 		atomic.AddInt64(&m.length, -1)
@@ -41,7 +41,7 @@ func (m *Map[V]) LoadAndDelete(key string) (value V, loaded bool) {
 	return empty, loaded
 }
 
-func (m *Map[V]) LoadOrStore(key string, value V) (actual V, loaded bool) {
+func (m *Map[K, V]) LoadOrStore(key K, value V) (actual V, loaded bool) {
 	a, loaded := m.m.LoadOrStore(key, value)
 	if !loaded {
 		atomic.AddInt64(&m.length, 1)
@@ -49,11 +49,11 @@ func (m *Map[V]) LoadOrStore(key string, value V) (actual V, loaded bool) {
 	return a.(V), loaded
 }
 
-func (m *Map[V]) Range(f func(key string, value V) bool) {
-	m.m.Range(func(key, value any) bool { return f(key.(string), value.(V)) })
+func (m *Map[K, V]) Range(f func(key K, value V) bool) {
+	m.m.Range(func(key, value any) bool { return f(key.(K), value.(V)) })
 }
 
-func (m *Map[V]) Store(key string, value V) {
+func (m *Map[K, V]) Store(key K, value V) {
 	_, loaded := m.m.LoadOrStore(key, value)
 	if !loaded {
 		atomic.AddInt64(&m.length, 1)
@@ -62,7 +62,7 @@ func (m *Map[V]) Store(key string, value V) {
 	}
 }
 
-func (m *Map[V]) LoadOrStoreLazy(key string, lazy func() V) (actual V, loaded bool) {
+func (m *Map[K, V]) LoadOrStoreLazy(key K, lazy func() V) (actual V, loaded bool) {
 	v, loaded := m.m.Load(key)
 	if !loaded {
 		v = lazy()
@@ -75,10 +75,10 @@ func (m *Map[V]) LoadOrStoreLazy(key string, lazy func() V) (actual V, loaded bo
 	return v.(V), loaded
 }
 
-func (m *Map[V]) Len() int {
+func (m *Map[K, V]) Len() int {
 	return int(atomic.LoadInt64(&m.length))
 }
 
-func NewSyncMap[V any]() SyncStringMap[V] {
-	return &Map[V]{}
+func NewSyncMap[K, V any]() Map[K, V] {
+	return Map[K, V]{}
 }
