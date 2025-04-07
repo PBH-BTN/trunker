@@ -35,4 +35,5 @@ _testmain.go
 *.local.yml
 dumped_hertz_remote_config.json
 persist.dat
+persist.dat.*
 kitex_gen/
