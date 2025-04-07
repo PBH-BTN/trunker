@@ -19,6 +19,7 @@ The configuration file is in YAML format, you can find the example configuration
 |udpServer| The config of the UDP server| false
 |wsServer| The config of the Websocket server| false
 |trackerId|A string that the client should send back on its next announcements. If absent and a previous announce sent a tracker id, do not discard the old value; keep using it.|`default`
+|debugPort|The debug port for pprof, `0` for disable.| `0`
 |===
 
 == Memory

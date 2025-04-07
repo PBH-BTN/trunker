@@ -35,6 +35,7 @@ tracker:
     enable: true
     shard: 10
   trackerId: default # https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol
+  debugPort: 6060
 rocketmq:
   topic: TrunkerEvent
   endpoint: localhost:8081

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -70,7 +71,11 @@ func initUDPServer() {
 }
 
 func initPprof() {
-	go func() {
-		_ = http.ListenAndServe("localhost:6060", nil)
-	}()
+	if config.AppConfig.Tracker.DebugPort > 0 {
+		go func() {
+			hlog.Info("debug port listening on address=localhost:", config.AppConfig.Tracker.DebugPort)
+			_ = http.ListenAndServe("localhost:"+strconv.Itoa(int(config.AppConfig.Tracker.DebugPort)), nil)
+		}()
+	}
+
 }

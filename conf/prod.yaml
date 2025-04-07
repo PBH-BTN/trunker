@@ -37,6 +37,7 @@ tracker:
     enable: true
     shard: 10
   trackerId: default
+  debugPort: 6060
 rocketmq:
   topic: TrunkerEvent
   endpoint: 127.0.0.1:8081

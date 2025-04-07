@@ -55,6 +55,7 @@ type TrackerConfig struct {
 	EnableEventProducer bool           `yaml:"enableEventProducer" json:"enableEventProducer"`
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
 	TrackerId           string         `yaml:"trackerId" json:"trackerId"`
+	DebugPort           int64          `yaml:"debugPort" json:"debugPort"`
 }
 
 type wsConfig struct {
