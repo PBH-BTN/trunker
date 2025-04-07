@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -30,6 +31,7 @@ func Init() {
 	if config.AppConfig.Tracker.WSServer.Enable {
 		websocket.InitWSMuxLocalManager()
 	}
+	initPprof()
 	metrics.Init()
 	//cache.Init()
 	peer.InitPeerManager()
@@ -65,4 +67,10 @@ func getServerOption() []hertzConfig.Option {
 
 func initUDPServer() {
 	log.Fatal(gnet.Run(udp_server.NewUDPServer(), "udp://"+config.AppConfig.Tracker.UDPServer.HostPorts, gnet.WithMulticore(true), gnet.WithTicker(true), gnet.WithLogger(hlog.DefaultLogger())))
+}
+
+func initPprof() {
+	go func() {
+		_ = http.ListenAndServe("localhost:6060", nil)
+	}()
 }

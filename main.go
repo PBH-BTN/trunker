@@ -9,7 +9,6 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/hertz-contrib/pprof"
 )
 
 func main() {
@@ -18,7 +17,6 @@ func main() {
 	}
 	Init()
 	h := server.Default(getServerOption()...)
-	pprof.Register(h)
 	register(h)
 	h.Use(middleware.LogSlowQuery())
 	h.Use(middleware.AdaptiveLimit())
