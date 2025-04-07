@@ -20,7 +20,7 @@ func main() {
 	h := server.Default(getServerOption()...)
 	pprof.Register(h)
 	register(h)
-	h.Use(middleware.LogSlowQuery)
+	h.Use(middleware.LogSlowQuery())
 	h.Use(middleware.AdaptiveLimit())
 	h.Engine.OnShutdown = append(h.Engine.OnShutdown, func(_ context.Context) {
 		// here save current data
