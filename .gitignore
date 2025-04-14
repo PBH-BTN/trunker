@@ -36,4 +36,6 @@ _testmain.go
 dumped_hertz_remote_config.json
 persist.dat
 persist.dat.*
+banInfoHash.dat
+banPeerId.dat
 kitex_gen/

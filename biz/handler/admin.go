@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/PBH-BTN/trunker/biz/services/peer"
+	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -25,7 +26,7 @@ func HandleBanInfoHash(ctx context.Context, c *app.RequestContext) {
 	}
 	manager := peer.GetPeerManager()
 	for _, infoHash := range req.Hash {
-		err := manager.BanInfoHash(ctx, infoHash)
+		err := manager.BanInfoHash(ctx, conv.UnsafeBytesToString(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(infoHash))))
 		if err != nil {
 			http.ResponseErr(c, err)
 			return
@@ -64,8 +65,8 @@ func HandleBanPeer(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	manager := peer.GetPeerManager()
-	for _, infoHash := range req.PeerId {
-		err := manager.BanPeer(ctx, infoHash)
+	for _, peerId := range req.PeerId {
+		err := manager.BanPeer(ctx, conv.UnsafeBytesToString(conv.TransUTF8To8859_1(conv.UnsafeStringToBytes(peerId))))
 		if err != nil {
 			http.ResponseErr(c, err)
 			return

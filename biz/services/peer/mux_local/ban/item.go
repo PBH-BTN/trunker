@@ -2,12 +2,14 @@ package ban
 
 import (
 	"bufio"
+	"encoding/hex"
 	"io"
 	"os"
 	"sync"
 
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bits-and-blooms/bloom/v3"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
@@ -22,13 +24,28 @@ type banItem struct {
 const defaultFilterCap = 32
 
 func newBanItem(storeName string) (*banItem, error) {
-	store, err := os.CreateTemp("", storeName)
+	store, err := os.OpenFile(storeName, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 	if err != nil {
 		return nil, err
 	}
+	filter := bloom.NewWithEstimates(defaultFilterCap, 0.01)
+	scanner := bufio.NewScanner(store)
+	for scanner.Scan() {
+		raw := scanner.Text()
+		decodeString, err := hex.DecodeString(raw)
+		if err != nil {
+			logger.Error("decode string error: ", err.Error())
+			break
+		}
+		if len(decodeString) == 20 {
+			filter.Add(decodeString)
+		} else {
+			logger.Errorf("decode string length error: %d,raw:%s", len(decodeString), raw)
+		}
+	}
 	return &banItem{
 		m:      sync.RWMutex{},
-		filter: bloom.NewWithEstimates(defaultFilterCap, 0.01),
+		filter: filter,
 		cap:    defaultFilterCap,
 		count:  0,
 		store:  store,
@@ -73,7 +90,7 @@ func (i *banItem) add(target string) error {
 		i.filter.Add(conv.UnsafeStringToBytes(target))
 	}
 	i.count++
-	_, err := i.store.WriteString(target + "\n")
+	_, err := i.store.WriteString(hex.EncodeToString(conv.UnsafeStringToBytes(target)) + "\n")
 	if err != nil {
 		hlog.Errorf("write ban list error: %s", err.Error())
 		return err
@@ -82,14 +99,24 @@ func (i *banItem) add(target string) error {
 }
 
 func (i *banItem) readBan() ([]string, error) {
-	var keys []string
+	keys := make([]string, 0, i.count)
 	_, err := i.store.Seek(0, io.SeekStart)
 	if err != nil {
 		return nil, err
 	}
 	scanner := bufio.NewScanner(i.store)
 	for scanner.Scan() {
-		keys = append(keys, scanner.Text())
+		raw := scanner.Text()
+		decodeString, err := hex.DecodeString(raw)
+		if err != nil {
+			logger.Error("decode string error: ", err.Error())
+			break
+		}
+		if len(decodeString) == 20 {
+			keys = append(keys, string(decodeString))
+		} else {
+			logger.Errorf("decode string length error: %d,raw:%s", len(decodeString), raw)
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
