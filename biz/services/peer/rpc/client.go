@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"time"
 	"unsafe"
 
 	"github.com/PBH-BTN/trunker/biz/model"
@@ -107,6 +108,8 @@ func (m Manager) DeleteInfoHash(ctx context.Context, infoHash string) error {
 func NewManager(target string) *Manager {
 	c := trunkerservice.MustNewClient("pbh.btn.trunker",
 		client.WithHostPorts(target),
+		client.WithRPCTimeout(5*time.Second),
+		client.WithConnectTimeout(3*time.Second),
 		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
 		client.WithTransportProtocol(transport.Framed),
 	)
