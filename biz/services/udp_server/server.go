@@ -48,7 +48,7 @@ func NewUDPServer() *UDPServer {
 	return s
 }
 func (s *UDPServer) OnTraffic(conn gnet.Conn) gnet.Action {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*8)
 	defer cancel()
 	start := time.Now()
 	defer func() {
