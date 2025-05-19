@@ -82,6 +82,10 @@ func (m *MuxLocalManager) LoadFromPersist() {
 					logger.Errorf("Failed to decode data length:%s", err.Error())
 					return
 				}
+				if size == 0 {
+					logger.Error("data length is 0, stop loading from data")
+					break
+				}
 				data = data[:size]
 				if readCount, err := reader.Read(data); err != nil {
 					logger.Errorf("Failed to read data:%s", err.Error())

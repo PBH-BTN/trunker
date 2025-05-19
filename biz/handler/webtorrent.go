@@ -236,8 +236,10 @@ func sendOffer(_ context.Context, target *common.Peer, o *model.Offer, infoHash 
 		"peer_id":   peerId,
 		"offer":     o.Offer,
 	}
-	if err := target.Conn.WriteJSON(offer); err != nil {
-		return err
+	if target.Conn != nil { // this may be nil while closing the connection
+		if err := target.Conn.WriteJSON(offer); err != nil {
+			return err
+		}
 	}
 	return nil
 }
