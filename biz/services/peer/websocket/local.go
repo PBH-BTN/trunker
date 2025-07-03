@@ -17,6 +17,7 @@ import (
 	"github.com/PBH-BTN/trunker/service/cache"
 	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/collections/mapx"
+	"github.com/bytedance/gg/gcond"
 	"github.com/bytedance/gopkg/util/gopool"
 	json "github.com/bytedance/sonic"
 	"github.com/xxjwxc/gowp/workpool"
@@ -44,11 +45,11 @@ func (m *manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 		IPv4:       net.ParseIP(req.IPv4),
 		IPv6:       net.ParseIP(req.IPv6),
 		ClientIP:   req.ClientIP,
-		Uploaded:   utils.If(req.Uploaded >= 0, uint64(req.Uploaded), 0),
-		Left:       utils.If(req.Left >= 0, uint64(req.Uploaded), math.MaxUint64),
+		Uploaded:   gcond.If(req.Uploaded >= 0, uint64(req.Uploaded), 0),
+		Left:       gcond.If(req.Left >= 0, uint64(req.Uploaded), math.MaxUint64),
 		Port:       req.Port,
 		Type:       req.Type,
-		Downloaded: utils.If(req.Downloaded >= 0, uint64(req.Downloaded), 0),
+		Downloaded: gcond.If(req.Downloaded >= 0, uint64(req.Downloaded), 0),
 		Offers:     req.Offers,
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),

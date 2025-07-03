@@ -10,11 +10,11 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/service/metrics"
-	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bencode"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/PBH-BTN/trunker/utils/http"
+	"github.com/bytedance/gg/gslice"
 	"github.com/bytedance/gopkg/lang/fastrand"
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -72,7 +72,7 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	if req.Compact == 0 {
 		bencode.ResponseOk(c, model.AnnounceBasicResponse{
 			Interval: config.AppConfig.Tracker.TTL + int64(fastrand.Intn(201)-100),
-			Peers: utils.Map(res, func(p *common.Peer) *model.Peer {
+			Peers: gslice.Map(res, func(p *common.Peer) *model.Peer {
 				return p.ToModel()
 			}),
 			ExternalIp: conv.UnsafeBytesToString(req.ClientIP),

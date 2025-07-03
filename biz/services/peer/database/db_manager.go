@@ -13,9 +13,10 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/database/data"
 	"github.com/PBH-BTN/trunker/service/database"
-	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/conv"
 	"github.com/bits-and-blooms/bloom/v3"
+	"github.com/bytedance/gg/gcond"
+	"github.com/bytedance/gg/gslice"
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
@@ -51,11 +52,11 @@ func (m *DBManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceR
 		IPv4:       net.ParseIP(req.IPv4),
 		IPv6:       net.ParseIP(req.IPv6),
 		ClientIP:   req.ClientIP,
-		Uploaded:   utils.If(req.Uploaded >= 0, uint64(req.Uploaded), 0),
+		Uploaded:   gcond.If(req.Uploaded >= 0, uint64(req.Uploaded), 0),
 		Type:       req.Type,
-		Left:       utils.If(req.Left >= 0, uint64(req.Left), math.MaxUint64),
+		Left:       gcond.If(req.Left >= 0, uint64(req.Left), math.MaxUint64),
 		Port:       req.Port,
-		Downloaded: utils.If(req.Downloaded >= 0, uint64(req.Downloaded), 0),
+		Downloaded: gcond.If(req.Downloaded >= 0, uint64(req.Downloaded), 0),
 		LastSeen:   time.Now(),
 		Event:      common.ParsePeerEvent(req.Event),
 		Offers:     req.Offers,
@@ -82,7 +83,7 @@ func (m *DBManager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceR
 		hlog.CtxErrorf(ctx, "failed to get peers: %s", err.Error())
 		return nil, err
 	}
-	return utils.Map(peers, DBToCommon), nil
+	return gslice.Map(peers, DBToCommon), nil
 }
 
 func (m *DBManager) Scrape(ctx context.Context, infoHashRaw string) (*model.ScrapeFile, error) {

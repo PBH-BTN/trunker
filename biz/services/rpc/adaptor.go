@@ -4,7 +4,8 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/kitex_gen/pbh/btn/trunker"
-	"github.com/PBH-BTN/trunker/utils"
+	"github.com/bytedance/gg/gcond"
+	"github.com/bytedance/gg/gslice"
 )
 
 func announceRequestIDLToCommon(req *trunker.AnnounceRequest) *model.AnnounceRequest {
@@ -25,11 +26,11 @@ func announceRequestIDLToCommon(req *trunker.AnnounceRequest) *model.AnnounceReq
 			Left:       req.Left,
 			NumWant:    int(req.NumWant),
 			Type:       model.PeerType(req.Type),
-			Compact:    int8(utils.If(req.Compact, 1, 0)),
+			Compact:    int8(gcond.If(req.Compact, 1, 0)),
 			Event:      req.Event.String(),
 		},
 		Source: model.Source(req.Source),
-		Offers: utils.Map(req.Offers, func(o *trunker.Offer) *model.Offer {
+		Offers: gslice.Map(req.Offers, func(o *trunker.Offer) *model.Offer {
 			return &model.Offer{
 				OfferID: o.OfferId,
 				Offer: model.OfferDetail{
@@ -51,7 +52,7 @@ func peerCommonToIDL(p *common.Peer) *trunker.Peer {
 		Ipv6:     p.IPv6,
 		ClientIp: p.ClientIP,
 		LastSeen: p.LastSeen.Unix(),
-		Offers: utils.Map(p.Offers, func(o *model.Offer) *trunker.Offer {
+		Offers: gslice.Map(p.Offers, func(o *model.Offer) *trunker.Offer {
 			return &trunker.Offer{
 				OfferId: o.OfferID,
 				Offer: &trunker.OfferDetail{

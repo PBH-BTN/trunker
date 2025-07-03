@@ -9,7 +9,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/kitex_gen/pbh/btn/trunker"
 	"github.com/PBH-BTN/trunker/kitex_gen/pbh/btn/trunker/trunkerservice"
-	"github.com/PBH-BTN/trunker/utils"
+	"github.com/bytedance/gg/gslice"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
@@ -26,7 +26,7 @@ func (m Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceRequ
 		hlog.CtxErrorf(ctx, "remote call announce error:%s", err.Error())
 		return nil, err
 	}
-	return utils.Map(resp.Peers, PeerIDLToCommon), nil
+	return gslice.Map(resp.Peers, PeerIDLToCommon), nil
 }
 
 func (m Manager) Scrape(ctx context.Context, infoHash string) (*model.ScrapeFile, error) {
@@ -93,7 +93,7 @@ func (m Manager) GetPeers(ctx context.Context, infoHash string) ([]*common.Peer,
 		hlog.CtxErrorf(ctx, "remote call GetPeer error:%s", err.Error())
 		return nil, err
 	}
-	return utils.Map(res.Peers, PeerIDLToCommon), nil
+	return gslice.Map(res.Peers, PeerIDLToCommon), nil
 }
 
 func (m Manager) DeleteInfoHash(ctx context.Context, infoHash string) error {

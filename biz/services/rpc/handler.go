@@ -7,8 +7,8 @@ import (
 	"github.com/PBH-BTN/trunker/biz/services/peer"
 	"github.com/PBH-BTN/trunker/kitex_gen/pbh/btn/trunker"
 	"github.com/PBH-BTN/trunker/service/metrics"
-	"github.com/PBH-BTN/trunker/utils"
 	"github.com/PBH-BTN/trunker/utils/bittorrent"
+	"github.com/bytedance/gg/gslice"
 	"github.com/bytedance/gopkg/util/gopool"
 )
 
@@ -35,7 +35,7 @@ func (s *TrunkerServiceImpl) Announce(ctx context.Context, request *trunker.Anno
 			metrics.LabelClient: bittorrent.ParsePeerID(request.PeerId),
 		})
 	})
-	return &trunker.AnnounceResponse{Peers: utils.Map(resp, peerCommonToIDL)}, nil
+	return &trunker.AnnounceResponse{Peers: gslice.Map(resp, peerCommonToIDL)}, nil
 }
 
 func (s *TrunkerServiceImpl) Scrape(ctx context.Context, request *trunker.ScrapeRequest) (*trunker.ScrapeResponse, error) {
@@ -97,6 +97,6 @@ func (s *TrunkerServiceImpl) GetPeer(ctx context.Context, request *trunker.GetPe
 		return nil, err
 	}
 	return &trunker.GetPeerResponse{
-		Peers: utils.Map(res, peerCommonToIDL),
+		Peers: gslice.Map(res, peerCommonToIDL),
 	}, nil
 }

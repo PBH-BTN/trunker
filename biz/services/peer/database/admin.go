@@ -7,7 +7,7 @@ import (
 
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/database/entity"
-	"github.com/PBH-BTN/trunker/utils"
+	"github.com/bytedance/gg/gslice"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
@@ -54,7 +54,7 @@ func (m *DBManager) GetPeers(ctx context.Context, infoHash string) ([]*common.Pe
 		hlog.CtxErrorf(ctx, "failed to get peers from db: %s", err.Error())
 		return nil, err
 	}
-	return utils.Map(peers, DBToCommon), nil
+	return gslice.Map(peers, DBToCommon), nil
 
 }
 

@@ -6,7 +6,7 @@ import (
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/kitex_gen/pbh/btn/trunker"
-	"github.com/PBH-BTN/trunker/utils"
+	"github.com/bytedance/gg/gslice"
 )
 
 func announceRequestCommonToIDL(req *model.AnnounceRequest) *trunker.AnnounceRequest {
@@ -29,7 +29,7 @@ func announceRequestCommonToIDL(req *model.AnnounceRequest) *trunker.AnnounceReq
 		Compact:    req.Compact == 1,
 		Source:     trunker.Source(req.Source),
 		Event:      trunker.PeerEvent(common.ParsePeerEvent(req.Event)),
-		Offers: utils.Map(req.Offers, func(o *model.Offer) *trunker.Offer {
+		Offers: gslice.Map(req.Offers, func(o *model.Offer) *trunker.Offer {
 			return &trunker.Offer{
 				OfferId: o.OfferID,
 				Offer: &trunker.OfferDetail{
@@ -51,7 +51,7 @@ func PeerIDLToCommon(p *trunker.Peer) *common.Peer {
 		IPv6:     p.Ipv6,
 		ClientIP: p.ClientIp,
 		LastSeen: time.Unix(p.LastSeen, 0),
-		Offers: utils.Map(p.Offers, func(o *trunker.Offer) *model.Offer {
+		Offers: gslice.Map(p.Offers, func(o *trunker.Offer) *model.Offer {
 			return &model.Offer{
 				OfferID: o.OfferId,
 				Offer: model.OfferDetail{
@@ -82,7 +82,7 @@ func PeerCommonToIDL(p *common.Peer) *trunker.Peer {
 		Ipv6:     p.IPv6,
 		ClientIp: p.ClientIP,
 		LastSeen: p.LastSeen.Unix(),
-		Offers: utils.Map(p.Offers, func(o *common.Offer) *trunker.Offer {
+		Offers: gslice.Map(p.Offers, func(o *common.Offer) *trunker.Offer {
 			return &trunker.Offer{
 				OfferId: o.OfferID,
 				Offer: &trunker.OfferDetail{

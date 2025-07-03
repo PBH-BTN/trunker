@@ -6,6 +6,7 @@ require (
 	github.com/DataDog/zstd v1.5.6
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/bits-and-blooms/bloom/v3 v3.7.0
+	github.com/bytedance/gg v1.0.0
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/sonic v1.13.1
 	github.com/cilium/fake v0.7.0
@@ -13,11 +14,11 @@ require (
 	github.com/cloudwego/gopkg v0.1.4
 	github.com/cloudwego/hertz v0.9.6
 	github.com/cloudwego/kitex v0.12.3
+	github.com/cloudwego/netpoll v0.6.5
 	github.com/cristalhq/bencode v0.4.0
 	github.com/gofrs/flock v0.12.1
 	github.com/hertz-contrib/limiter v0.0.0-20221008063035-ad27db7cc386
 	github.com/hertz-contrib/monitor-prometheus v0.1.3
-	github.com/hertz-contrib/pprof v0.1.2
 	github.com/hertz-contrib/websocket v0.2.0
 	github.com/hitoshi44/go-uid64 v0.2.0
 	github.com/lestrrat-go/choose v0.0.0-20220106133416-f26c14db9cd7
@@ -54,14 +55,12 @@ require (
 	github.com/cloudwego/fastpb v0.0.5 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cloudwego/localsession v0.1.2 // indirect
-	github.com/cloudwego/netpoll v0.6.5 // indirect
 	github.com/cloudwego/runtimex v0.1.1 // indirect
 	github.com/cloudwego/thriftgo v0.3.19 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
-	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-sql-driver/mysql v1.9.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
