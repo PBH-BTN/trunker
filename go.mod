@@ -3,18 +3,18 @@ module github.com/PBH-BTN/trunker
 go 1.24
 
 require (
-	github.com/DataDog/zstd v1.5.6
+	github.com/DataDog/zstd v1.5.7
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/bits-and-blooms/bloom/v3 v3.7.0
-	github.com/bytedance/gg v1.0.0
-	github.com/bytedance/gopkg v0.1.1
-	github.com/bytedance/sonic v1.13.1
+	github.com/bytedance/gg v1.1.0
+	github.com/bytedance/gopkg v0.1.2
+	github.com/bytedance/sonic v1.14.0
 	github.com/cilium/fake v0.7.0
-	github.com/cloudwego/frugal v0.2.4
-	github.com/cloudwego/gopkg v0.1.4
-	github.com/cloudwego/hertz v0.9.6
-	github.com/cloudwego/kitex v0.12.3
-	github.com/cloudwego/netpoll v0.6.5
+	github.com/cloudwego/frugal v0.2.6
+	github.com/cloudwego/gopkg v0.1.5
+	github.com/cloudwego/hertz v0.10.1
+	github.com/cloudwego/kitex v0.14.1
+	github.com/cloudwego/netpoll v0.7.1
 	github.com/cristalhq/bencode v0.4.0
 	github.com/gofrs/flock v0.12.1
 	github.com/hertz-contrib/limiter v0.0.0-20221008063035-ad27db7cc386
@@ -23,22 +23,22 @@ require (
 	github.com/hitoshi44/go-uid64 v0.2.0
 	github.com/lestrrat-go/choose v0.0.0-20220106133416-f26c14db9cd7
 	github.com/libp2p/go-buffer-pool v0.1.0
-	github.com/panjf2000/gnet/v2 v2.7.2
-	github.com/prometheus/client_golang v1.21.1
-	github.com/redis/go-redis/v9 v9.7.3
-	github.com/shamaton/msgpack/v2 v2.2.2
+	github.com/panjf2000/gnet/v2 v2.9.1
+	github.com/prometheus/client_golang v1.22.0
+	github.com/redis/go-redis/v9 v9.11.0
+	github.com/shamaton/msgpack/v2 v2.2.3
 	github.com/stretchr/testify v1.10.0
 	github.com/thinkeridea/go-extend v1.3.2
-	github.com/wasilibs/go-re2 v1.9.0
+	github.com/wasilibs/go-re2 v1.10.0
 	github.com/xxjwxc/gowp v0.0.0-20240929033016-5be68d222389
 	github.com/zhangyunhao116/fastrand v0.5.0
 	github.com/zhangyunhao116/skipmap v0.10.1
-	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
-	golang.org/x/text v0.23.0
+	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
+	golang.org/x/text v0.27.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/datatypes v1.2.5
-	gorm.io/driver/mysql v1.5.7
-	gorm.io/gorm v1.25.12
+	gorm.io/datatypes v1.2.6
+	gorm.io/driver/mysql v1.6.0
+	gorm.io/gorm v1.30.1
 )
 
 require (
@@ -46,26 +46,26 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
-	github.com/bytedance/sonic/loader v0.2.4 // indirect
+	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/c9s/goprocinfo v0.0.0-20210130143923-c95fcf8c64a8 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
-	github.com/cloudwego/configmanager v0.2.2 // indirect
-	github.com/cloudwego/dynamicgo v0.6.1 // indirect
+	github.com/cloudwego/configmanager v0.2.3 // indirect
+	github.com/cloudwego/dynamicgo v0.6.4 // indirect
 	github.com/cloudwego/fastpb v0.0.5 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cloudwego/localsession v0.1.2 // indirect
 	github.com/cloudwego/runtimex v0.1.1 // indirect
-	github.com/cloudwego/thriftgo v0.3.19 // indirect
+	github.com/cloudwego/thriftgo v0.4.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
-	github.com/fsnotify/fsnotify v1.8.0 // indirect
-	github.com/go-sql-driver/mysql v1.9.0 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/go-sql-driver/mysql v1.9.3 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/google/pprof v0.0.0-20250302191652-9094ed2288e7 // indirect
+	github.com/google/pprof v0.0.0-20250630185457-6e76a2b096b5 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jhump/protoreflect v1.17.0 // indirect
@@ -73,18 +73,18 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
+	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/nyaruka/phonenumbers v1.5.0 // indirect
-	github.com/panjf2000/ants/v2 v2.11.2 // indirect
+	github.com/nyaruka/phonenumbers v1.6.4 // indirect
+	github.com/panjf2000/ants/v2 v2.11.3 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.62.0 // indirect
-	github.com/prometheus/procfs v0.15.1 // indirect
+	github.com/prometheus/client_model v0.6.2 // indirect
+	github.com/prometheus/common v0.65.0 // indirect
+	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
@@ -97,13 +97,13 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/arch v0.15.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250311190419-81fb87f6b8bf // indirect
-	google.golang.org/grpc v1.70.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	golang.org/x/arch v0.19.0 // indirect
+	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074 // indirect
+	google.golang.org/grpc v1.74.2 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	stathat.com/c/consistent v1.0.0 // indirect
