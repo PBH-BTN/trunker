@@ -24,15 +24,15 @@ require (
 	github.com/lestrrat-go/choose v0.0.0-20220106133416-f26c14db9cd7
 	github.com/libp2p/go-buffer-pool v0.1.0
 	github.com/panjf2000/gnet/v2 v2.9.3
-	github.com/prometheus/client_golang v1.22.0
-	github.com/redis/go-redis/v9 v9.11.0
-	github.com/shamaton/msgpack/v2 v2.2.3
+	github.com/prometheus/client_golang v1.23.0
+	github.com/redis/go-redis/v9 v9.12.1
+	github.com/shamaton/msgpack/v2 v2.3.0
 	github.com/stretchr/testify v1.10.0
 	github.com/thinkeridea/go-extend v1.3.2
 	github.com/wasilibs/go-re2 v1.10.0
 	github.com/xxjwxc/gowp v0.0.0-20240929033016-5be68d222389
 	github.com/zhangyunhao116/fastrand v0.5.0
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
+	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50
 	golang.org/x/text v0.28.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/datatypes v1.2.6
@@ -43,12 +43,12 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bits-and-blooms/bitset v1.22.0 // indirect
+	github.com/bits-and-blooms/bitset v1.24.0 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/c9s/goprocinfo v0.0.0-20210130143923-c95fcf8c64a8 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cloudwego/base64x v0.1.5 // indirect
+	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/cloudwego/configmanager v0.2.3 // indirect
 	github.com/cloudwego/dynamicgo v0.6.4 // indirect
 	github.com/cloudwego/fastpb v0.0.5 // indirect
@@ -95,13 +95,13 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/arch v0.19.0 // indirect
-	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/arch v0.20.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b // indirect
 	google.golang.org/grpc v1.74.2 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
+	google.golang.org/protobuf v1.36.7 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	stathat.com/c/consistent v1.0.0 // indirect
