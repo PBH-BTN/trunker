@@ -1,18 +1,18 @@
 module github.com/PBH-BTN/trunker
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/DataDog/zstd v1.5.7
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/bits-and-blooms/bloom/v3 v3.7.0
 	github.com/bytedance/gg v1.1.0
-	github.com/bytedance/gopkg v0.1.2
+	github.com/bytedance/gopkg v0.1.3
 	github.com/bytedance/sonic v1.14.0
 	github.com/cilium/fake v0.7.0
 	github.com/cloudwego/frugal v0.2.6
 	github.com/cloudwego/gopkg v0.1.5
-	github.com/cloudwego/hertz v0.10.1
+	github.com/cloudwego/hertz v0.10.2
 	github.com/cloudwego/kitex v0.14.1
 	github.com/cloudwego/netpoll v0.7.1
 	github.com/cristalhq/bencode v0.4.0
@@ -27,12 +27,12 @@ require (
 	github.com/prometheus/client_golang v1.23.0
 	github.com/redis/go-redis/v9 v9.12.1
 	github.com/shamaton/msgpack/v2 v2.3.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	github.com/thinkeridea/go-extend v1.3.2
 	github.com/wasilibs/go-re2 v1.10.0
 	github.com/xxjwxc/gowp v0.0.0-20240929033016-5be68d222389
 	github.com/zhangyunhao116/fastrand v0.5.0
-	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50
+	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
 	golang.org/x/text v0.28.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/datatypes v1.2.6
@@ -50,7 +50,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/cloudwego/configmanager v0.2.3 // indirect
-	github.com/cloudwego/dynamicgo v0.6.4 // indirect
+	github.com/cloudwego/dynamicgo v0.7.0 // indirect
 	github.com/cloudwego/fastpb v0.0.5 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cloudwego/localsession v0.1.2 // indirect
@@ -64,7 +64,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.3 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/google/pprof v0.0.0-20250630185457-6e76a2b096b5 // indirect
+	github.com/google/pprof v0.0.0-20250820193118-f64d9cf942d6 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jhump/protoreflect v1.17.0 // indirect
@@ -75,7 +75,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/nyaruka/phonenumbers v1.6.4 // indirect
+	github.com/nyaruka/phonenumbers v1.6.5 // indirect
 	github.com/panjf2000/ants/v2 v2.11.3 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -99,9 +99,9 @@ require (
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1 // indirect
 	google.golang.org/grpc v1.74.2 // indirect
-	google.golang.org/protobuf v1.36.7 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	stathat.com/c/consistent v1.0.0 // indirect
