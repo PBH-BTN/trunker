@@ -1,4 +1,6 @@
 name: Docker Image CI
+permissions:
+  contents: write
 
 on:
   push:
