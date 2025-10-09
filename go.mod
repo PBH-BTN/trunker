@@ -27,7 +27,7 @@ require (
 	github.com/prometheus/client_golang v1.23.0
 	github.com/redis/go-redis/v9 v9.12.1
 	github.com/shamaton/msgpack/v2 v2.3.0
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	github.com/thinkeridea/go-extend v1.3.2
 	github.com/wasilibs/go-re2 v1.10.0
 	github.com/xxjwxc/gowp v0.0.0-20240929033016-5be68d222389
