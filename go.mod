@@ -14,7 +14,7 @@ require (
 	github.com/cloudwego/gopkg v0.1.5
 	github.com/cloudwego/hertz v0.10.2
 	github.com/cloudwego/kitex v0.14.1
-	github.com/cloudwego/netpoll v0.7.1
+	github.com/cloudwego/netpoll v0.7.2
 	github.com/cristalhq/bencode v0.4.0
 	github.com/gofrs/flock v0.12.1
 	github.com/hertz-contrib/limiter v0.0.0-20221008063035-ad27db7cc386
