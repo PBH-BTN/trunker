@@ -11,7 +11,7 @@ require (
 	github.com/bytedance/sonic v1.14.0
 	github.com/cilium/fake v0.7.0
 	github.com/cloudwego/frugal v0.2.6
-	github.com/cloudwego/gopkg v0.1.5
+	github.com/cloudwego/gopkg v0.1.6
 	github.com/cloudwego/hertz v0.10.2
 	github.com/cloudwego/kitex v0.14.1
 	github.com/cloudwego/netpoll v0.7.1
