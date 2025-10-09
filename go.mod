@@ -8,7 +8,7 @@ require (
 	github.com/bits-and-blooms/bloom/v3 v3.7.0
 	github.com/bytedance/gg v1.1.0
 	github.com/bytedance/gopkg v0.1.3
-	github.com/bytedance/sonic v1.14.0
+	github.com/bytedance/sonic v1.14.1
 	github.com/cilium/fake v0.7.0
 	github.com/cloudwego/frugal v0.2.6
 	github.com/cloudwego/gopkg v0.1.5
