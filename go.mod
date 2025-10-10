@@ -16,7 +16,7 @@ require (
 	github.com/cloudwego/kitex v0.15.1
 	github.com/cloudwego/netpoll v0.7.2
 	github.com/cristalhq/bencode v0.4.0
-	github.com/gofrs/flock v0.12.1
+	github.com/gofrs/flock v0.13.0
 	github.com/hertz-contrib/limiter v0.0.0-20221008063035-ad27db7cc386
 	github.com/hertz-contrib/monitor-prometheus v0.1.3
 	github.com/hertz-contrib/websocket v0.2.0
