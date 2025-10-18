@@ -13,7 +13,7 @@ require (
 	github.com/cloudwego/frugal v0.3.0
 	github.com/cloudwego/gopkg v0.1.6
 	github.com/cloudwego/hertz v0.10.2
-	github.com/cloudwego/kitex v0.15.1
+	github.com/cloudwego/kitex v0.15.2
 	github.com/cloudwego/netpoll v0.7.2
 	github.com/cristalhq/bencode v0.4.0
 	github.com/gofrs/flock v0.12.1
