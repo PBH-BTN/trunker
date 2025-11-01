@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/DataDog/zstd v1.5.7
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
-	github.com/bits-and-blooms/bloom/v3 v3.7.0
+	github.com/bits-and-blooms/bloom/v3 v3.7.1
 	github.com/bytedance/gg v1.1.0
 	github.com/bytedance/gopkg v0.1.3
 	github.com/bytedance/sonic v1.14.1
