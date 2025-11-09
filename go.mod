@@ -23,7 +23,7 @@ require (
 	github.com/hitoshi44/go-uid64 v0.2.0
 	github.com/lestrrat-go/choose v0.0.0-20220106133416-f26c14db9cd7
 	github.com/libp2p/go-buffer-pool v0.1.0
-	github.com/panjf2000/gnet/v2 v2.9.4
+	github.com/panjf2000/gnet/v2 v2.9.5
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/v9 v9.14.0
 	github.com/shamaton/msgpack/v2 v2.3.1
