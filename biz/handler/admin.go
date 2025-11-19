@@ -109,3 +109,85 @@ func DeleteInfoHash(ctx context.Context, c *app.RequestContext) {
 	}
 	http.ResponseOK(c, nil)
 }
+
+// IP Ban Management
+
+type banIPRequest struct {
+	IPs []string `json:"ips"`
+}
+
+func HandleBanIP(ctx context.Context, c *app.RequestContext) {
+	req := &banIPRequest{}
+	if c.Bind(req) != nil {
+		http.ResponseBadRequest(c)
+		return
+	}
+	if len(req.IPs) == 0 {
+		http.ResponseBadRequest(c)
+		return
+	}
+	manager := peer.GetPeerManager()
+	for _, ip := range req.IPs {
+		err := manager.BanIP(ctx, ip)
+		if err != nil {
+			http.ResponseErr(c, err)
+			return
+		}
+	}
+	http.ResponseOK(c, fmt.Sprintf("%d IP(s) banned", len(req.IPs)))
+}
+
+func HandleUnbanIP(ctx context.Context, c *app.RequestContext) {
+	req := &banIPRequest{}
+	if c.Bind(req) != nil {
+		http.ResponseBadRequest(c)
+		return
+	}
+	if len(req.IPs) == 0 {
+		http.ResponseBadRequest(c)
+		return
+	}
+	manager := peer.GetPeerManager()
+	for _, ip := range req.IPs {
+		err := manager.UnbanIP(ctx, ip)
+		if err != nil {
+			http.ResponseErr(c, err)
+			return
+		}
+	}
+	http.ResponseOK(c, fmt.Sprintf("%d IP(s) unbanned", len(req.IPs)))
+}
+
+func HandleClearBanIP(_ context.Context, c *app.RequestContext) {
+	manager := peer.GetPeerManager()
+	err := manager.ClearBanIP()
+	if err != nil {
+		http.ResponseErr(c, err)
+		return
+	}
+	http.ResponseOK(c, "all IP bans cleared")
+}
+
+type ipFilterStatsResponse struct {
+	TotalIPs       uint64 `json:"total_ips"`
+	PacketsDropped uint64 `json:"packets_dropped"`
+	PacketsAllowed uint64 `json:"packets_allowed"`
+	IsXDP          bool   `json:"is_xdp"`
+	InterfaceName  string `json:"interface_name,omitempty"`
+}
+
+func HandleGetIPFilterStats(_ context.Context, c *app.RequestContext) {
+	manager := peer.GetPeerManager()
+	stats := manager.GetIPFilterStats()
+	if stats == nil {
+		http.ResponseErr(c, fmt.Errorf("IP filter not available"))
+		return
+	}
+	http.ResponseOK(c, &ipFilterStatsResponse{
+		TotalIPs:       stats.TotalIPs,
+		PacketsDropped: stats.PacketsDropped,
+		PacketsAllowed: stats.PacketsAllowed,
+		IsXDP:          stats.IsXDP,
+		InterfaceName:  stats.InterfaceName,
+	})
+}

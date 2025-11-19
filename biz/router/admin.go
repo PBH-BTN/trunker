@@ -14,6 +14,13 @@ func RegisterAdminRouter(r route.IRouter) {
 	g.PUT("/ban/peer", handler.HandleBanPeer)
 	g.DELETE("/ban/info_hash", handler.HandleClearBanInfoHash)
 	g.DELETE("/ban/peer", handler.HandleClearBanPeer)
+
+	// IP ban management
+	g.PUT("/ban/ip", handler.HandleBanIP)
+	g.DELETE("/ban/ip", handler.HandleUnbanIP)
+	g.DELETE("/clear/ip/ban", handler.HandleClearBanIP)
+	g.GET("/ip/filter/stats", handler.HandleGetIPFilterStats)
+
 	g.GET("/info_hash/:infoHash/peers", handler.GetInfoHashPeers)
 	g.DELETE("/info_hash/:infoHash", handler.DeleteInfoHash)
 }

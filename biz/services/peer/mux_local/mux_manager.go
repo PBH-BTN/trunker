@@ -9,6 +9,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/PBH-BTN/trunker/biz/config"
 	"github.com/PBH-BTN/trunker/biz/model"
 	"github.com/PBH-BTN/trunker/biz/services/peer/common"
 	"github.com/PBH-BTN/trunker/biz/services/peer/local"
@@ -29,9 +30,19 @@ func NewMuxLocalManager(num int) *MuxLocalManager {
 	for i := 0; i < num; i++ {
 		list = append(list, local.NewLocalManger())
 	}
+
+	// Initialize ban manager with XDP support if configured
+	var banManager *ban.Manager
+	if config.AppConfig.Tracker.XDP.Enable && config.AppConfig.Tracker.XDP.Interface != "" {
+		hlog.Infof("Initializing ban manager with XDP on interface: %s", config.AppConfig.Tracker.XDP.Interface)
+		banManager = ban.NewBanManagerWithIP(config.AppConfig.Tracker.XDP.Interface)
+	} else {
+		banManager = ban.NewBanManager()
+	}
+
 	return &MuxLocalManager{
 		localList: list,
-		ban:       ban.NewBanManager(),
+		ban:       banManager,
 	}
 }
 
@@ -129,4 +140,32 @@ func (m *MuxLocalManager) GetPeers(ctx context.Context, infoHash string) ([]*com
 func (m *MuxLocalManager) DeleteInfoHash(ctx context.Context, infoHash string) error {
 	worker := m.pickWorker(conv.UnsafeStringToBytes(infoHash))
 	return worker.DeleteInfoHash(ctx, infoHash)
+}
+
+// IP Ban Management
+
+func (m *MuxLocalManager) BanIP(_ context.Context, ip string) error {
+	return m.ban.AddIPBan(ip)
+}
+
+func (m *MuxLocalManager) UnbanIP(_ context.Context, ip string) error {
+	return m.ban.RemoveIPBan(ip)
+}
+
+func (m *MuxLocalManager) ClearBanIP() error {
+	return m.ban.ClearIPBans()
+}
+
+func (m *MuxLocalManager) GetIPFilterStats() *common.IPFilterStats {
+	stats := m.ban.GetIPFilterStats()
+	if stats == nil {
+		return nil
+	}
+	return &common.IPFilterStats{
+		TotalIPs:       stats.TotalIPs,
+		PacketsDropped: stats.PacketsDropped,
+		PacketsAllowed: stats.PacketsAllowed,
+		IsXDP:          stats.IsXDP,
+		InterfaceName:  stats.InterfaceName,
+	}
 }

@@ -24,6 +24,11 @@ tracker:
     port: 3306
     user: root
     pass: root
+  xdp:
+    # XDP IP filtering (Linux only, requires root or CAP_NET_ADMIN)
+    # On macOS/Windows, this will be automatically ignored with application-level fallback
+    enable: false  # Set to true to enable XDP filtering
+    interface: ""  # Network interface name (e.g., "eth0", "ens33"). Run "ip link show" to find yours
   useUnixSocket: false
   hostPorts: 0.0.0.0:8888
   useAnnounceIP: true

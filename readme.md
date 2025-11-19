@@ -26,7 +26,7 @@ cd output
 ```
 or
 ```
-docker run -d --name trunker -e ADMIN_KEY=aabbcc -p 8888:8888 gaojianli2333/trunker:latest
+docker run -d --name trunker -e ADMIN_KEY=aabbcc --cap-add=NET_ADMIN --network=host -p 8888:8888 gaojianli2333/trunker:latest
 ```
 ## Features
 
@@ -45,6 +45,7 @@ docker run -d --name trunker -e ADMIN_KEY=aabbcc -p 8888:8888 gaojianli2333/trun
 - [x] Websocket support
 - [x] Prometheus based [metrics](./docs/metrics.adoc)
 - [x] RPC mode to support cluster. Powered by [Kitex](https://github.com/cloudwego/kitex)
+- [x] eBPF-based blacklist
 
 ## Wiki
 Trunker provides much config and observability capabilities, if you want to run trunker in production, please see the [Wiki](./docs/toc.adoc).

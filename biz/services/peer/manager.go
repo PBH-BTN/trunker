@@ -31,6 +31,12 @@ type PeerManager interface {
 	ClearBanPeer()
 	GetPeers(ctx context.Context, infoHash string) ([]*common.Peer, error)
 	DeleteInfoHash(ctx context.Context, infoHash string) error
+
+	// IP ban management
+	BanIP(ctx context.Context, ip string) error
+	UnbanIP(ctx context.Context, ip string) error
+	ClearBanIP() error
+	GetIPFilterStats() *common.IPFilterStats
 }
 
 var manager PeerManager
