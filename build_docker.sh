@@ -9,9 +9,12 @@ if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
   export CXX=aarch64-linux-gnu-g++
   export AR=aarch64-linux-gnu-ar
   export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
+  # Generate eBPF code (will be no-op on non-Linux platforms due to build tags)
 else
   apt-get update
   apt-get install -y build-essential libre2-dev clang llvm linux-headers-generic libbpf-dev
   export GOAMD64=v4
 fi
+cd biz/services/peer/mux_local/ban/xdp && go generate || true
+cd ../../../../../../
 ./build.sh $VERSION $COMMIT_SHA

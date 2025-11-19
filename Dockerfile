@@ -9,9 +9,6 @@ COPY . .
 # Install bpf2go for generating eBPF code
 RUN go install github.com/cilium/ebpf/cmd/bpf2go@latest
 
-# Generate eBPF code (will be no-op on non-Linux platforms due to build tags)
-RUN cd biz/services/peer/mux_local/ban/xdp && go generate || true
-
 # Build the application
 RUN bash build_docker.sh
 
