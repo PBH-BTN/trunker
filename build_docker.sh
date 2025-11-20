@@ -8,10 +8,10 @@ if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
   export CC=aarch64-linux-gnu-gcc
   export CXX=aarch64-linux-gnu-g++
   export AR=aarch64-linux-gnu-ar
+  export AS=aarch64-linux-gnu-as
   export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
   ln -s /usr/include/aarch64-linux-gnu/asm /usr/include/asm
   go generate biz/services/peer/mux_local/ban/xdp/filter.go
-  # Generate eBPF code (will be no-op on non-Linux platforms due to build tags)
 else
   apt-get update
   apt-get install -y build-essential libre2-dev clang llvm libbpf-dev

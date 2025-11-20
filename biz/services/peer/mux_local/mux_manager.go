@@ -86,6 +86,13 @@ func (m *MuxLocalManager) HandleAnnouncePeer(ctx context.Context, req *model.Ann
 		return nil, errors.New("banned peer_id")
 	}
 
+	// Check IP ban (application layer filtering)
+	// This ensures IP filtering works even when XDP is unavailable or falls back
+	if req.ClientIP != nil && m.ban.TestIPAddr(req.ClientIP) {
+		hlog.CtxInfof(ctx, "client IP %s is banned", req.ClientIP.String())
+		return nil, errors.New("banned ip")
+	}
+
 	worker := m.pickWorker(conv.UnsafeStringToBytes(req.InfoHash))
 	return worker.HandleAnnouncePeer(ctx, req)
 }
