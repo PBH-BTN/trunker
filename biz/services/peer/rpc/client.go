@@ -105,6 +105,25 @@ func (m Manager) DeleteInfoHash(ctx context.Context, infoHash string) error {
 	return nil
 }
 
+// IP Ban Management (not supported in RPC mode)
+// RPC mode delegates to remote server, IP banning should be configured on the remote server
+
+func (m Manager) BanIP(_ context.Context, _ string) error {
+	return common.ErrNotSupportedInRPCMode
+}
+
+func (m Manager) UnbanIP(_ context.Context, _ string) error {
+	return common.ErrNotSupportedInRPCMode
+}
+
+func (m Manager) ClearBanIP() error {
+	return common.ErrNotSupportedInRPCMode
+}
+
+func (m Manager) GetIPFilterStats() *common.IPFilterStats {
+	return nil
+}
+
 func NewManager(target string) *Manager {
 	c := trunkerservice.MustNewClient("pbh.btn.trunker",
 		client.WithHostPorts(target),

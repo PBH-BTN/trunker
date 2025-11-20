@@ -46,6 +46,7 @@ type TrackerConfig struct {
 	WSServer            wsConfig       `yaml:"wsServer" json:"wsServer"`
 	Mode                runningMode    `yaml:"mode" json:"mode"`
 	RPC                 rpcConfig      `yaml:"rpc" json:"rpc"`
+	XDP                 xdpConfig      `yaml:"xdp" json:"xdp"`
 	HostPorts           string         `yaml:"hostPorts" json:"hostPorts"`
 	MetricsHostPorts    string         `yaml:"metricsHostPorts" json:"metricsHostPorts"`
 	TTL                 int64          `yaml:"ttl" json:"ttl"`
@@ -79,6 +80,14 @@ type memoryConfig struct {
 	MaxPeersPerTorrent int    `yaml:"maxPeersPerTorrent" json:"maxPeersPerTorrent"`
 	Shard              int    `yaml:"shard" json:"shard"`
 	EnablePersist      bool   `yaml:"enablePersist" json:"enablePersist"`
+}
+
+type xdpConfig struct {
+	// Enable XDP-based IP filtering (Linux only)
+	Enable bool `yaml:"enable" json:"enable"`
+	// Interface is the network interface name to attach XDP program (e.g., "eth0", "ens33")
+	// If empty, XDP will be disabled even if Enable is true
+	Interface string `yaml:"interface" json:"interface"`
 }
 
 type Config struct {

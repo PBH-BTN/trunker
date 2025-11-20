@@ -23,5 +23,8 @@ jobs:
             ${{ runner.os }}-go-
       - run: |
           make install_tool && make update_idl
+          sudo apt-get update && sudo apt-get install -y clang llvm libbpf-dev
+          sudo ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/asm
+          go generate biz/services/peer/mux_local/ban/xdp/filter.go
           go test ./...
 

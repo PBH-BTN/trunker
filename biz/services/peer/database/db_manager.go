@@ -140,6 +140,25 @@ func (m *DBManager) GetStatistic(ctx context.Context) (*common.StatisticInfo, er
 
 }
 
+// IP Ban Management (not supported in database mode)
+// Database mode focuses on persistent storage, XDP is only available in memory mode
+
+func (m *DBManager) BanIP(_ context.Context, _ string) error {
+	return errors.New("IP banning is not supported in database mode, use memory mode with XDP config")
+}
+
+func (m *DBManager) UnbanIP(_ context.Context, _ string) error {
+	return errors.New("IP unbanning is not supported in database mode, use memory mode with XDP config")
+}
+
+func (m *DBManager) ClearBanIP() error {
+	return errors.New("IP ban clearing is not supported in database mode, use memory mode with XDP config")
+}
+
+func (m *DBManager) GetIPFilterStats() *common.IPFilterStats {
+	return nil
+}
+
 func NewDBManager() *DBManager {
 	hlog.Info("running as database mode")
 	db := database.InitDB()

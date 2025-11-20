@@ -12,6 +12,11 @@ tracker:
     persistFile: persist.dat
     maxPeersPerTorrent: 1500
     shard: 40
+  xdp:
+    # XDP IP filtering (Linux only, requires root or CAP_NET_ADMIN)
+    # On macOS/Windows, this will be automatically ignored with application-level fallback
+    enable: false  # Set to true to enable XDP filtering
+    interface: ""  # Network interface name (e.g., "eth0", "ens33"). Run "ip link show" to find yours
   rpc:
     enableServer: false
     hostPorts: 0.0.0.0:6789
