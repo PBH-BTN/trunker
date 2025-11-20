@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 apt-get update
-apt-get install clang llvm libbpf-dev
+apt-get install -y clang llvm libbpf-dev
 ln -s /usr/include/aarch64-linux-gnu/asm /usr/include/asm
 go generate biz/services/peer/mux_local/ban/xdp/filter.go
 echo "eBPF generated"
