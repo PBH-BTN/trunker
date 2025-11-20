@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+apt-get update
 apt-get install clang llvm libbpf-dev
 ln -s /usr/include/aarch64-linux-gnu/asm /usr/include/asm
 go generate biz/services/peer/mux_local/ban/xdp/filter.go
@@ -15,7 +16,6 @@ if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
   export AR=aarch64-linux-gnu-ar
   export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
 else
-  apt-get update
   apt-get install -y build-essential libre2-dev
   export GOAMD64=v4
 fi
