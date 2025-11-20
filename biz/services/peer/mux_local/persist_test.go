@@ -19,7 +19,6 @@ import (
 )
 
 func TestMuxLocalManager_StoreToPersist(t *testing.T) {
-	m := NewMuxLocalManager(10)
 	tempDir, err := os.MkdirTemp("", "persist_test")
 	if err != nil {
 		t.Fatal(err)
@@ -29,6 +28,7 @@ func TestMuxLocalManager_StoreToPersist(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	m := NewMuxLocalManager(10)
 	// generate 100000 peers
 	now := time.Now()
 	for i := 0; i < 100; i++ {
