@@ -134,7 +134,9 @@ func (m *Manager) HandleAnnouncePeer(ctx context.Context, req *model.AnnounceReq
 	}
 	if !ok { // first seen torrent
 		if common.IsPeerConnectable(peer) {
-			root.LoadOrStore(peer.GetKey(), peer)
+			if peer.Event != common.PeerEvent_Stopped {
+				root.LoadOrStore(peer.GetKey(), peer)
+			}
 		}
 		go producer.SendPeerEvent(ctx, req.InfoHash, peer)
 		return nil, nil
