@@ -52,6 +52,8 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 		req.ClientIP = v4
 	}
 	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
+	// workaround for memory issue
+	req.UserAgent = ""
 	if req.NumWant > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent {
 		req.NumWant = config.AppConfig.Tracker.Memory.MaxPeersPerTorrent
 	}
