@@ -57,6 +57,7 @@ type TrackerConfig struct {
 	EnableMetrics       bool           `yaml:"enableMetrics" json:"enableMetrics"`
 	TrackerId           string         `yaml:"trackerId" json:"trackerId"`
 	DebugPort           int64          `yaml:"debugPort" json:"debugPort"`
+	RecordUserAgent     bool           `yaml:"recordUserAgent" json:"recordUserAgent"`
 }
 
 type wsConfig struct {

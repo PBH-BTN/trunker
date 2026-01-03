@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"github.com/thinkeridea/go-extend/exstrings"
 	"strings"
 
 	"github.com/PBH-BTN/trunker/biz/config"
@@ -19,7 +20,6 @@ import (
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/thinkeridea/go-extend/exstrings"
 )
 
 func Announce(ctx context.Context, c *app.RequestContext) {
@@ -51,7 +51,11 @@ func Announce(ctx context.Context, c *app.RequestContext) {
 	if v4 := req.ClientIP.To4(); v4 != nil {
 		req.ClientIP = v4
 	}
-	// workaround for memory issue
+	if config.AppConfig.Tracker.RecordUserAgent {
+		req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
+	} else {
+		req.UserAgent = ""
+	}
 	req.UserAgent = ""
 	if req.NumWant > config.AppConfig.Tracker.Memory.MaxPeersPerTorrent {
 		req.NumWant = config.AppConfig.Tracker.Memory.MaxPeersPerTorrent

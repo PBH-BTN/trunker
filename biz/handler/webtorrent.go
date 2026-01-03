@@ -140,7 +140,11 @@ func handleWSAnnounce(ctx context.Context, msg []byte, c *app.RequestContext, co
 		})
 	})
 	req.ClientIP = http.GetClientIP(ctx, c)
-	req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
+	if config.AppConfig.Tracker.RecordUserAgent {
+		req.UserAgent = exstrings.SubString(string(c.UserAgent()), 0, 256)
+	} else {
+		req.UserAgent = ""
+	}
 	if req.NumWant == 0 || req.NumWant > 500 {
 		req.NumWant = 50
 	}
