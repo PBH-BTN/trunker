@@ -142,6 +142,12 @@ func (m *MuxLocalManager) StoreToPersist() {
 		return
 	}
 	logger.Infof("start to store peers to persist")
+	// Ensure the directory exists
+	dir := filepath.Dir(config.AppConfig.Tracker.Memory.PersistFile)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		logger.Errorf("failed to create persist directory: %s", err.Error())
+		return
+	}
 	count := atomic.Int64{}
 	wp := workpool.New(writeFileThread)
 	for i, manager := range m.localList {
