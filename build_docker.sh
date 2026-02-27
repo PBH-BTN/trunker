@@ -4,7 +4,7 @@ apt-get install -y clang llvm libbpf-dev
 ln -s /usr/include/aarch64-linux-gnu/asm /usr/include/asm
 go generate biz/services/peer/mux_local/ban/xdp/filter.go
 echo "eBPF generated"
-apt-get remove -y llvm clang
+apt-get remove --autoremove -y llvm clang
 make install_tool && make update_idl
 if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then
   dpkg --add-architecture arm64

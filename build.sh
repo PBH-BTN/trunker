@@ -28,7 +28,7 @@ LDFLAGS=(
   "-X 'main.BuildTimestamp=${BUILD_TIMESTAMP}'"
 )
 if [ "$BUILD_TYPE" != "test" ]; then
-    GOEXPERIMENT=greenteagc CGO_ENABLED=1 go build -trimpath -ldflags="-w -s ${LDFLAGS[*]}" -tags="gc_opt poll_opt re2_cgo" -o output/bin/${RUN_NAME}
+    CGO_ENABLED=1 go build -trimpath -ldflags="-w -s ${LDFLAGS[*]}" -tags="gc_opt poll_opt re2_cgo" -o output/bin/${RUN_NAME}
 else
     go build -trimpath -gcflags="all=-N -l ${LDFLAGS[*]}" -o output/bin/${RUN_NAME}
 fi
