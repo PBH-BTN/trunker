@@ -11,10 +11,10 @@ A high-performance BitTorrent Tracker implemented in Go. Using [Hertz](https://g
 For benchmark, please refer to the [Benchmark](#benchmark) section.
 
 ### Official Instance 
-HTTPS `https://tracker.ghostchu-services.top/announce`  
-WebSocket (for WebTorrent Protocol) `wss://tracker.ghostchu-services.top/announce`  
-UDP `udp://utracker.ghostchu-services.top:6969`
-
+~~HTTPS `https://tracker.ghostchu-services.top/announce`~~
+~~WebSocket (for WebTorrent Protocol) `wss://tracker.ghostchu-services.top/announce`~~
+~~UDP `udp://utracker.ghostchu-services.top:6969`~~
+Since we received a DMCA Takedown from Markscan Inc., the official instance has been shutdown.
 ## How to run
 
 ```bash
